@@ -1,4 +1,3 @@
-bukkit-safespawn-repo
-=====================
+You will need to configure eclipse's environment variable "BUKKIT_LIB" to point to libs/bukkit.jar
 
-Safe spawn tools for Minecraft built on Bukkit
+

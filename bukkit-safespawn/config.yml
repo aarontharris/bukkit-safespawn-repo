@@ -1,0 +1,6 @@
+# default config.yml
+message: Hello World
+rules:
+  - Play nice
+  - Respect others
+  - Have fun

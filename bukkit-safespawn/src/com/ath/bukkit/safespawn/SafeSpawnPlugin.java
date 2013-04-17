@@ -2,7 +2,6 @@ package com.ath.bukkit.safespawn;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,10 +9,12 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -23,11 +24,12 @@ import com.ath.bukkit.safespawn.cmd.SpawnCmd;
 import com.ath.bukkit.safespawn.data.PlayerDao;
 import com.ath.bukkit.safespawn.event.BlockEventHandler;
 import com.ath.bukkit.safespawn.event.PlayerJoinLeaveHandler;
+import com.ath.bukkit.safespawn.event.ZoneEventHandler;
 
 public class SafeSpawnPlugin extends JavaPlugin {
 
-	private Logger logger;
-	private Set<Zone> zones;
+	public static Logger logger;
+	private ZoneManager zoneManager;
 	private Map<String, Player> playerCache;
 	private Location spawnLocation;
 	private PlayerDao dao;
@@ -37,6 +39,7 @@ public class SafeSpawnPlugin extends JavaPlugin {
 		super.onLoad();
 		logger = getLogger();
 		dao = new PlayerDao( this );
+		zoneManager = new ZoneManager( this );
 	}
 
 	@Override
@@ -57,7 +60,8 @@ public class SafeSpawnPlugin extends JavaPlugin {
 		// FIXME: if this fails, the plugin is useless
 		// the plugin should shut its services down
 		// maybe just disable the server?
-		zones = Zone.fromConfig( this );
+		getZoneManager().initializeFromConfig();
+		getZoneManager().logAllZones();
 
 		try {
 			ConfigurationSection spawnpoint = getConfig().getConfigurationSection( Const.CFG_spawnpoint );
@@ -73,7 +77,14 @@ public class SafeSpawnPlugin extends JavaPlugin {
 	}
 
 	private void initializeEvents() {
+		Event e;
+
 		getServer().getPluginManager().registerEvents( new Listener() {
+			@EventHandler
+			public void creatureSpawn( CreatureSpawnEvent event ) {
+				ZoneEventHandler.onCreatureSpawnEvent( SafeSpawnPlugin.this, event );
+			}
+
 			@EventHandler
 			public void playerJoin( PlayerJoinEvent event ) {
 				PlayerJoinLeaveHandler.onPlayerJoin( SafeSpawnPlugin.this, event );
@@ -131,18 +142,32 @@ public class SafeSpawnPlugin extends JavaPlugin {
 		return dao;
 	}
 
-	public Set<Zone> getZones() {
-		return zones;
-	}
-
 	public Location getSpawnLocation() {
 		return spawnLocation;
 	}
 
-	public void logError( Exception e ) {
+	public ZoneManager getZoneManager() {
+		return zoneManager;
+	}
+
+	public static void logError( Exception e ) {
 		logger.log( Level.SEVERE, e.getMessage() );
 		for ( StackTraceElement el : e.getStackTrace() ) {
 			logger.log( Level.SEVERE, el.getFileName() + ":" + el.getLineNumber() );
+		}
+	}
+
+	public static void logLine() {
+		logLine( null );
+	}
+
+	public static void logLine( String msg ) {
+		Throwable t = new Throwable();
+		StackTraceElement el = t.getStackTrace()[1];
+		if ( msg == null || msg.isEmpty() ) {
+			logger.info( String.format( "%s: %s", el.getFileName(), el.getLineNumber() ) );
+		} else {
+			logger.info( String.format( "%s: %s: %s", msg, el.getFileName(), el.getLineNumber() ) );
 		}
 	}
 }

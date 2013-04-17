@@ -7,6 +7,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.ath.bukkit.safespawn.Const;
+import com.ath.bukkit.safespawn.Functions;
 import com.ath.bukkit.safespawn.SafeSpawnPlugin;
 import com.ath.bukkit.safespawn.data.PlayerDao;
 import com.ath.bukkit.safespawn.data.PlayerData;
@@ -18,6 +19,7 @@ public class PlayerJoinLeaveHandler {
 		plugin.cachePlayer( player );
 		player.sendMessage( plugin.getConfig().getString( Const.MSG_welcome_message ) );
 
+		// configure first time user data
 		try {
 			PlayerDao dao = plugin.getPlayerDao();
 			PlayerData data = dao.readPlayerData( player );
@@ -31,6 +33,12 @@ public class PlayerJoinLeaveHandler {
 			dao.writePlayerData( data, player );
 		} catch ( Exception e ) {
 			plugin.logError( e );
+		}
+		
+		// Teleport first time users to spawn area
+		{
+			player.setBedSpawnLocation( plugin.getSpawnLocation().clone() );
+			Functions.teleport( plugin, player, plugin.getSpawnLocation() );
 		}
 	}
 

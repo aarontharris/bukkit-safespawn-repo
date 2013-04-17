@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.entity.Player;
 
 public class Zone {
 	private static final String ZONEKEY_description = "description";
@@ -23,10 +23,23 @@ public class Zone {
 
 
 	public static enum ZoneExclude {
-		BLOCK_BREAK, BLOCK_PLACE
+		BLOCK_BREAK( Const.PERM_blockbreak ), BLOCK_PLACE( Const.PERM_blockplace );
+
+		private String permission;
+
+		private ZoneExclude( String permission ) {
+			this.permission = permission;
+		}
+
+		public boolean hasPermission( Player player, Zone zone ) {
+			if ( player.isPermissionSet( permission ) || player.isPermissionSet( permission + "." + zone.getName() ) ) {
+				return true;
+			}
+			return false;
+		}
 	}
 
-	public static Set<Zone> fromConfig( JavaPlugin plugin ) {
+	public static Set<Zone> fromConfig( SafeSpawnPlugin plugin ) {
 		Set<Zone> out = new HashSet<Zone>();
 
 		ConfigurationSection section = plugin.getConfig().getConfigurationSection( "zones" );
@@ -50,19 +63,14 @@ public class Zone {
 				// radius
 				zone.setRadius( zoneCfg.getInt( ZONEKEY_radius ) );
 
-				// world
+				// location
 				{
 					String worldName = zoneCfg.getString( ZONEKEY_world );
 					World world = plugin.getServer().getWorld( worldName );
-					zone.setWorld( world );
-				}
-
-				// location
-				{
 					int x = zoneCfg.getInt( ZONEKEY_x );
 					int y = zoneCfg.getInt( ZONEKEY_y );
 					int z = zoneCfg.getInt( ZONEKEY_z );
-					Location location = new Location( zone.getWorld(), x, y, z );
+					Location location = new Location( world, x, y, z );
 					zone.setLocation( location );
 				}
 
@@ -94,22 +102,16 @@ public class Zone {
 	private String description;
 	private Set<ZoneExclude> exclude;
 	private int radius;
-	private World world;
 	private Location location;
 
 	public Zone() {
 	}
 
-	public boolean isTouching( Location l ) {
-		if ( l != null ) {
-			if ( this.getWorld() == l.getWorld() ) {
-				double dist = getLocation().distance( l );
-				if ( dist <= getRadius() ) {
-					return true;
-				}
-			}
+	public boolean caresAbout( Location l, ZoneExclude ex ) {
+		if ( !hasExclude( ex ) ) {
+			return false;
 		}
-		return false;
+		return Functions.insideZone( this, l );
 	}
 
 	@Override
@@ -118,10 +120,10 @@ public class Zone {
 		sb.append( "name: " ).append( "\"" ).append( getName() ).append( "\"" ).append( ", " );
 		sb.append( "description: " ).append( "\"" ).append( getDescription() ).append( "\"" ).append( ", " );
 		sb.append( "radius: " ).append( "\"" ).append( getRadius() ).append( "\"" ).append( ", " );
-		if ( getWorld() != null ) {
-			sb.append( "world: " ).append( "\"" ).append( getWorld().getName() ).append( "\"" ).append( ", " );
-		}
 		if ( getLocation() != null ) {
+			if ( getLocation().getWorld() != null ) {
+				sb.append( "world: " ).append( "\"" ).append( getLocation().getWorld().getName() ).append( "\"" ).append( ", " );
+			}
 			Location l = getLocation();
 			sb.append( "location: " ).append( "\"" ).append( l.getX() + ", " + l.getY() + ", " + l.getZ() ).append( "\"" ).append( ", " );
 		}
@@ -156,14 +158,6 @@ public class Zone {
 
 	public void setRadius( int radius ) {
 		this.radius = radius;
-	}
-
-	public World getWorld() {
-		return world;
-	}
-
-	public void setWorld( World world ) {
-		this.world = world;
 	}
 
 	public Location getLocation() {

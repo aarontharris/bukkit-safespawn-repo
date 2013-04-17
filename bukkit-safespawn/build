@@ -1,0 +1,11 @@
+#!/bin/bash
+
+jarname=SafeSpawn-0.1b.jar
+
+cp config.yml ./bin
+cp plugin.yml ./bin
+cd ./bin
+rm $jarname
+jar cf $jarname config.yml plugin.yml com
+rm config.yml plugin.yml
+push_bukkit $jarname

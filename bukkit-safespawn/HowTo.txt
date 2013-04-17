@@ -1,0 +1,59 @@
+# Coming soon:
+# safespawn.night_terror // PVP enabled after sun down.
+# safespawn.vampirism // if you are infected, sunlight hurts your skin for 3 minecraft days, contact with others can spread infection. 
+# safespawn.plague // if you are infected, you slowly drain life for 3 minecraft days, contact with others can spread infection.
+# 
+# Ideas:
+# - ability to heal plague or vampirism?
+# - add things to gain experience faster, maybe a well?
+# - add things you can do with experience aka magic?
+#
+
+
+### General commands
+# /rules is disallowed by default and can be allowed with:
+safespawn.rules
+# /gamedesc is disallowed by default and can be allowed with:
+safespawn.gamedesc
+
+### Zoning
+#
+# You may define zones like this
+zones:
+  zone0:
+    description: Test zone 0
+    exclude:
+      - BLOCK_BREAK
+      - BLOCK_PLACE
+    radius: 20
+    world: world
+    x: -186 
+    y: 70
+    z: 257 
+  zone1:
+    description: Test zone 1
+    exclude:
+      - BLOCK_BREAK
+      - BLOCK_PLACE
+    radius: 20
+    world: world
+    x: -286 
+    y: 70
+    z: 257 
+
+# The above zones will disallow all from breaking or placing blocks
+# unless they have one of the following permissions.
+
+# These permissions allow for all zones
+safespawn.block_place
+safespawn.block_break
+
+# These permissions allow for only zone0
+safespawn.block_place.zone0
+safespawn.block_break.zone0
+
+# These permissions allow for only zone1
+safespawn.block_place.zone1
+safespawn.block_break.zone1
+
+

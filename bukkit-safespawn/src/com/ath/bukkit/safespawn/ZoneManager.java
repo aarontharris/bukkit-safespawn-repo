@@ -26,7 +26,7 @@ public class ZoneManager {
 
 	public void logAllZones() {
 		for ( Zone z : allZones ) {
-			plugin.logLine( "logAllZones - zone: " + z.getName() );
+			SafeSpawnPlugin.logLine( "logAllZones - zone: " + z.getName() );
 		}
 	}
 

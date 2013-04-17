@@ -25,6 +25,7 @@ zones:
     exclude:
       - BLOCK_BREAK
       - BLOCK_PLACE
+      - PLAYER_DMG_FROM_ENTITY
     radius: 20
     world: world
     x: -186 

@@ -19,11 +19,14 @@ public class Zone {
 	private static final String ZONEKEY_x = "x";
 	private static final String ZONEKEY_y = "y";
 	private static final String ZONEKEY_z = "z";
+	private static final String ZONEKEY_playerTakesDamage = "playerTakesDamage";
 
 
 
 	public static enum ZoneExclude {
-		BLOCK_BREAK( Const.PERM_blockbreak ), BLOCK_PLACE( Const.PERM_blockplace );
+		BLOCK_BREAK( Const.PERM_blockbreak ),
+		BLOCK_PLACE( Const.PERM_blockplace ),
+		PLAYER_DMG_FROM_ENTITY( Const.PERM_player_dmg_from_entity );
 
 		private String permission;
 
@@ -62,6 +65,8 @@ public class Zone {
 
 				// radius
 				zone.setRadius( zoneCfg.getInt( ZONEKEY_radius ) );
+
+				zone.setPlayerTakesDamage( zoneCfg.getBoolean( ZONEKEY_playerTakesDamage ) );
 
 				// location
 				{
@@ -103,6 +108,7 @@ public class Zone {
 	private Set<ZoneExclude> exclude;
 	private int radius;
 	private Location location;
+	private boolean playerTakesDamage;
 
 	public Zone() {
 	}
@@ -182,6 +188,14 @@ public class Zone {
 
 	public void setDescription( String description ) {
 		this.description = description;
+	}
+
+	public boolean isPlayerTakesDamageEnabled() {
+		return playerTakesDamage;
+	}
+
+	public void setPlayerTakesDamage( boolean playerTakesDamage ) {
+		this.playerTakesDamage = playerTakesDamage;
 	}
 
 }

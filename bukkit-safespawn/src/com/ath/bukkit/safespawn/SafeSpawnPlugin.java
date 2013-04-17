@@ -1,20 +1,17 @@
 package com.ath.bukkit.safespawn;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -23,14 +20,14 @@ import com.ath.bukkit.safespawn.cmd.LinesReaderCmd;
 import com.ath.bukkit.safespawn.cmd.SpawnCmd;
 import com.ath.bukkit.safespawn.data.PlayerDao;
 import com.ath.bukkit.safespawn.event.BlockEventHandler;
-import com.ath.bukkit.safespawn.event.PlayerJoinLeaveHandler;
+import com.ath.bukkit.safespawn.event.PlayerEventHandler;
 import com.ath.bukkit.safespawn.event.ZoneEventHandler;
 
 public class SafeSpawnPlugin extends JavaPlugin {
 
 	public static Logger logger;
 	private ZoneManager zoneManager;
-	private Map<String, Player> playerCache;
+	private PlayerManager playerManager;
 	private Location spawnLocation;
 	private PlayerDao dao;
 
@@ -40,6 +37,7 @@ public class SafeSpawnPlugin extends JavaPlugin {
 		logger = getLogger();
 		dao = new PlayerDao( this );
 		zoneManager = new ZoneManager( this );
+		playerManager = new PlayerManager( this );
 	}
 
 	@Override
@@ -48,7 +46,7 @@ public class SafeSpawnPlugin extends JavaPlugin {
 			initializeConfig();
 			initializeEvents();
 			initializeCommands();
-			initializePlayerCache();
+			playerManager.initialize();
 		} catch ( Exception e ) {
 			logger.log( Level.SEVERE, e.getMessage(), e );
 		}
@@ -77,8 +75,6 @@ public class SafeSpawnPlugin extends JavaPlugin {
 	}
 
 	private void initializeEvents() {
-		Event e;
-
 		getServer().getPluginManager().registerEvents( new Listener() {
 			@EventHandler
 			public void creatureSpawn( CreatureSpawnEvent event ) {
@@ -86,13 +82,18 @@ public class SafeSpawnPlugin extends JavaPlugin {
 			}
 
 			@EventHandler
+			public void entityDamagedByEntity( EntityDamageByEntityEvent event ) {
+				PlayerEventHandler.onEntityDamagedByEntity( SafeSpawnPlugin.this, event );
+			}
+
+			@EventHandler
 			public void playerJoin( PlayerJoinEvent event ) {
-				PlayerJoinLeaveHandler.onPlayerJoin( SafeSpawnPlugin.this, event );
+				PlayerEventHandler.onPlayerJoin( SafeSpawnPlugin.this, event );
 			}
 
 			@EventHandler
 			public void playerLeave( PlayerQuitEvent event ) {
-				PlayerJoinLeaveHandler.onPlayerLeave( SafeSpawnPlugin.this, event );
+				PlayerEventHandler.onPlayerLeave( SafeSpawnPlugin.this, event );
 			}
 
 			@EventHandler
@@ -111,31 +112,6 @@ public class SafeSpawnPlugin extends JavaPlugin {
 		getCommand( Const.CMD_rules ).setExecutor( new LinesReaderCmd( this, Const.MSG_rules ) );
 		getCommand( Const.CMD_gamedesc ).setExecutor( new LinesReaderCmd( this, Const.MSG_gamedesc ) );
 		getCommand( Const.CMD_spawn ).setExecutor( new SpawnCmd( this ) );
-	}
-
-	private void initializePlayerCache() {
-		playerCache = new HashMap<String, Player>();
-		for ( World world : getServer().getWorlds() ) {
-			for ( Player player : world.getPlayers() ) {
-				playerCache.put( player.getName(), player );
-			}
-		}
-	}
-
-	public Player getActivePlayerByName( String name ) {
-		return playerCache.get( name );
-	}
-
-	public void cachePlayer( Player player ) {
-		if ( player != null ) {
-			playerCache.put( player.getName(), player );
-		}
-	}
-
-	public void removePlayerFromCache( Player player ) {
-		if ( player != null ) {
-			playerCache.remove( player.getName() );
-		}
 	}
 
 	public PlayerDao getPlayerDao() {
@@ -169,5 +145,9 @@ public class SafeSpawnPlugin extends JavaPlugin {
 		} else {
 			logger.info( String.format( "%s: %s: %s", msg, el.getFileName(), el.getLineNumber() ) );
 		}
+	}
+
+	public PlayerManager getPlayerManager() {
+		return playerManager;
 	}
 }

@@ -18,7 +18,7 @@ public class SpawnCmd implements CommandExecutor {
 
 	@Override
 	public boolean onCommand( CommandSender sender, Command cmd, String label, String[] args ) {
-		Player player = plugin.getActivePlayerByName( sender.getName() );
+		Player player = plugin.getPlayerManager().getActivePlayerByName( sender.getName() );
 		if ( player != null ) {
 			Functions.teleport( plugin, player, plugin.getSpawnLocation() );
 			return true;

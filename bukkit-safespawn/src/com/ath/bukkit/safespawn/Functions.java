@@ -59,7 +59,7 @@ public class Functions {
 				player.teleport( teleport );
 			}
 		} catch ( Exception e ) {
-			plugin.logError( e );
+			SafeSpawnPlugin.logError( e );
 		}
 	}
 

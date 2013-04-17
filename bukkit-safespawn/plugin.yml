@@ -4,5 +4,15 @@ version: 0.1 Beta
 author: angryBits
 description: My own special blend of tools for running a minecraft server
 commands:
+  gamedesc:
+    description: How the server is configured
+    permission: safespawn.gamedesc
+    permission-message: You don't have permission
   rules:
     description: Rules for the server
+    permission: safespawn.rules
+    permission-message: You don't have permission
+  spawn:
+    description: Return to the spawn area.
+    permission: safespawn.spawn
+    permission-message: You don't have permission

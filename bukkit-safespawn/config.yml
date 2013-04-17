@@ -1,6 +1,31 @@
 # default config.yml
-message: Hello World
+welcome_message: Please read and obey the /rules
+spawnradius: 5
+spawnpoint:
+  world: world
+  x: -186
+  y: 70
+  z: 257
+gamedesc:
+  - Im experimenting with my own plugins so I apologize for instability.
+  - GameMode = Survival, unless youre helping the Op with something.
+  - PVP = false, however Im working enabling it upon request.
+  - Hardcore = false
+  - Difficulty = normal
 rules:
-  - Play nice
-  - Respect others
-  - Have fun
+  - Dont ask to change the server or game config, its just the way I like it. 
+  - Dont push others into lava.
+  - Dont mess up the spawn area.
+  - Id prefer you re-plant trees you chop down.
+  - Obey the rules.
+zones:
+  zone0:
+    description: Test zone
+    exclude:
+      - BLOCK_BREAK
+      - BLOCK_PLACE
+    radius: 20
+    world: world
+    x: -186 
+    y: 70
+    z: 257 

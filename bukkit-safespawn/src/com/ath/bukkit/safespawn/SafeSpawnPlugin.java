@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,9 +18,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.ath.bukkit.safespawn.Zone.ZoneExclude;
 import com.ath.bukkit.safespawn.cmd.LinesReaderCmd;
 import com.ath.bukkit.safespawn.cmd.SpawnCmd;
+import com.ath.bukkit.safespawn.data.PlayerDao;
+import com.ath.bukkit.safespawn.event.BlockEventHandler;
+import com.ath.bukkit.safespawn.event.PlayerJoinLeaveHandler;
 
 public class SafeSpawnPlugin extends JavaPlugin {
 
@@ -29,11 +30,13 @@ public class SafeSpawnPlugin extends JavaPlugin {
 	private Set<Zone> zones;
 	private Map<String, Player> playerCache;
 	private Location spawnLocation;
+	private PlayerDao dao;
 
 	@Override
 	public void onLoad() {
 		super.onLoad();
 		logger = getLogger();
+		dao = new PlayerDao( this );
 	}
 
 	@Override
@@ -51,13 +54,9 @@ public class SafeSpawnPlugin extends JavaPlugin {
 	private void initializeConfig() {
 		this.saveDefaultConfig(); // this does not overwrite if config.yml already exists, bad naming...
 
-		// List<World> worlds = getServer().getWorlds();
-		// if ( worlds != null ) {
-		// for ( World w : worlds ) {
-		// logger.info( String.format( "World %s=%s", w.getName(), w.getUID() ) );
-		// }
-		// }
-
+		// FIXME: if this fails, the plugin is useless
+		// the plugin should shut its services down
+		// maybe just disable the server?
 		zones = Zone.fromConfig( this );
 
 		try {
@@ -77,54 +76,22 @@ public class SafeSpawnPlugin extends JavaPlugin {
 		getServer().getPluginManager().registerEvents( new Listener() {
 			@EventHandler
 			public void playerJoin( PlayerJoinEvent event ) {
-				Player player = event.getPlayer();
-				playerCache.put( player.getName(), player );
-				player.sendMessage( getConfig().getString( Const.MSG_welcome_message ) );
+				PlayerJoinLeaveHandler.onPlayerJoin( SafeSpawnPlugin.this, event );
 			}
 
 			@EventHandler
 			public void playerLeave( PlayerQuitEvent event ) {
-				// TODO: make sure when a player is banned or kicked that it still calls the PlayerQuitEvent
-				Player player = event.getPlayer();
-				playerCache.remove( player );
+				PlayerJoinLeaveHandler.onPlayerLeave( SafeSpawnPlugin.this, event );
 			}
 
 			@EventHandler
 			public void blockBreakEvent( BlockBreakEvent event ) {
-				for ( Zone zone : zones ) {
-					Block block = event.getBlock();
-					Player player = event.getPlayer();
-					if ( zone.isTouching( block.getLocation() ) && zone.hasExclude( ZoneExclude.BLOCK_BREAK ) ) {
-						if ( !player.isPermissionSet( Const.PERM_blockbreak ) && !player.isPermissionSet( Const.PERM_blockbreak + "." + zone.getName() ) ) {
-							event.setCancelled( true );
-							Location l = zone.getLocation();
-							player.sendMessage( "Zone: " + zone.getName() + ", Radius: " + zone.getRadius() + " @ " + l.getX() + ", " + l.getY() + ", " + l.getZ() );
-							player.sendMessage( "This is a no block breaking zone" );
-						}
-					}
-				}
+				BlockEventHandler.onBlockBreakEvent( SafeSpawnPlugin.this, event );
 			}
 
 			@EventHandler
 			public void blockPlaceEvent( BlockPlaceEvent event ) {
-				// TODO: ATH-P3 -- make me more efficient
-				// P3 because there are unlikely to be many zones as long as they are only created within the config.yml
-				// - - if I allow others to create zones within the game, then we really need to bump up the priority.
-				// I should be able to hash down to a narrow list of zones based on a world or even a chunk?
-				// maybe only get zones that care about the event:
-				// - - EX: onBlockPlaceEvent, only get zones that exclude the BlockPlaceEvent
-				for ( Zone zone : zones ) {
-					Block block = event.getBlock();
-					Player player = event.getPlayer();
-					if ( zone.isTouching( block.getLocation() ) && zone.hasExclude( ZoneExclude.BLOCK_PLACE ) ) {
-						if ( !player.isPermissionSet( Const.PERM_blockplace ) && !player.isPermissionSet( Const.PERM_blockplace + "." + zone.getName() ) ) {
-							event.setCancelled( true );
-							Location l = zone.getLocation();
-							player.sendMessage( "Zone: " + zone.getName() + ", Radius: " + zone.getRadius() + " @ " + l.getX() + ", " + l.getY() + ", " + l.getZ() );
-							player.sendMessage( "This is a no block placement protected zone" );
-						}
-					}
-				}
+				BlockEventHandler.onBlockPlaceEvent( SafeSpawnPlugin.this, event );
 			}
 		}, this );
 	}
@@ -145,13 +112,37 @@ public class SafeSpawnPlugin extends JavaPlugin {
 	}
 
 	public Player getActivePlayerByName( String name ) {
-		if ( playerCache != null ) {
-			return playerCache.get( name );
+		return playerCache.get( name );
+	}
+
+	public void cachePlayer( Player player ) {
+		if ( player != null ) {
+			playerCache.put( player.getName(), player );
 		}
-		return null;
+	}
+
+	public void removePlayerFromCache( Player player ) {
+		if ( player != null ) {
+			playerCache.remove( player.getName() );
+		}
+	}
+
+	public PlayerDao getPlayerDao() {
+		return dao;
+	}
+
+	public Set<Zone> getZones() {
+		return zones;
 	}
 
 	public Location getSpawnLocation() {
 		return spawnLocation;
+	}
+
+	public void logError( Exception e ) {
+		logger.log( Level.SEVERE, e.getMessage() );
+		for ( StackTraceElement el : e.getStackTrace() ) {
+			logger.log( Level.SEVERE, el.getFileName() + ":" + el.getLineNumber() );
+		}
 	}
 }

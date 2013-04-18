@@ -1,6 +1,8 @@
 package com.ath.bukkit.safespawn;
 
 public final class Const {
+	
+	public static final String MW_empty = "non";
 
 	public static final String PERM_blockbreak = "safespawn.block_break";
 	public static final String PERM_blockplace = "safespawn.block_place";

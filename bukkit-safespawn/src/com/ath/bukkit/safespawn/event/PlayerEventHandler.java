@@ -88,7 +88,7 @@ public class PlayerEventHandler {
 				if ( state instanceof Sign ) {
 					MagicSign sign = SignReader.readSign( (Sign) state );
 					SafeSpawnPlugin.logLine( "onPlayerInteractEvent - left - sign is " + sign );
-					if ( sign.evokeSign( (Sign) state, event ) ) {
+					if ( sign.activateSign( (Sign) state, event ) ) {
 						// TODO: send a message?
 					}
 				}

@@ -6,14 +6,17 @@ import org.bukkit.block.Sign;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.ath.bukkit.safespawn.Const;
 import com.ath.bukkit.safespawn.Functions;
 import com.ath.bukkit.safespawn.SafeSpawnPlugin;
 
 
-// teles:352:oh
-// 31
-// 41
-// 14D
+// teles:352:oh  // command : itemInHand : world
+//        31     //            hex of x
+//        41     //            hex of y
+//       14D     //            hex of z
+//
+// itemInHand is the materialId, but can be "non" for empty or in this case, its ignored
 public class TeleporterSign extends MagicSign {
 
 	private int materialInHandId;
@@ -24,7 +27,7 @@ public class TeleporterSign extends MagicSign {
 	private int z;
 
 	@Override
-	public boolean evokeSign( Sign sign, PlayerInteractEvent event ) {
+	public boolean activateSign( Sign sign, PlayerInteractEvent event ) {
 		try {
 			ItemStack itemStack = event.getPlayer().getItemInHand();
 			if ( itemStack != null ) {
@@ -32,11 +35,15 @@ public class TeleporterSign extends MagicSign {
 
 				// line 1
 				String line1 = sign.getLine( 0 );
-				String l1Parts[] = line1.split( ":" );
+				String l1Parts[] = line1.split( " " );
 				// skip part[0], its the type and we already know it
-				requiredMaterialId = Integer.parseInt( l1Parts[1] );
-				if ( materialInHandId != requiredMaterialId )
-					return false;
+				if ( l1Parts[1].equals( Const.MW_empty ) ) {
+					// ignore the material requirements
+				} else {
+					requiredMaterialId = Integer.parseInt( l1Parts[1] );
+					if ( materialInHandId != requiredMaterialId )
+						return false;
+				}
 				String worldWord = l1Parts[2];
 				worldName = SafeSpawnPlugin.instance().getWorldsManager().findByMagic( worldWord );
 				if ( worldName == null )

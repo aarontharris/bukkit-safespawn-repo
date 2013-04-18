@@ -18,7 +18,7 @@ public class MagicSign {
 	}
 
 	/** return true if sign was activated */
-	public boolean evokeSign( Sign sign, PlayerInteractEvent event ) {
+	public boolean activateSign( Sign sign, PlayerInteractEvent event ) {
 		return false;
 	}
 

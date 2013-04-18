@@ -7,6 +7,7 @@
 # - ability to heal plague or vampirism?
 # - add things to gain experience faster, maybe a well?
 # - add things you can do with experience aka magic?
+# - an altar - when buttons are pressed in a specific order and the user has enough xp, an object is produced - maybe a monster egg?
 #
 
 

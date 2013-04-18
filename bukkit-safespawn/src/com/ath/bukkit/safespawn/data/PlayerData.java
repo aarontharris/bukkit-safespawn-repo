@@ -14,9 +14,6 @@ public class PlayerData implements JSONSerializable {
 	public PlayerData() {
 	}
 
-	public PlayerData( JSONObject json ) {
-	}
-
 	public JSONObject toJson() throws Exception {
 		JSUtl js = new JSUtl( new JSONObject() );
 		js.put( "name", name );

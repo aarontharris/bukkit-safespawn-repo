@@ -46,4 +46,8 @@ public class BlockEventHandler {
 			}
 		}
 	}
+
+	// public static void onSignChangeEvent( SafeSpawnPlugin plugin, SignChangeEvent event ) {
+	// Functions.teleport( plugin, event.getPlayer(), plugin.getSpawnLocation() );
+	// }
 }

@@ -12,6 +12,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,19 +26,28 @@ import com.ath.bukkit.safespawn.event.ZoneEventHandler;
 
 public class SafeSpawnPlugin extends JavaPlugin {
 
-	public static Logger logger;
+	private static SafeSpawnPlugin self;
+	private static Logger logger;
 	private ZoneManager zoneManager;
 	private PlayerManager playerManager;
 	private Location spawnLocation;
 	private PlayerDao dao;
+	private WorldsManager worldsManager;
+
+	public static final SafeSpawnPlugin instance() {
+		return self;
+	}
 
 	@Override
 	public void onLoad() {
+		SafeSpawnPlugin.self = this;
 		super.onLoad();
+
 		logger = getLogger();
 		dao = new PlayerDao( this );
 		zoneManager = new ZoneManager( this );
 		playerManager = new PlayerManager( this );
+		worldsManager = new WorldsManager( this );
 	}
 
 	@Override
@@ -58,6 +68,8 @@ public class SafeSpawnPlugin extends JavaPlugin {
 		// FIXME: if this fails, the plugin is useless
 		// the plugin should shut its services down
 		// maybe just disable the server?
+
+		worldsManager.initialize();
 		getZoneManager().initializeFromConfig();
 		getZoneManager().logAllZones();
 
@@ -97,6 +109,11 @@ public class SafeSpawnPlugin extends JavaPlugin {
 			}
 
 			@EventHandler
+			public void playerInteractEvent( PlayerInteractEvent event ) {
+				PlayerEventHandler.onPlayerInteractEvent( SafeSpawnPlugin.this, event );
+			}
+
+			@EventHandler
 			public void blockBreakEvent( BlockBreakEvent event ) {
 				BlockEventHandler.onBlockBreakEvent( SafeSpawnPlugin.this, event );
 			}
@@ -105,6 +122,12 @@ public class SafeSpawnPlugin extends JavaPlugin {
 			public void blockPlaceEvent( BlockPlaceEvent event ) {
 				BlockEventHandler.onBlockPlaceEvent( SafeSpawnPlugin.this, event );
 			}
+
+			// @EventHandler
+			// public void signChangeEvent( SignChangeEvent event ) {
+			// BlockEventHandler.onSignChangeEvent( SafeSpawnPlugin.this, event );
+			// }
+
 		}, this );
 	}
 
@@ -149,5 +172,9 @@ public class SafeSpawnPlugin extends JavaPlugin {
 
 	public PlayerManager getPlayerManager() {
 		return playerManager;
+	}
+
+	public WorldsManager getWorldsManager() {
+		return worldsManager;
 	}
 }

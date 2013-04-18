@@ -1,12 +1,22 @@
 # default config.yml
 # zone.radius has a max of 200
 welcome_message: Please read and obey the /rules
+worlds:
+  world:
+    name: world
+    magic: oh
+  world_nether:
+    name: world_nether
+    magic: ne
+  world_the_end:
+    name: world_the_end
+    magic: de
 spawnradius: 5
 spawnpoint:
   world: world
-  x: -186
-  y: 70
-  z: 257
+  x: 50
+  y: 65
+  z: 330 
 gamedesc:
   - Im experimenting with my own plugins so I apologize for instability.
   - GameMode = Survival, unless youre helping the Op with something.
@@ -26,8 +36,8 @@ zones:
       - BLOCK_BREAK
       - BLOCK_PLACE
       - PLAYER_DMG_FROM_ENTITY
-    radius: 20
+    radius: 100 
     world: world
-    x: -186 
-    y: 70
-    z: 257 
+    x: 50
+    y: 65
+    z: 330 

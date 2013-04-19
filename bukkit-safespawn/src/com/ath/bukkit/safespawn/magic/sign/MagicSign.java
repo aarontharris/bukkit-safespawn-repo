@@ -1,13 +1,13 @@
-package com.ath.bukkit.safespawn.data.magicsign;
+package com.ath.bukkit.safespawn.magic.sign;
 
 import org.bukkit.block.Sign;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-public class ShrineSign extends MagicSign {
+public class MagicSign {
 
-	@Override
+	/** return true if sign was activated */
 	public boolean activateSign( Sign sign, PlayerInteractEvent event ) {
-		return super.activateSign( sign, event );
+		return false;
 	}
 
 }

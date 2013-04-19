@@ -1,4 +1,4 @@
-package com.ath.bukkit.safespawn.data.magicsign;
+package com.ath.bukkit.safespawn.magic.sign;
 
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import com.ath.bukkit.safespawn.Const;
 import com.ath.bukkit.safespawn.Functions;
 import com.ath.bukkit.safespawn.SafeSpawnPlugin;
+import com.ath.bukkit.safespawn.magic.MagicWords;
 
 
 // teles:352:oh  // command : itemInHand : world
@@ -35,7 +36,7 @@ public class TeleporterSign extends MagicSign {
 
 				// line 1
 				String line1 = sign.getLine( 0 );
-				String l1Parts[] = line1.split( " " );
+				String l1Parts[] = line1.split( Const.MW_separator );
 				// skip part[0], its the type and we already know it
 				if ( l1Parts[1].equals( Const.MW_empty ) ) {
 					// ignore the material requirements
@@ -54,13 +55,13 @@ public class TeleporterSign extends MagicSign {
 
 				// line 2
 				String line2 = sign.getLine( 1 );
-				x = decodeCoordinate( line2 );
+				x = MagicWords.readCoordinateFromLine( line2 );
 
 				String line3 = sign.getLine( 2 );
-				y = decodeCoordinate( line3 );
+				y = MagicWords.readCoordinateFromLine( line3 );
 
 				String line4 = sign.getLine( 3 );
-				z = decodeCoordinate( line4 );
+				z = MagicWords.readCoordinateFromLine( line4 );
 
 				if ( world != null ) {
 					Location location = new Location( world, x, y, z );
@@ -74,11 +75,4 @@ public class TeleporterSign extends MagicSign {
 		return false;
 	}
 
-	private int decodeCoordinate( String line ) {
-		if ( line.startsWith( "-" ) ) {
-			return -Integer.decode( "0x" + line.substring( 1 ) );
-		} else {
-			return Integer.decode( "0x" + line );
-		}
-	}
 }

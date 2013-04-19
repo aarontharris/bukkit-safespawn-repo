@@ -2,6 +2,8 @@ package com.ath.bukkit.safespawn;
 
 public final class Const {
 	
+	public static final String MW_separator = " ";
+	
 	public static final String MW_empty = "non";
 
 	public static final String PERM_blockbreak = "safespawn.block_break";
@@ -21,10 +23,6 @@ public final class Const {
 
 	public static final String CFG_spawn = "spawn";
 	public static final String CFG_spawnpoint = "spawnpoint";
-	public static final String CFG_spawnpoint_world = "world";
-	public static final String CFG_spawnpoint_x = "x";
-	public static final String CFG_spawnpoint_y = "y";
-	public static final String CFG_spawnpoint_z = "z";
 
 	public static final String CMD_spawn = "spawn";
 

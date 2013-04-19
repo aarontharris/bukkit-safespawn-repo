@@ -8,6 +8,9 @@
 # - add things to gain experience faster, maybe a well?
 # - add things you can do with experience aka magic?
 # - an altar - when buttons are pressed in a specific order and the user has enough xp, an object is produced - maybe a monster egg?
+# - an altar - "Sticks" and "Stones" may break my "Bones" but words will never hurt me.
+# - - if you put 2 or more sticks, 2 or more stone blocks and 2 or more bones into a container
+# - - you get a surprise!
 #
 
 

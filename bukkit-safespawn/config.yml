@@ -1,6 +1,6 @@
 # default config.yml
 # zone.radius has a max of 200
-welcome_message: Please read and obey the /rules
+welcome_message: Welcome to Zulu, please read /gamedesc and the /rules thanks.
 worlds:
   world:
     name: world
@@ -11,27 +11,29 @@ worlds:
   world_the_end:
     name: world_the_end
     magic: de
-spawnradius: 5
 spawnpoint:
   world: world
   x: 50
   y: 65
   z: 330 
 gamedesc:
-  - Im experimenting with my own plugins so I apologize for instability.
-  - GameMode = Survival, unless youre helping the Op with something.
-  - PVP = false, however Im working enabling it upon request.
-  - Hardcore = false
-  - Difficulty = normal
+  - Welcome to Zulu -
+  - I started this server after getting in a motorcycle accident and got bored laying in bed.  When they wheeled me into the ER they didnt know my name so they gave me a temporary name of Zulu so it seemed fitting.
+  - This may appear to be plain old vanilla server but it isnt.
+  - I am a software engineer and in my boredom I have written my own plugin for this world with many mysterious and awesome magic tricks for you to discover.
+  - The spawn area you have started in is in a protection bubble 200 wide.  You cant move blocks and monsters cant hurt you here.
+  - GameMode is Survival
+  - PVP is off, but will soon turn on at night.
+  - Hardcore is off, if you die you return to spawn.
+  - Difficulty = normal.
+  - Enjoy the world, and new features are coming.
 rules:
-  - Dont ask to change the server or game config, its just the way I like it. 
-  - Dont push others into lava.
-  - Dont mess up the spawn area.
-  - Id prefer you re-plant trees you chop down.
-  - Obey the rules.
+  - 1. Dont be a dick.
+  - 2. Dont ask to change the server settings.
+  - 3. Obey the rules.
 zones:
   zone0:
-    description: Test zone
+    description: Iron Spawn 
     exclude:
       - BLOCK_BREAK
       - BLOCK_PLACE

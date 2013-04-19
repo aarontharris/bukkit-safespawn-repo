@@ -22,8 +22,8 @@ import com.ath.bukkit.safespawn.Zone;
 import com.ath.bukkit.safespawn.Zone.ZoneExclude;
 import com.ath.bukkit.safespawn.data.PlayerDao;
 import com.ath.bukkit.safespawn.data.PlayerData;
-import com.ath.bukkit.safespawn.data.magicsign.MagicSign;
-import com.ath.bukkit.safespawn.data.magicsign.SignReader;
+import com.ath.bukkit.safespawn.magic.sign.MagicSign;
+import com.ath.bukkit.safespawn.magic.sign.SignReader;
 
 public class PlayerEventHandler {
 

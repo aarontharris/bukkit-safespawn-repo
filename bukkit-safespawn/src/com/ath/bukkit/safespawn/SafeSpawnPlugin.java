@@ -4,8 +4,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -73,17 +71,7 @@ public class SafeSpawnPlugin extends JavaPlugin {
 		getZoneManager().initializeFromConfig();
 		getZoneManager().logAllZones();
 
-		try {
-			ConfigurationSection spawnpoint = getConfig().getConfigurationSection( Const.CFG_spawnpoint );
-			World spawnWorld = getServer().getWorld( spawnpoint.getString( Const.CFG_spawnpoint_world ) );
-			int x = spawnpoint.getInt( Const.CFG_spawnpoint_x );
-			int y = spawnpoint.getInt( Const.CFG_spawnpoint_y );
-			int z = spawnpoint.getInt( Const.CFG_spawnpoint_z );
-			spawnLocation = new Location( spawnWorld, x, y, z );
-		} catch ( Exception e ) {
-			logger.log( Level.SEVERE, "Something was wrong with your spawnpoint config, maybe a bad/missing world name? or xyz?" );
-			logger.log( Level.SEVERE, e.getMessage(), e );
-		}
+		spawnLocation = CfgHelper.readLocationFromConfig( getConfig().getConfigurationSection( Const.CFG_spawnpoint ) );
 	}
 
 	private void initializeEvents() {

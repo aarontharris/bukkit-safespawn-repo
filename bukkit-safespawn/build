@@ -1,15 +1,28 @@
 #!/bin/bash
 
+# our jar file
 jarname=SafeSpawn-0.1b.jar
 
+# move some files into bin for bundling
 cp config.yml ./bin
 cp plugin.yml ./bin
+
+# move into bin to do the work
 cd ./bin
 
+# remove the old jar if it exists
 if [ -e $jarname ]; then
   rm $jarname
 fi
 
+# bundle it up
 jar cf $jarname config.yml plugin.yml com ../libs
+
+# clean up the mess
 rm config.yml plugin.yml
-push_bukkit $jarname
+
+# backup the previous jar
+ssh `getMCServerUsername`@`getMCServerIP` "~/backup_safespawn_plugin.sh $jarname";
+
+# push jar to minecraft server
+push_bukkit $jarname 

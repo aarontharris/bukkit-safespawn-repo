@@ -16,6 +16,7 @@ public class MagicWords {
 	public static enum MagicCommand {
 		Ordinary( "un" ), //
 		Teleport( "teles" ), //
+		Manifest( "spitus" ), //
 		;
 
 		private String word;

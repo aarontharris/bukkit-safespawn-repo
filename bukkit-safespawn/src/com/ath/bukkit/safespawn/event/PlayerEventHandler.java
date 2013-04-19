@@ -79,21 +79,20 @@ public class PlayerEventHandler {
 	}
 
 	public static void onPlayerInteractEvent( SafeSpawnPlugin plugin, PlayerInteractEvent event ) {
-		SafeSpawnPlugin.logLine( "onPlayerInteractEvent" );
 		if ( event.getAction().equals( Action.LEFT_CLICK_BLOCK ) ) {
-			SafeSpawnPlugin.logLine( "onPlayerInteractEvent - left" );
 			Block block = event.getClickedBlock();
+
+			// WALL SIGN
 			if ( block.getType().equals( Material.WALL_SIGN ) ) {
-				SafeSpawnPlugin.logLine( "onPlayerInteractEvent - left - sign " );
 				BlockState state = block.getState();
 				if ( state instanceof Sign ) {
 					MagicSign sign = SignReader.readSign( (Sign) state );
-					SafeSpawnPlugin.logLine( "onPlayerInteractEvent - left - sign is " + sign );
 					if ( sign.activateSign( (Sign) state, event ) ) {
 						// TODO: send a message?
 					}
 				}
 			}
+
 		}
 	}
 }

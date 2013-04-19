@@ -100,7 +100,7 @@ public class SafeSpawnPlugin extends JavaPlugin {
 			public void playerInteractEvent( PlayerInteractEvent event ) {
 				PlayerEventHandler.onPlayerInteractEvent( SafeSpawnPlugin.this, event );
 			}
-
+			
 			@EventHandler
 			public void blockBreakEvent( BlockBreakEvent event ) {
 				BlockEventHandler.onBlockBreakEvent( SafeSpawnPlugin.this, event );

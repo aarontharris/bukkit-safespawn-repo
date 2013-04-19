@@ -40,6 +40,12 @@ public class PlayerEventHandler {
 				data = new PlayerData();
 				data.setName( player.getName() );
 				data.setFirstLogin( new Date() );
+
+				// Teleport first time users to spawn area
+				{
+					player.setBedSpawnLocation( plugin.getSpawnLocation().clone(), true );
+					Functions.teleport( plugin, player, plugin.getSpawnLocation() );
+				}
 			}
 			data.setLastLogin( new Date() );
 			data.setTimesLoggedIn( data.getTimesLoggedIn() + 1 );
@@ -48,11 +54,6 @@ public class PlayerEventHandler {
 			SafeSpawnPlugin.logError( e );
 		}
 
-		// Teleport first time users to spawn area
-		{
-			player.setBedSpawnLocation( plugin.getSpawnLocation().clone() );
-			Functions.teleport( plugin, player, plugin.getSpawnLocation() );
-		}
 	}
 
 	public static void onPlayerLeave( SafeSpawnPlugin plugin, PlayerQuitEvent event ) {

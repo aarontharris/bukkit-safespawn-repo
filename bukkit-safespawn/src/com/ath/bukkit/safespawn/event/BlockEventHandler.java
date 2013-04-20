@@ -6,13 +6,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-import com.ath.bukkit.safespawn.SafeSpawnPlugin;
+import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.Zone;
 import com.ath.bukkit.safespawn.Zone.ZoneExclude;
 
 public class BlockEventHandler {
 
-	public static void onBlockBreakEvent( SafeSpawnPlugin plugin, BlockBreakEvent event ) {
+	public static void onBlockBreakEvent( SafeSpawn plugin, BlockBreakEvent event ) {
 		Block block = event.getBlock();
 		for ( Zone zone : plugin.getZoneManager().findZones( block.getLocation() ) ) {
 			Player player = event.getPlayer();
@@ -26,7 +26,7 @@ public class BlockEventHandler {
 	}
 
 	@EventHandler
-	public static void onBlockPlaceEvent( SafeSpawnPlugin plugin, BlockPlaceEvent event ) {
+	public static void onBlockPlaceEvent( SafeSpawn plugin, BlockPlaceEvent event ) {
 		// TODO: ATH-P3 -- make me more efficient
 		// P3 because there are unlikely to be many zones as long as they are only created within the config.yml
 		// - - if I allow others to create zones within the game, then we really need to bump up the priority.

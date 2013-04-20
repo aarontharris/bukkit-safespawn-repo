@@ -11,7 +11,9 @@ public class SignReader {
 		MagicSign out = null;
 		MagicCommand type = parseSignType( sign );
 		switch ( type ) {
-		//case Manifest: out = new ShrineSign(); break;
+		case Manifest:
+			out = new ShrineSign();
+			break;
 		case Teleport:
 			out = new TeleporterSign();
 			break;

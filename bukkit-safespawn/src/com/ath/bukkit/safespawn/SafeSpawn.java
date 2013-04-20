@@ -22,9 +22,9 @@ import com.ath.bukkit.safespawn.event.BlockEventHandler;
 import com.ath.bukkit.safespawn.event.PlayerEventHandler;
 import com.ath.bukkit.safespawn.event.ZoneEventHandler;
 
-public class SafeSpawnPlugin extends JavaPlugin {
+public class SafeSpawn extends JavaPlugin {
 
-	private static SafeSpawnPlugin self;
+	private static SafeSpawn self;
 	private static Logger logger;
 	private ZoneManager zoneManager;
 	private PlayerManager playerManager;
@@ -32,13 +32,25 @@ public class SafeSpawnPlugin extends JavaPlugin {
 	private PlayerDao dao;
 	private WorldsManager worldsManager;
 
-	public static final SafeSpawnPlugin instance() {
+	public static final SafeSpawn instance() {
 		return self;
+	}
+	
+	@Override
+	public void saveConfig() {
+		super.saveConfig();
+		logLine( "saveConfig" );
+	}
+	
+	@Override
+	public void saveDefaultConfig() {
+		super.saveDefaultConfig();
+		logLine( "saveDefaultConfig" );
 	}
 
 	@Override
 	public void onLoad() {
-		SafeSpawnPlugin.self = this;
+		SafeSpawn.self = this;
 		super.onLoad();
 
 		logger = getLogger();
@@ -78,37 +90,37 @@ public class SafeSpawnPlugin extends JavaPlugin {
 		getServer().getPluginManager().registerEvents( new Listener() {
 			@EventHandler
 			public void creatureSpawn( CreatureSpawnEvent event ) {
-				ZoneEventHandler.onCreatureSpawnEvent( SafeSpawnPlugin.this, event );
+				ZoneEventHandler.onCreatureSpawnEvent( SafeSpawn.this, event );
 			}
 
 			@EventHandler
 			public void entityDamagedByEntity( EntityDamageByEntityEvent event ) {
-				PlayerEventHandler.onEntityDamagedByEntity( SafeSpawnPlugin.this, event );
+				PlayerEventHandler.onEntityDamagedByEntity( SafeSpawn.this, event );
 			}
 
 			@EventHandler
 			public void playerJoin( PlayerJoinEvent event ) {
-				PlayerEventHandler.onPlayerJoin( SafeSpawnPlugin.this, event );
+				PlayerEventHandler.onPlayerJoin( SafeSpawn.this, event );
 			}
 
 			@EventHandler
 			public void playerLeave( PlayerQuitEvent event ) {
-				PlayerEventHandler.onPlayerLeave( SafeSpawnPlugin.this, event );
+				PlayerEventHandler.onPlayerLeave( SafeSpawn.this, event );
 			}
 
 			@EventHandler
 			public void playerInteractEvent( PlayerInteractEvent event ) {
-				PlayerEventHandler.onPlayerInteractEvent( SafeSpawnPlugin.this, event );
+				PlayerEventHandler.onPlayerInteractEvent( SafeSpawn.this, event );
 			}
 			
 			@EventHandler
 			public void blockBreakEvent( BlockBreakEvent event ) {
-				BlockEventHandler.onBlockBreakEvent( SafeSpawnPlugin.this, event );
+				BlockEventHandler.onBlockBreakEvent( SafeSpawn.this, event );
 			}
 
 			@EventHandler
 			public void blockPlaceEvent( BlockPlaceEvent event ) {
-				BlockEventHandler.onBlockPlaceEvent( SafeSpawnPlugin.this, event );
+				BlockEventHandler.onBlockPlaceEvent( SafeSpawn.this, event );
 			}
 
 			// @EventHandler

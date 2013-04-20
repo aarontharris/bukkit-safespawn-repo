@@ -6,13 +6,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.ath.bukkit.safespawn.Functions;
-import com.ath.bukkit.safespawn.SafeSpawnPlugin;
+import com.ath.bukkit.safespawn.SafeSpawn;
 
 public class SpawnCmd implements CommandExecutor {
 
-	private SafeSpawnPlugin plugin;
+	private SafeSpawn plugin;
 
-	public SpawnCmd( SafeSpawnPlugin plugin ) {
+	public SpawnCmd( SafeSpawn plugin ) {
 		this.plugin = plugin;
 	}
 

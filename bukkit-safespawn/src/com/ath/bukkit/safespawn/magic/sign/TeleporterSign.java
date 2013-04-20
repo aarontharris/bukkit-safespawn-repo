@@ -8,8 +8,9 @@ import org.bukkit.inventory.ItemStack;
 
 import com.ath.bukkit.safespawn.Const;
 import com.ath.bukkit.safespawn.Functions;
-import com.ath.bukkit.safespawn.SafeSpawnPlugin;
+import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.magic.MagicWords;
+import com.ath.bukkit.safespawn.magic.MagicWords.ActivatorType;
 
 
 // teles:352:oh  // command : itemInHand : world
@@ -38,18 +39,21 @@ public class TeleporterSign extends MagicSign {
 				String line1 = sign.getLine( 0 );
 				String l1Parts[] = line1.split( Const.MW_separator );
 				// skip part[0], its the type and we already know it
-				if ( l1Parts[1].equals( Const.MW_empty ) ) {
-					// ignore the material requirements
-				} else {
-					requiredMaterialId = Integer.parseInt( l1Parts[1] );
+				ActivatorType activator = ActivatorType.getByWord( l1Parts[1] );
+				if ( !ActivatorType.EMPTY.equals( activator ) ) {
+					if ( ActivatorType.INVALID.equals( activator ) ) {
+						return false;
+					}
+					requiredMaterialId = activator.getMaterialId();
 					if ( materialInHandId != requiredMaterialId )
 						return false;
 				}
+
 				String worldWord = l1Parts[2];
-				worldName = SafeSpawnPlugin.instance().getWorldsManager().findByMagic( worldWord );
+				worldName = SafeSpawn.instance().getWorldsManager().findByMagic( worldWord );
 				if ( worldName == null )
 					return false;
-				World world = SafeSpawnPlugin.instance().getServer().getWorld( worldName );
+				World world = SafeSpawn.instance().getServer().getWorld( worldName );
 				if ( world == null )
 					return false;
 
@@ -65,12 +69,12 @@ public class TeleporterSign extends MagicSign {
 
 				if ( world != null ) {
 					Location location = new Location( world, x, y, z );
-					Functions.teleport( SafeSpawnPlugin.instance(), event.getPlayer(), location );
+					Functions.teleport( SafeSpawn.instance(), event.getPlayer(), location );
 					return true;
 				}
 			}
 		} catch ( Exception e ) {
-			SafeSpawnPlugin.logError( e ); // TODO Mute me
+			SafeSpawn.logError( e ); // TODO Mute me
 		}
 		return false;
 	}

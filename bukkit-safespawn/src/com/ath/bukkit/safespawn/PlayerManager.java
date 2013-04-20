@@ -8,12 +8,12 @@ import org.bukkit.entity.Player;
 
 public class PlayerManager {
 
-	private SafeSpawnPlugin plugin;
+	private SafeSpawn plugin;
 
 	private Map<Integer, Player> entityIdToPlayerMap;
 	private Map<String, Player> nameToPlayerMap;
 
-	public PlayerManager( SafeSpawnPlugin plugin ) {
+	public PlayerManager( SafeSpawn plugin ) {
 		this.plugin = plugin;
 		entityIdToPlayerMap = new HashMap<Integer, Player>();
 		nameToPlayerMap = new HashMap<String, Player>();

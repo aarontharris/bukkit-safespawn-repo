@@ -44,11 +44,11 @@ public class Functions {
 		return false;
 	}
 
-	public static void teleport( SafeSpawnPlugin plugin, Player player, World world, double x, double y, double z ) {
+	public static void teleport( SafeSpawn plugin, Player player, World world, double x, double y, double z ) {
 		teleport( plugin, player, new Location( world, x, y, z ) );
 	}
 
-	public static void teleport( SafeSpawnPlugin plugin, Player player, Location loc ) {
+	public static void teleport( SafeSpawn plugin, Player player, Location loc ) {
 		try {
 			if ( player != null ) {
 				Location teleport = loc.clone();
@@ -57,7 +57,7 @@ public class Functions {
 				player.teleport( teleport );
 			}
 		} catch ( Exception e ) {
-			SafeSpawnPlugin.logError( e );
+			SafeSpawn.logError( e );
 		}
 	}
 

@@ -33,18 +33,23 @@ public class MagicWords {
 			}
 			return MagicCommand.Ordinary;
 		}
+
+		public String getWord() {
+			return word;
+		}
 	}
 
 
 
 	// FIXME: move into a magic word to world item manager
 	public static enum ActivatorType {
-		INVALID( null, -1 ),
-		EMPTY( "non", 0 ),
-		BONE( "bon", Material.BONE.getId() );
+		INVALID( null, -1 ), //
+		EMPTY( "non", 0 ), //
+		BONE( "bon", Material.BONE.getId() ), //
+		GOLD_SPADE( "g'spad", Material.GOLD_SPADE.getId() ), //
+		;
 
 		private static final Map<String, ActivatorType> wordToType = new HashMap<String, ActivatorType>();
-		@SuppressWarnings( "unused" )
 		private int materialId;
 		private String word;
 		static {
@@ -66,6 +71,14 @@ public class MagicWords {
 				}
 			}
 			return ActivatorType.INVALID;
+		}
+
+		public int getMaterialId() {
+			return materialId;
+		}
+
+		public String getWord() {
+			return word;
 		}
 	}
 

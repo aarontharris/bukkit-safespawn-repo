@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.ath.bukkit.safespawn.Const;
 import com.ath.bukkit.safespawn.Functions;
-import com.ath.bukkit.safespawn.SafeSpawnPlugin;
+import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.Zone;
 import com.ath.bukkit.safespawn.Zone.ZoneExclude;
 import com.ath.bukkit.safespawn.data.PlayerDao;
@@ -27,7 +27,7 @@ import com.ath.bukkit.safespawn.magic.sign.SignReader;
 
 public class PlayerEventHandler {
 
-	public static void onPlayerJoin( SafeSpawnPlugin plugin, PlayerJoinEvent event ) {
+	public static void onPlayerJoin( SafeSpawn plugin, PlayerJoinEvent event ) {
 		Player player = event.getPlayer();
 		plugin.getPlayerManager().cachePlayer( player );
 		player.sendMessage( plugin.getConfig().getString( Const.MSG_welcome_message ) );
@@ -51,18 +51,18 @@ public class PlayerEventHandler {
 			data.setTimesLoggedIn( data.getTimesLoggedIn() + 1 );
 			dao.writePlayerData( data, player );
 		} catch ( Exception e ) {
-			SafeSpawnPlugin.logError( e );
+			SafeSpawn.logError( e );
 		}
 
 	}
 
-	public static void onPlayerLeave( SafeSpawnPlugin plugin, PlayerQuitEvent event ) {
+	public static void onPlayerLeave( SafeSpawn plugin, PlayerQuitEvent event ) {
 		// TODO: make sure when a player is banned or kicked that it still calls the PlayerQuitEvent
 		Player player = event.getPlayer();
 		plugin.getPlayerManager().removePlayerFromCache( player );
 	}
 
-	public static void onEntityDamagedByEntity( SafeSpawnPlugin plugin, EntityDamageByEntityEvent event ) {
+	public static void onEntityDamagedByEntity( SafeSpawn plugin, EntityDamageByEntityEvent event ) {
 		if ( event.getEntityType() == EntityType.PLAYER ) {
 			Entity entity = event.getEntity();
 			Player player = plugin.getPlayerManager().getActivePlayerByEntityId( entity.getEntityId() );
@@ -78,17 +78,19 @@ public class PlayerEventHandler {
 		}
 	}
 
-	public static void onPlayerInteractEvent( SafeSpawnPlugin plugin, PlayerInteractEvent event ) {
+	public static void onPlayerInteractEvent( SafeSpawn plugin, PlayerInteractEvent event ) {
 		if ( event.getAction().equals( Action.LEFT_CLICK_BLOCK ) ) {
 			Block block = event.getClickedBlock();
 
 			// WALL SIGN
 			if ( block.getType().equals( Material.WALL_SIGN ) ) {
-				BlockState state = block.getState();
-				if ( state instanceof Sign ) {
-					MagicSign sign = SignReader.readSign( (Sign) state );
-					if ( sign.activateSign( (Sign) state, event ) ) {
-						// TODO: send a message?
+				if ( event.getPlayer().hasPermission( Const.PERM_magic_sign ) ) {
+					BlockState state = block.getState();
+					if ( state instanceof Sign ) {
+						MagicSign sign = SignReader.readSign( (Sign) state );
+						if ( sign.activateSign( (Sign) state, event ) ) {
+							// TODO: send a message?
+						}
 					}
 				}
 			}

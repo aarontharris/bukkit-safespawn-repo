@@ -6,6 +6,7 @@ public final class Const {
 	
 	public static final String MW_empty = "non";
 
+	public static final String PERM_magic_sign = "safespawn.magic.sign";
 	public static final String PERM_blockbreak = "safespawn.block_break";
 	public static final String PERM_blockplace = "safespawn.block_place";
 	public static final String PERM_spawn = "safespawn.spawn";
@@ -31,5 +32,6 @@ public final class Const {
 
 	public static final String CMD_gamedesc = "gamedesc";
 	public static final String MSG_gamedesc = "gamedesc";
+
 
 }

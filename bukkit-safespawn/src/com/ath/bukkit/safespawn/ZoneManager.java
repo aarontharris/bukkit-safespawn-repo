@@ -7,12 +7,12 @@ import org.bukkit.Location;
 
 public class ZoneManager {
 
-	private SafeSpawnPlugin plugin;
+	private SafeSpawn plugin;
 
 
 	private Set<Zone> allZones;
 
-	public ZoneManager( SafeSpawnPlugin plugin ) {
+	public ZoneManager( SafeSpawn plugin ) {
 		this.plugin = plugin;
 		allZones = new HashSet<Zone>();
 	}
@@ -26,7 +26,7 @@ public class ZoneManager {
 
 	public void logAllZones() {
 		for ( Zone z : allZones ) {
-			SafeSpawnPlugin.logLine( "logAllZones - zone: " + z.getName() );
+			SafeSpawn.logLine( "logAllZones - zone: " + z.getName() );
 		}
 	}
 

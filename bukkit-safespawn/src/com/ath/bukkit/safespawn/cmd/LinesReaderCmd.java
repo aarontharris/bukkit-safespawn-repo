@@ -8,7 +8,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import com.ath.bukkit.safespawn.Const;
-import com.ath.bukkit.safespawn.SafeSpawnPlugin;
+import com.ath.bukkit.safespawn.SafeSpawn;
 
 /**
  * Simply prints a list of messages for the given command<br>
@@ -16,13 +16,13 @@ import com.ath.bukkit.safespawn.SafeSpawnPlugin;
  * @author aharris
  */
 public class LinesReaderCmd implements CommandExecutor {
-	private SafeSpawnPlugin plugin;
+	private SafeSpawn plugin;
 	private String cfgKey;
 
 	/**
 	 * @param cfgKey - must be a valid list of strings defined in config.yml
 	 */
-	public LinesReaderCmd( SafeSpawnPlugin plugin, String cfgKey ) {
+	public LinesReaderCmd( SafeSpawn plugin, String cfgKey ) {
 		this.plugin = plugin;
 		this.cfgKey = cfgKey;
 	}

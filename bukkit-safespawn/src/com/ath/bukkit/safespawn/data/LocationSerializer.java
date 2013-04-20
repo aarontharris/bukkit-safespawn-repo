@@ -4,7 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.json.simple.JSONObject;
 
-import com.ath.bukkit.safespawn.SafeSpawnPlugin;
+import com.ath.bukkit.safespawn.SafeSpawn;
 
 public class LocationSerializer implements JSONSerializable {
 
@@ -40,7 +40,7 @@ public class LocationSerializer implements JSONSerializable {
 	public void fromJson( JSONObject json ) throws Exception {
 		JSUtl js = new JSUtl( json );
 		String worldName = js.getString( "world", null );
-		World world = SafeSpawnPlugin.instance().getServer().getWorld( worldName ); // FIXME: need injection
+		World world = SafeSpawn.instance().getServer().getWorld( worldName ); // FIXME: need injection
 		if ( world != null ) {
 			Double x = js.getDouble( "x", 0.0 );
 			Double y = js.getDouble( "y", 0.0 );

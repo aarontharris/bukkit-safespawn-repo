@@ -6,11 +6,11 @@ import java.util.Map;
 import org.bukkit.configuration.ConfigurationSection;
 
 public class WorldsManager {
-	private SafeSpawnPlugin plugin;
+	private SafeSpawn plugin;
 	private Map<String, String> nameToMagic;
 	private Map<String, String> magicToName;
 
-	public WorldsManager( SafeSpawnPlugin plugin ) {
+	public WorldsManager( SafeSpawn plugin ) {
 		this.plugin = plugin;
 		nameToMagic = new HashMap<String, String>();
 		magicToName = new HashMap<String, String>();
@@ -30,7 +30,7 @@ public class WorldsManager {
 			cfg = worldsCfg.getConfigurationSection( Const.CFG_worlds_world_the_end );
 			add( cfg.getString( "magic" ), cfg.getString( "name" ) );
 		} catch ( Exception e ) {
-			SafeSpawnPlugin.logError( e );
+			SafeSpawn.logError( e );
 		}
 	}
 

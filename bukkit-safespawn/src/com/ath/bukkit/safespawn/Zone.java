@@ -42,7 +42,7 @@ public class Zone {
 		}
 	}
 
-	public static Set<Zone> fromConfig( SafeSpawnPlugin plugin ) {
+	public static Set<Zone> fromConfig( SafeSpawn plugin ) {
 		Set<Zone> out = new HashSet<Zone>();
 
 		ConfigurationSection section = plugin.getConfig().getConfigurationSection( "zones" );

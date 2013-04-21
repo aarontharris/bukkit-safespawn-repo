@@ -1,17 +1,19 @@
 package com.ath.bukkit.safespawn.magic;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import org.bukkit.Material;
 
 import com.ath.bukkit.safespawn.Const;
+import com.ath.bukkit.safespawn.SafeSpawn;
 
 public class MagicWords {
 
 	//
 	// DEFINITIONS
 	//
+
+	// COMMAND WORDS
 
 	public static enum MagicCommand {
 		Ordinary( "un" ), //
@@ -41,44 +43,94 @@ public class MagicWords {
 
 
 
-	// FIXME: move into a magic word to world item manager
-	public static enum ActivatorType {
-		INVALID( null, -1 ), //
-		EMPTY( "non", 0 ), //
-		BONE( "bon", Material.BONE.getId() ), //
-		GOLD_SPADE( "g'spad", Material.GOLD_SPADE.getId() ), //
-		;
+	// ITEM WORDS
+	public static enum MagicWord {
+		INVALID( null, null ), // bad
+		NOTHING( "vod", null ), // must be empty
+		AGNOSTIC( "non", null ), // agnostic, can be anything
+		BONE( "bon", Material.BONE ),
+		GOLD_SPADE( "g'spad", Material.GOLD_SPADE ),
+		IRON_SPADE( "i'spad", Material.IRON_SPADE ),
+		STONE_SPADE( "p'spad", Material.STONE_SPADE ),
+		WOOD_SPADE( "u'spad", Material.WOOD_SPADE ),
 
-		private static final Map<String, ActivatorType> wordToType = new HashMap<String, ActivatorType>();
-		private int materialId;
+		GOLD_BLOCK( "gal'b", Material.GOLD_BLOCK ),
+
+		DIAMOND( "wb'f", Material.DIAMOND ),
+		STONE( "poc", Material.STONE ),
+		WOOD_OAK( "ud", Material.WOOD ), ;
+
+
 		private String word;
-		static {
-			for ( ActivatorType t : ActivatorType.values() ) {
-				wordToType.put( t.word, t );
-			}
-		}
+		private Material mat;
 
-		ActivatorType( String word, int materialId ) {
+		MagicWord( String word, Material mat ) {
 			this.word = word;
-			this.materialId = materialId;
+			this.mat = mat;
 		}
 
-		public static ActivatorType getByWord( String word ) {
-			if ( word != null ) {
-				ActivatorType type = wordToType.get( word );
-				if ( type != null ) {
-					return type;
-				}
+		/**
+		 * True when, not equal but match requirements are met.<br>
+		 * EX: BONE.matches( BONE ) == true.
+		 * EX: BONE.matches( STONE ) == false.
+		 * EX: AGNOSTIC.matches( BONE ) == true.
+		 * EX: AGNOSTIC.matches( INVALID ) == true.
+		 * EX: AGNOSTIC.matches( null ) == true.
+		 * EX: *.matches( AGNOSTIC ) == false.
+		 * EX: NOTHING.matches( null ) == true.
+		 * EX: NOTHING.matches( !null ) == false.
+		 * EX: INVALID.matches( * ) == false.
+		 */
+		public boolean matches( MagicWord magicWord ) {
+			SafeSpawn.logLine( this + ".matches( " + magicWord + " )" );
+			if ( this.equals( INVALID ) ) {
+				SafeSpawn.logLine( this + ".matches( " + magicWord + " ) false" );
+				return false;
 			}
-			return ActivatorType.INVALID;
+			if ( this.equals( AGNOSTIC ) ) {
+				SafeSpawn.logLine( this + ".matches( " + magicWord + " ) true" );
+				return true;
+			}
+			if ( this.equals( NOTHING ) ) {
+				SafeSpawn.logLine( this + ".matches( " + magicWord + " ) " + ( magicWord == null ) );
+				return magicWord == null;
+			}
+			SafeSpawn.logLine( this + ".matches( " + magicWord + " ) " + ( this.equals( magicWord ) ) );
+			return this.equals( magicWord );
 		}
 
-		public int getMaterialId() {
-			return materialId;
+		private static HashMap<String, MagicWord> nameMap = new HashMap<String, MagicWord>();
+		private static HashMap<Material, MagicWord> matMap = new HashMap<Material, MagicWord>();
+
+		static {
+			for ( MagicWord itemWord : MagicWord.values() ) {
+				nameMap.put( itemWord.word, itemWord );
+				matMap.put( itemWord.mat, itemWord );
+			}
 		}
 
-		public String getWord() {
-			return word;
+		public static MagicWord findItemByWord( String word ) {
+			try {
+				MagicWord out = nameMap.get( word );
+				if ( out != null ) {
+					return out;
+				}
+			} catch ( Exception e ) {
+				SafeSpawn.logError( e );
+			}
+			return MagicWord.INVALID;
+		}
+
+		public static MagicWord findItemByMaterial( Material material ) {
+			try {
+				MagicWord out = matMap.get( material );
+				if ( out != null ) {
+					return out;
+				}
+			} catch ( Exception e ) {
+				SafeSpawn.logError( e );
+			}
+			return MagicWord.INVALID;
 		}
 	}
 

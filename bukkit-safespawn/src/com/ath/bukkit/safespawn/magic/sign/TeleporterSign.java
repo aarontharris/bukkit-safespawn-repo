@@ -10,7 +10,7 @@ import com.ath.bukkit.safespawn.Const;
 import com.ath.bukkit.safespawn.Functions;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.magic.MagicWords;
-import com.ath.bukkit.safespawn.magic.MagicWords.ActivatorType;
+import com.ath.bukkit.safespawn.magic.MagicWords.MagicWord;
 
 
 // teles:352:oh  // command : itemInHand : world
@@ -21,8 +21,8 @@ import com.ath.bukkit.safespawn.magic.MagicWords.ActivatorType;
 // itemInHand is the materialId, but can be "non" for empty or in this case, its ignored
 public class TeleporterSign extends MagicSign {
 
-	private int materialInHandId;
-	private int requiredMaterialId;
+	private MagicWord itemInHand;
+	private MagicWord requiredInHand;
 	private String worldName;
 	private int x;
 	private int y;
@@ -33,20 +33,15 @@ public class TeleporterSign extends MagicSign {
 		try {
 			ItemStack itemStack = event.getPlayer().getItemInHand();
 			if ( itemStack != null ) {
-				materialInHandId = itemStack.getType().getId();
+				itemInHand = MagicWord.findItemByMaterial( itemStack.getType() );
 
 				// line 1
 				String line1 = sign.getLine( 0 );
 				String l1Parts[] = line1.split( Const.MW_separator );
-				// skip part[0], its the type and we already know it
-				ActivatorType activator = ActivatorType.getByWord( l1Parts[1] );
-				if ( !ActivatorType.EMPTY.equals( activator ) ) {
-					if ( ActivatorType.INVALID.equals( activator ) ) {
-						return false;
-					}
-					requiredMaterialId = activator.getMaterialId();
-					if ( materialInHandId != requiredMaterialId )
-						return false;
+				requiredInHand = MagicWord.findItemByWord( l1Parts[1] );
+
+				if ( !requiredInHand.matches( itemInHand ) ) {
+					return false;
 				}
 
 				String worldWord = l1Parts[2];

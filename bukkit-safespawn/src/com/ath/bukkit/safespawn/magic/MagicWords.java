@@ -58,7 +58,13 @@ public class MagicWords {
 
 		DIAMOND( "wb'f", Material.DIAMOND ),
 		STONE( "poc", Material.STONE ),
-		WOOD_OAK( "ud", Material.WOOD ), ;
+		WOOD_OAK( "ud", Material.WOOD ),
+
+
+		// EGGS
+		EGG_ZOMBIE( "uzooba", null ), // SPAWN_EGGs have no material
+
+		; //
 
 
 		private String word;
@@ -137,6 +143,26 @@ public class MagicWords {
 	//
 	// HELPER FUNCTIONS
 	//
+
+	/**
+	 * @param line
+	 * @param delimiter - what separates the words in the line
+	 * @param wordIndex - first word in the line would be 0, second would be 1 ...
+	 * @return
+	 */
+	public static MagicWord readMagicWordFromLine( String line, String delimiter, int wordIndex ) {
+		try {
+			if ( line != null && !line.isEmpty() ) {
+				String parts[] = line.split( delimiter );
+				if ( parts.length >= ( wordIndex + 1 ) ) {
+					return MagicWord.findItemByWord( parts[wordIndex] );
+				}
+			}
+		} catch ( Exception e ) {
+			SafeSpawn.logError( e );
+		}
+		return MagicWord.INVALID;
+	}
 
 	/** must be the first or only word in the line */
 	public static MagicCommand readCommandFromLine( String line ) {

@@ -7,7 +7,10 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
+import com.ath.bukkit.safespawn.EggHatchery;
+import com.ath.bukkit.safespawn.EggHatchery.EggStackType;
 import com.ath.bukkit.safespawn.Functions;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.magic.MagicWords.MagicCommand;
@@ -27,7 +30,6 @@ public class ShrineSign extends MagicSign {
 			y -= 1;
 
 			Block block = event.getPlayer().getWorld().getBlockAt( x, y, z );
-			SafeSpawn.logLine( String.format( "%s @ %s, %s, %s", block.getType().toString(), x, y, z ) );
 
 			if ( block.getType().equals( Material.CHEST ) ) {
 				Chest chest = Functions.blockToChest( block );
@@ -35,6 +37,13 @@ public class ShrineSign extends MagicSign {
 
 				if ( Functions.removeFromInventory( inv, 2, Material.STICK, Material.STONE, Material.BONE ) ) {
 					event.getPlayer().sendMessage( MagicCommand.Manifest.getWord() );
+
+					// MagicWord word = MagicWords.readMagicWordFromLine( sign.getLine( 1 ), Const.MW_separator, 0 );
+					// if ( word.matches( MagicWord.EGG_ZOMBIE ) { }
+
+					ItemStack stack = EggHatchery.newEgg( EggStackType.Zombie );
+					inv.addItem( stack );
+
 					return true;
 				}
 			}

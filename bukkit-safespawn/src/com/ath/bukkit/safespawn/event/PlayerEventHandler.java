@@ -28,12 +28,12 @@ import com.ath.bukkit.safespawn.magic.sign.SignReader;
 public class PlayerEventHandler {
 
 	public static void onPlayerJoin( SafeSpawn plugin, PlayerJoinEvent event ) {
-		Player player = event.getPlayer();
-		plugin.getPlayerManager().cachePlayer( player );
-		player.sendMessage( plugin.getConfig().getString( Const.MSG_welcome_message ) );
-
-		// configure first time user data
 		try {
+			Player player = event.getPlayer();
+			plugin.getPlayerManager().cachePlayer( player );
+			player.sendMessage( plugin.getConfig().getString( Const.MSG_welcome_message ) );
+
+			// configure first time user data
 			PlayerDao dao = plugin.getPlayerDao();
 			PlayerData data = dao.readPlayerData( player );
 			if ( data.getTimesLoggedIn() == 0 ) {
@@ -53,48 +53,63 @@ public class PlayerEventHandler {
 		} catch ( Exception e ) {
 			SafeSpawn.logError( e );
 		}
-
 	}
 
 	public static void onPlayerLeave( SafeSpawn plugin, PlayerQuitEvent event ) {
 		// TODO: make sure when a player is banned or kicked that it still calls the PlayerQuitEvent
-		Player player = event.getPlayer();
-		plugin.getPlayerManager().removePlayerFromCache( player );
+		try {
+			Player player = event.getPlayer();
+			plugin.getPlayerManager().removePlayerFromCache( player );
+		} catch ( Exception e ) {
+			SafeSpawn.logError( e );
+		}
 	}
 
 	public static void onEntityDamagedByEntity( SafeSpawn plugin, EntityDamageByEntityEvent event ) {
-		if ( event.getEntityType() == EntityType.PLAYER ) {
-			Entity entity = event.getEntity();
-			Player player = plugin.getPlayerManager().getActivePlayerByEntityId( entity.getEntityId() );
-			if ( player != null ) {
-				for ( Zone zone : plugin.getZoneManager().findZones( entity.getLocation() ) ) {
-					if ( zone.caresAbout( entity.getLocation(), ZoneExclude.PLAYER_DMG_FROM_ENTITY ) ) {
-						if ( !ZoneExclude.PLAYER_DMG_FROM_ENTITY.hasPermission( player, zone ) ) {
-							event.setCancelled( true );
+		try {
+			if ( event.getEntityType() == EntityType.PLAYER ) {
+				Entity entity = event.getEntity();
+				Player player = plugin.getPlayerManager().getActivePlayerByEntityId( entity.getEntityId() );
+				if ( player != null ) {
+					for ( Zone zone : plugin.getZoneManager().findZones( entity.getLocation() ) ) {
+						if ( zone.caresAbout( entity.getLocation(), ZoneExclude.PLAYER_DMG_FROM_ENTITY ) ) {
+							if ( !ZoneExclude.PLAYER_DMG_FROM_ENTITY.hasPermission( player, zone ) ) {
+								event.setCancelled( true );
+							}
 						}
 					}
 				}
 			}
+		} catch ( Exception e ) {
+			SafeSpawn.logError( e );
 		}
 	}
 
 	public static void onPlayerInteractEvent( SafeSpawn plugin, PlayerInteractEvent event ) {
-		if ( event.getAction().equals( Action.LEFT_CLICK_BLOCK ) ) {
-			Block block = event.getClickedBlock();
+		try {
+			if ( event.getAction().equals( Action.LEFT_CLICK_BLOCK ) ) {
+				Block block = event.getClickedBlock();
 
-			// WALL SIGN
-			if ( block.getType().equals( Material.WALL_SIGN ) ) {
-				if ( event.getPlayer().hasPermission( Const.PERM_magic_sign ) ) {
-					BlockState state = block.getState();
-					if ( state instanceof Sign ) {
-						MagicSign sign = SignReader.readSign( (Sign) state );
-						if ( sign.activateSign( (Sign) state, event ) ) {
-							// TODO: send a message?
+				if ( event.getPlayer().getName().equals( "angryBits" ) ) {
+					SafeSpawn.logLine( "player clicked: " + block.getType() );
+				}
+
+				// WALL SIGN
+				if ( block.getType().equals( Material.WALL_SIGN ) || block.getType().equals( Material.SIGN_POST ) ) { // || block.getType().equals( Material.SIGN ) ) {
+					if ( event.getPlayer().hasPermission( Const.PERM_magic_sign ) ) {
+						BlockState state = block.getState();
+						if ( state instanceof Sign ) {
+							MagicSign sign = SignReader.readSign( (Sign) state );
+							if ( sign.activateSign( (Sign) state, event ) ) {
+								// TODO: send a message?
+							}
 						}
 					}
 				}
-			}
 
+			}
+		} catch ( Exception e ) {
+			SafeSpawn.logError( e );
 		}
 	}
 }

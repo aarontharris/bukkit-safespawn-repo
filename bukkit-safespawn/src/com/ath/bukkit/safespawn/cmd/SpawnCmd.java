@@ -18,12 +18,16 @@ public class SpawnCmd implements CommandExecutor {
 
 	@Override
 	public boolean onCommand( CommandSender sender, Command cmd, String label, String[] args ) {
-		Player player = plugin.getPlayerManager().getActivePlayerByName( sender.getName() );
-		if ( player != null ) {
-			Functions.teleport( plugin, player, plugin.getSpawnLocation() );
-			return true;
-		} else {
-			sender.sendMessage( "Something evil has happened... we can't return you to spawn" );
+		try {
+			Player player = plugin.getPlayerManager().getActivePlayerByName( sender.getName() );
+			if ( player != null ) {
+				Functions.teleport( plugin, player, plugin.getSpawnLocation() );
+				return true;
+			} else {
+				sender.sendMessage( "Something evil has happened... we can't return you to spawn" );
+			}
+		} catch ( Exception e ) {
+			SafeSpawn.logError( e );
 		}
 		return false;
 	}

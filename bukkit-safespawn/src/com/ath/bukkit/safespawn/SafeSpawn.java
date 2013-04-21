@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.print.attribute.standard.Fidelity;
-
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -74,8 +72,8 @@ public class SafeSpawn extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		try {
-			setupDatabase();
-			findExample();
+			//setupDatabase();
+			//findExample();
 		}
 		catch ( Exception e ) {
 			logError( e );
@@ -209,7 +207,7 @@ public class SafeSpawn extends JavaPlugin {
 	@Override
 	public List<Class<?>> getDatabaseClasses() {
 		List<Class<?>> out = new ArrayList<Class<?>>();
-		out.add( SimpleKeyVal.class );
+		//out.add( SimpleKeyVal.class );
 		return out;
 	}
 

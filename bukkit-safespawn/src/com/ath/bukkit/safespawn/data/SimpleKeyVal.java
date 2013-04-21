@@ -1,19 +1,14 @@
 package com.ath.bukkit.safespawn.data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
-import com.avaje.ebean.validation.NotEmpty;
-
-@Entity
-@Table( name = "DBTest" )
+//@Entity
+//@Table( name = "DBTest" )
 public class SimpleKeyVal {
 
-	@Id
+	// @Id
 	private int id;
-	
-	@NotEmpty
+
+	// @NotEmpty
 	private String key;
 
 	private String value;

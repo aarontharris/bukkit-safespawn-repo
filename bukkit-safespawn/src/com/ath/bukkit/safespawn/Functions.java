@@ -5,6 +5,9 @@ import java.util.HashMap;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.Chest;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -125,28 +128,22 @@ public class Functions {
 				}
 
 				for ( Material mat : materials ) {
-					SafeSpawn.logLine( "Removing " + mat );
 					HashMap<Integer, ? extends ItemStack> all = inv.all( mat );
 					int remaining = count;
 					for ( ItemStack stack : all.values() ) {
-						SafeSpawn.logLine( "Removing from " + mat + " with " + stack.getAmount() );
 						if ( stack.getAmount() == remaining ) {
-							SafeSpawn.logLine( " -- Removing the whole stack" );
 							inv.remove( stack );
 							break;
 						}
 						if ( stack.getAmount() > remaining ) {
-							SafeSpawn.logLine( " -- Removing " + remaining + " from the stack and satisfied" );
 							stack.setAmount( stack.getAmount() - remaining );
 							break;
 						}
 						if ( stack.getAmount() < remaining ) {
 							remaining -= stack.getAmount();
-							SafeSpawn.logLine( " -- Removing the whole stack and " + remaining + " remaining" );
 							inv.remove( stack );
 						}
 						if ( remaining <= 0 ) {
-							SafeSpawn.logLine( " -- Satisfied -- should never see this" );
 							break;
 						}
 					}
@@ -158,5 +155,30 @@ public class Functions {
 			SafeSpawn.logError( e );
 		}
 		return false;
+	}
+
+
+	@SuppressWarnings( "incomplete-switch" )
+	public static void adjustXZ( Location l, double offset, BlockFace blockFace ) {
+		switch ( blockFace ) {
+		case NORTH:
+			l.setZ( l.getZ() - offset );
+			break;
+		case SOUTH:
+			l.setZ( l.getZ() + offset );
+			break;
+		case EAST:
+			l.setX( l.getX() + offset );
+			break;
+		case WEST:
+			l.setX( l.getX() - offset );
+			break;
+		}
+	}
+
+	/** assumes the block IS material.chest */
+	public static Chest blockToChest( Block block ) {
+		Chest chest = (Chest) block.getState();
+		return chest;
 	}
 }

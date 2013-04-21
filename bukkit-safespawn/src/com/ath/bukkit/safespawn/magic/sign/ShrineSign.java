@@ -23,31 +23,14 @@ public class ShrineSign extends MagicSign {
 			int y = Location.locToBlock( l.getY() );
 			int z = Location.locToBlock( l.getZ() );
 
-			// // move 1 unit in the direction the sign is facing
-			// switch ( event.getBlockFace() ) {
-			// case NORTH:
-			// z -= 1;
-			// break;
-			// case EAST:
-			// x += 1;
-			// break;
-			// case SOUTH:
-			// z += 1;
-			// break;
-			// case WEST:
-			// x -= 1;
-			// break;
-			// }
-
 			// move down 1 unit
 			y -= 1;
 
 			Block block = event.getPlayer().getWorld().getBlockAt( x, y, z );
 			SafeSpawn.logLine( String.format( "%s @ %s, %s, %s", block.getType().toString(), x, y, z ) );
 
-			// FIXME chest
 			if ( block.getType().equals( Material.CHEST ) ) {
-				Chest chest = (Chest) block.getState();
+				Chest chest = Functions.blockToChest( block );
 				Inventory inv = chest.getInventory();
 
 				if ( Functions.removeFromInventory( inv, 2, Material.STICK, Material.STONE, Material.BONE ) ) {

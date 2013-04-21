@@ -1,5 +1,5 @@
 name: SafeSpawn
-main: com.ath.bukkit.safespawn.SafeSpawnPlugin
+main: com.ath.bukkit.safespawn.SafeSpawn
 version: 0.1 Beta
 author: angryBits
 description: My own special blend of tools for running a minecraft server

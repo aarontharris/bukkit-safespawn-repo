@@ -8,6 +8,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 
+import com.ath.bukkit.safespawn.Functions;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.magic.MagicWords.MagicCommand;
 
@@ -49,16 +50,11 @@ public class ShrineSign extends MagicSign {
 				Chest chest = (Chest) block.getState();
 				Inventory inv = chest.getInventory();
 
-				if ( inv.contains( Material.STICK, 2 ) ) {
-					if ( inv.contains( Material.STONE, 2 ) ) {
-						if ( inv.contains( Material.BONE, 2 ) ) {
-							event.getPlayer().sendMessage( MagicCommand.Manifest.getWord() );
-							return true;
-						}
-					}
+				if ( Functions.removeFromInventory( inv, 2, Material.STICK, Material.STONE, Material.BONE ) ) {
+					event.getPlayer().sendMessage( MagicCommand.Manifest.getWord() );
+					return true;
 				}
 			}
-
 		} catch ( Exception e ) {
 			SafeSpawn.logError( e );
 		}

@@ -1,9 +1,14 @@
 package com.ath.bukkit.safespawn;
 
+import java.util.HashMap;
+
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 public class Functions {
 
@@ -97,6 +102,60 @@ public class Functions {
 			return true;
 		default:
 			break;
+		}
+		return false;
+	}
+
+	/**
+	 * Remove {count} items of each {materials} from {inv} and return true if it was successful.<br>
+	 * 
+	 * @param inv
+	 * @param count
+	 * @param materials
+	 * @return false if the {inv} did not contain at least {count} of each {materials}
+	 */
+	public static boolean removeFromInventory( Inventory inv, int count, Material... materials ) {
+		try {
+			if ( inv != null && materials != null ) {
+				// first do a quick check to see if the mats need are in the inventory before doing all the other work...
+				for ( Material mat : materials ) {
+					if ( !inv.contains( mat, count ) ) {
+						return false;
+					}
+				}
+
+				for ( Material mat : materials ) {
+					SafeSpawn.logLine( "Removing " + mat );
+					HashMap<Integer, ? extends ItemStack> all = inv.all( mat );
+					int remaining = count;
+					for ( ItemStack stack : all.values() ) {
+						SafeSpawn.logLine( "Removing from " + mat + " with " + stack.getAmount() );
+						if ( stack.getAmount() == remaining ) {
+							SafeSpawn.logLine( " -- Removing the whole stack" );
+							inv.remove( stack );
+							break;
+						}
+						if ( stack.getAmount() > remaining ) {
+							SafeSpawn.logLine( " -- Removing " + remaining + " from the stack and satisfied" );
+							stack.setAmount( stack.getAmount() - remaining );
+							break;
+						}
+						if ( stack.getAmount() < remaining ) {
+							remaining -= stack.getAmount();
+							SafeSpawn.logLine( " -- Removing the whole stack and " + remaining + " remaining" );
+							inv.remove( stack );
+						}
+						if ( remaining <= 0 ) {
+							SafeSpawn.logLine( " -- Satisfied -- should never see this" );
+							break;
+						}
+					}
+				}
+
+				return true;
+			}
+		} catch ( Exception e ) {
+			SafeSpawn.logError( e );
 		}
 		return false;
 	}

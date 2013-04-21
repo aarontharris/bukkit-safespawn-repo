@@ -1,7 +1,11 @@
 package com.ath.bukkit.safespawn;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.print.attribute.standard.Fidelity;
 
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
@@ -18,6 +22,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.ath.bukkit.safespawn.cmd.LinesReaderCmd;
 import com.ath.bukkit.safespawn.cmd.SpawnCmd;
 import com.ath.bukkit.safespawn.data.PlayerDao;
+import com.ath.bukkit.safespawn.data.SimpleKeyVal;
 import com.ath.bukkit.safespawn.event.BlockEventHandler;
 import com.ath.bukkit.safespawn.event.PlayerEventHandler;
 import com.ath.bukkit.safespawn.event.ZoneEventHandler;
@@ -35,13 +40,13 @@ public class SafeSpawn extends JavaPlugin {
 	public static final SafeSpawn instance() {
 		return self;
 	}
-	
+
 	@Override
 	public void saveConfig() {
 		super.saveConfig();
 		logLine( "saveConfig" );
 	}
-	
+
 	@Override
 	public void saveDefaultConfig() {
 		super.saveDefaultConfig();
@@ -61,7 +66,21 @@ public class SafeSpawn extends JavaPlugin {
 	}
 
 	@Override
+	public void onDisable() {
+		super.onDisable();
+		logLine( "onDisable" );
+	}
+
+	@Override
 	public void onEnable() {
+		try {
+			setupDatabase();
+			findExample();
+		}
+		catch ( Exception e ) {
+			logError( e );
+		}
+		
 		try {
 			initializeConfig();
 			initializeEvents();
@@ -112,7 +131,7 @@ public class SafeSpawn extends JavaPlugin {
 			public void playerInteractEvent( PlayerInteractEvent event ) {
 				PlayerEventHandler.onPlayerInteractEvent( SafeSpawn.this, event );
 			}
-			
+
 			@EventHandler
 			public void blockBreakEvent( BlockBreakEvent event ) {
 				BlockEventHandler.onBlockBreakEvent( SafeSpawn.this, event );
@@ -176,5 +195,32 @@ public class SafeSpawn extends JavaPlugin {
 
 	public WorldsManager getWorldsManager() {
 		return worldsManager;
+	}
+
+	private void setupDatabase() {
+		try {
+			getDatabase().find( SimpleKeyVal.class ).findRowCount();
+		} catch ( Exception e ) {
+			logError( e );
+			installDDL();
+		}
+	}
+
+	@Override
+	public List<Class<?>> getDatabaseClasses() {
+		List<Class<?>> out = new ArrayList<Class<?>>();
+		out.add( SimpleKeyVal.class );
+		return out;
+	}
+
+	public void findExample() {
+		SimpleKeyVal testOrig = new SimpleKeyVal();
+		testOrig.setKey( "test key" );
+		testOrig.setValue( "test value" );
+		logLine( "Test: " + testOrig.getId() + ", " + testOrig.getKey() + " = " + testOrig.getValue() );
+		getDatabase().save( testOrig );
+
+		SimpleKeyVal test = getDatabase().find( SimpleKeyVal.class ).where().ieq( "key", "test key" ).findUnique();
+		logLine( "Test: " + test.getId() + ", " + test.getKey() + " = " + test.getValue() );
 	}
 }

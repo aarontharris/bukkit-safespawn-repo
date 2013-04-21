@@ -20,7 +20,10 @@ public class ShrineSign extends MagicSign {
 	@Override
 	public boolean activateSign( Sign sign, PlayerInteractEvent event ) {
 		try {
+			SafeSpawn.logLine( "shrine sign" );
 			Location l = sign.getBlock().getLocation();
+
+			// TODO: associate metadata with the sign indicating if magic was used to create the sign or not -- it should only work if it was created with magic
 
 			int x = Location.locToBlock( l.getX() );
 			int y = Location.locToBlock( l.getY() );
@@ -30,8 +33,11 @@ public class ShrineSign extends MagicSign {
 			y -= 1;
 
 			Block block = event.getPlayer().getWorld().getBlockAt( x, y, z );
+			
+			SafeSpawn.logLine( " block is " + block.getType() );
 
 			if ( block.getType().equals( Material.CHEST ) ) {
+				SafeSpawn.logLine( " is chest " );
 				Chest chest = Functions.blockToChest( block );
 				Inventory inv = chest.getInventory();
 

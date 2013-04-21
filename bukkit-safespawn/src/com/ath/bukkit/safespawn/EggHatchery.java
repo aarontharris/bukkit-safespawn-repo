@@ -1,6 +1,5 @@
 package com.ath.bukkit.safespawn;
 
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 public class EggHatchery {

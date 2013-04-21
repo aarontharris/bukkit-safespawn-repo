@@ -122,7 +122,9 @@ public class Functions {
 			if ( inv != null && materials != null ) {
 				// first do a quick check to see if the mats need are in the inventory before doing all the other work...
 				for ( Material mat : materials ) {
+					SafeSpawn.logLine( " contains " + mat );
 					if ( !inv.contains( mat, count ) ) {
+						SafeSpawn.logLine( " contains " + mat + " false");
 						return false;
 					}
 				}

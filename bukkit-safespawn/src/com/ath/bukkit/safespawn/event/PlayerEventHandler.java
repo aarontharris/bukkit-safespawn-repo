@@ -20,8 +20,8 @@ import com.ath.bukkit.safespawn.Functions;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.Zone;
 import com.ath.bukkit.safespawn.Zone.ZoneExclude;
-import com.ath.bukkit.safespawn.data.PlayerJsonDao;
 import com.ath.bukkit.safespawn.data.PlayerData;
+import com.ath.bukkit.safespawn.data.PlayerJsonDao;
 import com.ath.bukkit.safespawn.magic.sign.MagicSign;
 import com.ath.bukkit.safespawn.magic.sign.SignReader;
 
@@ -75,6 +75,7 @@ public class PlayerEventHandler {
 						if ( zone.caresAbout( entity.getLocation(), ZoneExclude.PLAYER_DMG_FROM_ENTITY ) ) {
 							if ( !ZoneExclude.PLAYER_DMG_FROM_ENTITY.hasPermission( player, zone ) ) {
 								event.setCancelled( true );
+								break;
 							}
 						}
 					}

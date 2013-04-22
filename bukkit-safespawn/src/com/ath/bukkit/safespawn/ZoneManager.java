@@ -40,8 +40,17 @@ public class ZoneManager {
 		allZones.remove( zone );
 	}
 
+	// TODO: can still be better
+	// currently doing a radius check on all zones, find a way to hash down zones
+	// also doing a new HashSet each time, maybe we can cache this
 	public Set<Zone> findZones( Location l ) {
-		return new HashSet<Zone>( allZones ); // FIXME: make this better
+		HashSet<Zone> out = new HashSet<Zone>();
+		for ( Zone zone : allZones ) {
+			if ( zone.caresAbout( l ) ) {
+				out.add( zone );
+			}
+		}
+		return out;
 	}
 
 }

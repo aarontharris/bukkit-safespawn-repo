@@ -124,7 +124,7 @@ public class Functions {
 				for ( Material mat : materials ) {
 					SafeSpawn.logLine( " contains " + mat );
 					if ( !inv.contains( mat, count ) ) {
-						SafeSpawn.logLine( " contains " + mat + " false");
+						SafeSpawn.logLine( " contains " + mat + " false" );
 						return false;
 					}
 				}

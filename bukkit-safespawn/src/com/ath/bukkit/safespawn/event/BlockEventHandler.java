@@ -20,6 +20,7 @@ public class BlockEventHandler {
 				if ( !ZoneExclude.BLOCK_BREAK.hasPermission( player, zone ) ) {
 					event.setCancelled( true );
 					player.sendMessage( "This is a no block breaking zone" );
+					break;
 				}
 			}
 		}
@@ -42,6 +43,7 @@ public class BlockEventHandler {
 				if ( !ZoneExclude.BLOCK_PLACE.hasPermission( player, zone ) ) {
 					event.setCancelled( true );
 					player.sendMessage( "This is a no block placement protected zone" );
+					break;
 				}
 			}
 		}

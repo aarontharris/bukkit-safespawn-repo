@@ -2,6 +2,7 @@ package com.ath.bukkit.safespawn;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -72,13 +73,12 @@ public class SafeSpawn extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		try {
-			//setupDatabase();
-			//findExample();
-		}
-		catch ( Exception e ) {
+			setupDatabase();
+			findExample();
+		} catch ( Exception e ) {
 			logError( e );
 		}
-		
+
 		try {
 			initializeConfig();
 			initializeEvents();
@@ -200,25 +200,40 @@ public class SafeSpawn extends JavaPlugin {
 			getDatabase().find( SimpleKeyVal.class ).findRowCount();
 		} catch ( Exception e ) {
 			logError( e );
-			installDDL();
+			try {
+				installDDL();
+			} catch ( Exception e2 ) {
+				logError( e2 );
+			}
 		}
 	}
 
 	@Override
 	public List<Class<?>> getDatabaseClasses() {
 		List<Class<?>> out = new ArrayList<Class<?>>();
-		//out.add( SimpleKeyVal.class );
+		out.add( SimpleKeyVal.class );
 		return out;
 	}
 
 	public void findExample() {
-		SimpleKeyVal testOrig = new SimpleKeyVal();
-		testOrig.setKey( "test key" );
-		testOrig.setValue( "test value" );
-		logLine( "Test: " + testOrig.getId() + ", " + testOrig.getKey() + " = " + testOrig.getValue() );
-		getDatabase().save( testOrig );
+		try {
+			Set<SimpleKeyVal> old = getDatabase().find( SimpleKeyVal.class ).where().ieq( "key", "test key" ).findSet();
+			if ( old != null ) {
+				getDatabase().delete( old );
+			}
 
-		SimpleKeyVal test = getDatabase().find( SimpleKeyVal.class ).where().ieq( "key", "test key" ).findUnique();
-		logLine( "Test: " + test.getId() + ", " + test.getKey() + " = " + test.getValue() );
+			SimpleKeyVal testOrig = new SimpleKeyVal();
+			testOrig.setKey( "test key" );
+			testOrig.setValue( "test value" );
+			logLine( "Test: " + testOrig.getId() + ", " + testOrig.getKey() + " = " + testOrig.getValue() );
+			getDatabase().save( testOrig );
+
+			SimpleKeyVal test = getDatabase().find( SimpleKeyVal.class ).where().ieq( "key", "test key" ).findUnique();
+			logLine( "Test: " + test.getId() + ", " + test.getKey() + " = " + test.getValue() );
+
+			getDatabase().delete( test );
+		} catch ( Exception e ) {
+			logError( e );
+		}
 	}
 }

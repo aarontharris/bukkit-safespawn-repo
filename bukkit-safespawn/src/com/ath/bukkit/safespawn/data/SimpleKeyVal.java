@@ -1,16 +1,24 @@
 package com.ath.bukkit.safespawn.data;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-//@Entity
-//@Table( name = "DBTest" )
+import com.avaje.ebean.validation.NotEmpty;
+import com.avaje.ebean.validation.NotNull;
+
+
+@Entity
+@Table( name = "SimpleKeyVal" )
 public class SimpleKeyVal {
 
-	// @Id
+	@Id
 	private int id;
 
-	// @NotEmpty
+	@NotEmpty
 	private String key;
 
+	@NotNull
 	private String value;
 
 	public int getId() {

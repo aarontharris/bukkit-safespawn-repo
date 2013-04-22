@@ -26,6 +26,7 @@ public class Zone {
 	public static enum ZoneExclude {
 		BLOCK_BREAK( Const.PERM_blockbreak ),
 		BLOCK_PLACE( Const.PERM_blockplace ),
+		BADDIE_SPAWN( Const.PERM_baddiespawn ),
 		PLAYER_DMG_FROM_ENTITY( Const.PERM_player_dmg_from_entity );
 
 		private String permission;
@@ -111,6 +112,14 @@ public class Zone {
 	private boolean playerTakesDamage;
 
 	public Zone() {
+	}
+
+	public boolean caresAbout( Location l ) {
+		return Functions.insideZone( this, l );
+	}
+
+	public boolean caresAbout( ZoneExclude ex ) {
+		return hasExclude( ex );
 	}
 
 	public boolean caresAbout( Location l, ZoneExclude ex ) {

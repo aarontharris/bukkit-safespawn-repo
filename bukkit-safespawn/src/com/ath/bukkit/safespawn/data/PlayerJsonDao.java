@@ -4,9 +4,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.json.simple.JSONObject;
 
-public class PlayerDao extends BaseDao {
+public class PlayerJsonDao extends BaseJsonDao {
 
-	public PlayerDao( JavaPlugin plugin ) {
+	public PlayerJsonDao( JavaPlugin plugin ) {
 		super( plugin );
 	}
 

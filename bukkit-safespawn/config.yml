@@ -38,6 +38,7 @@ zones:
       - BLOCK_BREAK
       - BLOCK_PLACE
       - PLAYER_DMG_FROM_ENTITY
+      - BADDIE_SPAWN
     radius: 100 
     world: world
     x: 50

@@ -9,14 +9,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-public class BaseDao {
+public class BaseJsonDao {
 
 	// public static final Gson gson = new GsonBuilder() .setFieldNamingPolicy( FieldNamingPolicy.UPPER_CAMEL_CASE ) .setDateFormat( "yyyy-MM-dd'T'HH:mm:ss Z" )
 	// .create();
 
 	private JavaPlugin plugin;
 
-	public BaseDao( JavaPlugin plugin ) {
+	public BaseJsonDao( JavaPlugin plugin ) {
 		this.plugin = plugin;
 	}
 

@@ -2,10 +2,19 @@ package com.ath.bukkit.safespawn.data;
 
 import java.util.Date;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.json.simple.JSONObject;
 
+@Entity
+@Table( name = "PlayerData" )
 public class PlayerData implements JSONSerializable {
 
+	@Id
+	private int id;
+	
 	private String name;
 	private Date firstLogin;
 	private Date lastLogin;

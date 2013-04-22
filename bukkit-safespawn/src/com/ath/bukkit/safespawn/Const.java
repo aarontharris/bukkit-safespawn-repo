@@ -9,6 +9,7 @@ public final class Const {
 	public static final String PERM_magic_sign = "safespawn.magic.sign";
 	public static final String PERM_blockbreak = "safespawn.block_break";
 	public static final String PERM_blockplace = "safespawn.block_place";
+	public static final String PERM_baddiespawn = "safespawn.baddie_spawn";
 	public static final String PERM_spawn = "safespawn.spawn";
 	public static final String PERM_player_dmg_from_entity = "safespawn.player_takes_dmg_from_entity";
 

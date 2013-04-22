@@ -20,7 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.ath.bukkit.safespawn.cmd.LinesReaderCmd;
 import com.ath.bukkit.safespawn.cmd.SpawnCmd;
-import com.ath.bukkit.safespawn.data.PlayerDao;
+import com.ath.bukkit.safespawn.data.PlayerJsonDao;
 import com.ath.bukkit.safespawn.data.SimpleKeyVal;
 import com.ath.bukkit.safespawn.event.BlockEventHandler;
 import com.ath.bukkit.safespawn.event.PlayerEventHandler;
@@ -33,7 +33,7 @@ public class SafeSpawn extends JavaPlugin {
 	private ZoneManager zoneManager;
 	private PlayerManager playerManager;
 	private Location spawnLocation;
-	private PlayerDao dao;
+	private PlayerJsonDao dao;
 	private WorldsManager worldsManager;
 
 	public static final SafeSpawn instance() {
@@ -58,7 +58,7 @@ public class SafeSpawn extends JavaPlugin {
 		super.onLoad();
 
 		logger = getLogger();
-		dao = new PlayerDao( this );
+		dao = new PlayerJsonDao( this );
 		zoneManager = new ZoneManager( this );
 		playerManager = new PlayerManager( this );
 		worldsManager = new WorldsManager( this );
@@ -74,7 +74,7 @@ public class SafeSpawn extends JavaPlugin {
 	public void onEnable() {
 		try {
 			setupDatabase();
-			findExample();
+			dbTestExample();
 		} catch ( Exception e ) {
 			logError( e );
 		}
@@ -154,7 +154,7 @@ public class SafeSpawn extends JavaPlugin {
 		getCommand( Const.CMD_spawn ).setExecutor( new SpawnCmd( this ) );
 	}
 
-	public PlayerDao getPlayerDao() {
+	public PlayerJsonDao getPlayerDao() {
 		return dao;
 	}
 
@@ -215,7 +215,7 @@ public class SafeSpawn extends JavaPlugin {
 		return out;
 	}
 
-	public void findExample() {
+	public void dbTestExample() {
 		try {
 			Set<SimpleKeyVal> old = getDatabase().find( SimpleKeyVal.class ).where().ieq( "key", "test key" ).findSet();
 			if ( old != null ) {

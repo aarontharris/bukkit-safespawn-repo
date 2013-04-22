@@ -20,7 +20,7 @@ import com.ath.bukkit.safespawn.Functions;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.Zone;
 import com.ath.bukkit.safespawn.Zone.ZoneExclude;
-import com.ath.bukkit.safespawn.data.PlayerDao;
+import com.ath.bukkit.safespawn.data.PlayerJsonDao;
 import com.ath.bukkit.safespawn.data.PlayerData;
 import com.ath.bukkit.safespawn.magic.sign.MagicSign;
 import com.ath.bukkit.safespawn.magic.sign.SignReader;
@@ -34,7 +34,7 @@ public class PlayerEventHandler {
 			player.sendMessage( plugin.getConfig().getString( Const.MSG_welcome_message ) );
 
 			// configure first time user data
-			PlayerDao dao = plugin.getPlayerDao();
+			PlayerJsonDao dao = plugin.getPlayerDao();
 			PlayerData data = dao.readPlayerData( player );
 			if ( data.getTimesLoggedIn() == 0 ) {
 				data = new PlayerData();

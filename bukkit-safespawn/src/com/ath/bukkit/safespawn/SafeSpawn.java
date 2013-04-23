@@ -20,11 +20,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.ath.bukkit.safespawn.cmd.LinesReaderCmd;
 import com.ath.bukkit.safespawn.cmd.SpawnCmd;
-import com.ath.bukkit.safespawn.data.PlayerJsonDao;
+import com.ath.bukkit.safespawn.data.Persisted;
+import com.ath.bukkit.safespawn.data.PlayerData;
+import com.ath.bukkit.safespawn.data.PlayerStore;
 import com.ath.bukkit.safespawn.data.SimpleKeyVal;
 import com.ath.bukkit.safespawn.event.BlockEventHandler;
 import com.ath.bukkit.safespawn.event.PlayerEventHandler;
 import com.ath.bukkit.safespawn.event.ZoneEventHandler;
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 
 public class SafeSpawn extends JavaPlugin {
 
@@ -33,8 +37,9 @@ public class SafeSpawn extends JavaPlugin {
 	private ZoneManager zoneManager;
 	private PlayerManager playerManager;
 	private Location spawnLocation;
-	private PlayerJsonDao dao;
 	private WorldsManager worldsManager;
+
+	private PlayerStore playerStore;
 
 	public static final SafeSpawn instance() {
 		return self;
@@ -58,10 +63,19 @@ public class SafeSpawn extends JavaPlugin {
 		super.onLoad();
 
 		logger = getLogger();
-		dao = new PlayerJsonDao( this );
+
+		try {
+			setupDatabase();
+			dbTestExample();
+		} catch ( Exception e ) {
+			logError( e );
+		}
+
 		zoneManager = new ZoneManager( this );
 		playerManager = new PlayerManager( this );
 		worldsManager = new WorldsManager( this );
+
+		playerStore = new PlayerStore( getDatabase() );
 	}
 
 	@Override
@@ -72,13 +86,6 @@ public class SafeSpawn extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		try {
-			setupDatabase();
-			dbTestExample();
-		} catch ( Exception e ) {
-			logError( e );
-		}
-
 		try {
 			initializeConfig();
 			initializeEvents();
@@ -154,8 +161,8 @@ public class SafeSpawn extends JavaPlugin {
 		getCommand( Const.CMD_spawn ).setExecutor( new SpawnCmd( this ) );
 	}
 
-	public PlayerJsonDao getPlayerDao() {
-		return dao;
+	public PlayerStore getPlayerStore() {
+		return playerStore;
 	}
 
 	public Location getSpawnLocation() {
@@ -197,14 +204,38 @@ public class SafeSpawn extends JavaPlugin {
 
 	private void setupDatabase() {
 		try {
-			getDatabase().find( SimpleKeyVal.class ).findRowCount();
+			for ( Class<?> clazz : getDatabaseClasses() ) {
+				try {
+					getDatabase().find( clazz ).findRowCount();
+				} catch ( Exception e ) {
+					initializePersistedClass( clazz );
+				}
+			}
 		} catch ( Exception e ) {
 			logError( e );
-			try {
-				installDDL();
-			} catch ( Exception e2 ) {
-				logError( e2 );
+		}
+	}
+
+	private void initializePersistedClass( Class<?> clazz ) {
+		try {
+			Object o = clazz.newInstance();
+			if ( o instanceof Persisted ) {
+				Persisted persisted = (Persisted) o;
+				try {
+					logLine( "Initializing: " + clazz.getName() );
+					SpiEbeanServer db = (SpiEbeanServer) getDatabase();
+					DdlGenerator gen = db.getDdlGenerator();
+					for ( String query : persisted.getSchema() ) {
+						gen.runScript( true, query );
+					}
+				} catch ( Exception e3 ) {
+					// mute
+				}
+			} else {
+				logLine( "All Database Objects must implement Pesisted" );
 			}
+		} catch ( Exception e2 ) {
+			logError( e2 );
 		}
 	}
 
@@ -212,6 +243,7 @@ public class SafeSpawn extends JavaPlugin {
 	public List<Class<?>> getDatabaseClasses() {
 		List<Class<?>> out = new ArrayList<Class<?>>();
 		out.add( SimpleKeyVal.class );
+		out.add( PlayerData.class );
 		return out;
 	}
 

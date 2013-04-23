@@ -2,43 +2,58 @@ package com.ath.bukkit.safespawn.data;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.json.simple.JSONObject;
+import org.bukkit.entity.Player;
 
 @Entity
 @Table( name = "PlayerData" )
-public class PlayerData implements JSONSerializable {
+public class PlayerData implements Persisted {
+	public static final String[] SCHEMA = {
+			"create table PlayerData" +
+					"(" +
+					"name TEXT," +
+					"firstLogin timestamp," +
+					"lastLogin timestamp," +
+					"timesLoggedIn INTEGER," +
+					"id INTEGER primary key autoincrement" +
+					");",
+			"CREATE INDEX PlayerData_name_INDEX ON PlayerData (name);"
+	};
+
+	@Override
+	public String[] getSchema() {
+		return SCHEMA;
+	}
 
 	@Id
 	private int id;
-	
+
+	@Column( name = "name" )
 	private String name;
+
+	@Column( name = "firstLogin" )
 	private Date firstLogin;
+
+	@Column( name = "lastLogin" )
 	private Date lastLogin;
+
+	@Column( name = "timesLoggedIn" )
 	private int timesLoggedIn = 0;
 
 	public PlayerData() {
 	}
 
-	public JSONObject toJson() throws Exception {
-		JSUtl js = new JSUtl( new JSONObject() );
-		js.put( "name", name );
-		js.put( "firstLogin", firstLogin );
-		js.put( "lastLogin", lastLogin );
-		js.put( "timesLoggedIn", timesLoggedIn );
-		return js.getJSON();
-	}
-
-	@Override
-	public void fromJson( JSONObject json ) throws Exception {
-		JSUtl js = new JSUtl( json );
-		name = js.getString( "name", null );
-		firstLogin = js.getDate( "firstLogin", null );
-		lastLogin = js.getDate( "lastLogin", null );
-		timesLoggedIn = js.getInteger( "timesLoggedIn", 0 );
+	public static PlayerData newPlayerData( Player player ) {
+		PlayerData out = new PlayerData();
+		out.setId( player.getEntityId() );
+		out.setName( player.getName() );
+		out.setFirstLogin( new Date() );
+		out.setLastLogin( out.getFirstLogin() );
+		return out;
 	}
 
 	@Override
@@ -76,6 +91,14 @@ public class PlayerData implements JSONSerializable {
 
 	public void setTimesLoggedIn( int timesLoggedIn ) {
 		this.timesLoggedIn = timesLoggedIn;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId( int id ) {
+		this.id = id;
 	}
 
 }

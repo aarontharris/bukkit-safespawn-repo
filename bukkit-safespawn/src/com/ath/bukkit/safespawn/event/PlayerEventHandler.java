@@ -21,7 +21,6 @@ import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.Zone;
 import com.ath.bukkit.safespawn.Zone.ZoneExclude;
 import com.ath.bukkit.safespawn.data.PlayerData;
-import com.ath.bukkit.safespawn.data.PlayerJsonDao;
 import com.ath.bukkit.safespawn.magic.sign.MagicSign;
 import com.ath.bukkit.safespawn.magic.sign.SignReader;
 
@@ -33,23 +32,34 @@ public class PlayerEventHandler {
 			plugin.getPlayerManager().cachePlayer( player );
 			player.sendMessage( plugin.getConfig().getString( Const.MSG_welcome_message ) );
 
-			// configure first time user data
-			PlayerJsonDao dao = plugin.getPlayerDao();
-			PlayerData data = dao.readPlayerData( player );
-			if ( data.getTimesLoggedIn() == 0 ) {
-				data = new PlayerData();
-				data.setName( player.getName() );
-				data.setFirstLogin( new Date() );
+			PlayerData data = plugin.getPlayerStore().getPlayerData( player );
 
-				// Teleport first time users to spawn area
-				{
-					player.setBedSpawnLocation( plugin.getSpawnLocation().clone(), true );
-					Functions.teleport( plugin, player, plugin.getSpawnLocation() );
+			// User Maintenance
+			{
+				// New User
+				if ( data == null ) {
+					SafeSpawn.logLine( "creating new user: " + player.getName() );
+					data = PlayerData.newPlayerData( player );
+					data.setTimesLoggedIn( 1 );
+
+					// Teleport first time users to spawn area
+					{
+						player.setBedSpawnLocation( plugin.getSpawnLocation().clone(), true );
+						Functions.teleport( plugin, player, plugin.getSpawnLocation() );
+					}
 				}
+
+				// Returning users
+				else {
+					SafeSpawn.logLine( "returning user: " + player.getName() );
+					data.setLastLogin( new Date() );
+					data.setTimesLoggedIn( data.getTimesLoggedIn() + 1 );
+				}
+
+				// Save
+				plugin.getPlayerStore().savePlayerData( data );
 			}
-			data.setLastLogin( new Date() );
-			data.setTimesLoggedIn( data.getTimesLoggedIn() + 1 );
-			dao.writePlayerData( data, player );
+
 		} catch ( Exception e ) {
 			SafeSpawn.logError( e );
 		}

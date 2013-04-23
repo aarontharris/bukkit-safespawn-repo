@@ -11,23 +11,38 @@ import com.avaje.ebean.validation.NotNull;
 
 @Entity
 @Table( name = "SimpleKeyVal" )
-public class SimpleKeyVal {
+public class SimpleKeyVal implements Persisted {
 	public static final String KEY = "key";
 	public static final String val = "value";
+
+	public static final String[] SCHEMA = {
+			"create table SimpleKeyVal" +
+					"(" +
+					"key TEXT," +
+					"value TEXT," +
+					"id INTEGER primary key autoincrement" +
+					");",
+			"CREATE INDEX SimpleKeyVal_key_INDEX ON SimpleKeyVal (key);" };
+
+	@Override
+	public String[] getSchema() {
+		return SCHEMA;
+	}
 
 	@Id
 	private int id;
 
 	@NotEmpty
-	@Column( unique = true )
+	@Column( name = "key", unique = true )
 	private String key;
 
 	@NotNull
+	@Column( name = "value" )
 	private String value;
 
 	public SimpleKeyVal() {
 	}
-	
+
 	public SimpleKeyVal( String key, String val ) {
 		setKey( key );
 		setValue( val );

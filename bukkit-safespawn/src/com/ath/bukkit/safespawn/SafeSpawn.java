@@ -18,8 +18,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.ath.bukkit.safespawn.cmd.CastCmd;
 import com.ath.bukkit.safespawn.cmd.LinesReaderCmd;
 import com.ath.bukkit.safespawn.cmd.SpawnCmd;
+import com.ath.bukkit.safespawn.data.BlockData;
+import com.ath.bukkit.safespawn.data.BlockStore;
 import com.ath.bukkit.safespawn.data.Persisted;
 import com.ath.bukkit.safespawn.data.PlayerData;
 import com.ath.bukkit.safespawn.data.PlayerStore;
@@ -40,6 +43,7 @@ public class SafeSpawn extends JavaPlugin {
 	private WorldsManager worldsManager;
 
 	private PlayerStore playerStore;
+	private BlockStore blockStore;
 
 	public static final SafeSpawn instance() {
 		return self;
@@ -76,6 +80,7 @@ public class SafeSpawn extends JavaPlugin {
 		worldsManager = new WorldsManager( this );
 
 		playerStore = new PlayerStore( getDatabase() );
+		blockStore = new BlockStore( getDatabase() );
 	}
 
 	@Override
@@ -159,10 +164,16 @@ public class SafeSpawn extends JavaPlugin {
 		getCommand( Const.CMD_rules ).setExecutor( new LinesReaderCmd( this, Const.MSG_rules ) );
 		getCommand( Const.CMD_gamedesc ).setExecutor( new LinesReaderCmd( this, Const.MSG_gamedesc ) );
 		getCommand( Const.CMD_spawn ).setExecutor( new SpawnCmd( this ) );
+		getCommand( Const.CMD_cast ).setExecutor( new CastCmd( this ) );
+		getCommand( Const.CMD_casthelp ).setExecutor( new LinesReaderCmd( this, Const.MSG_casthelp ) );
 	}
 
 	public PlayerStore getPlayerStore() {
 		return playerStore;
+	}
+
+	public BlockStore getBlockStore() {
+		return blockStore;
 	}
 
 	public Location getSpawnLocation() {
@@ -245,6 +256,7 @@ public class SafeSpawn extends JavaPlugin {
 		List<Class<?>> out = new ArrayList<Class<?>>();
 		out.add( SimpleKeyVal.class );
 		out.add( PlayerData.class );
+		out.add( BlockData.class );
 		return out;
 	}
 

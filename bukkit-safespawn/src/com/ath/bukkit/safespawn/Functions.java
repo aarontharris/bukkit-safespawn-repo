@@ -183,4 +183,15 @@ public class Functions {
 		Chest chest = (Chest) block.getState();
 		return chest;
 	}
+
+	public static String toString( Location l ) {
+		try {
+			if ( l != null ) {
+				return "x=" + (int) l.getX() + ",y=" + (int) l.getY() + ",z=" + (int) l.getZ() + ",w=" + l.getWorld().getName();
+			}
+		} catch ( Exception e ) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

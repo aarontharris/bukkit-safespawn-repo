@@ -65,6 +65,8 @@ public class PlayerData implements Persisted {
 	private String flags;
 
 	private transient JSONObject flagsJSON;
+	
+	private transient boolean casting;
 
 	public PlayerData() {
 	}
@@ -171,6 +173,14 @@ public class PlayerData implements Persisted {
 			flagsJSON = new JSONObject();
 		}
 		return flagsJSON;
+	}
+
+	public boolean isCasting() {
+		return casting;
+	}
+
+	public void setCasting( boolean casting ) {
+		this.casting = casting;
 	}
 
 }

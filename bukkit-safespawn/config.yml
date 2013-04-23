@@ -31,6 +31,8 @@ rules:
   - 1. Dont be a dick.
   - 2. Dont ask to change the server settings.
   - 3. Obey the rules.
+help-cast:
+  - If you have figured out how to encode a magic sign, type /cast and then place it.
 zones:
   zone0:
     description: Iron Spawn 

@@ -101,15 +101,18 @@ public class PlayerEventHandler {
 			if ( event.getAction().equals( Action.LEFT_CLICK_BLOCK ) ) {
 				Block block = event.getClickedBlock();
 
-				if ( event.getPlayer().getName().equals( "angryBits" ) ) {
-					SafeSpawn.logLine( "player clicked: " + block.getType() );
-				}
-
 				// WALL SIGN
 				if ( block.getType().equals( Material.WALL_SIGN ) || block.getType().equals( Material.SIGN_POST ) ) { // || block.getType().equals( Material.SIGN ) ) {
 					if ( event.getPlayer().hasPermission( Const.PERM_magic_sign ) ) {
 						BlockState state = block.getState();
 						if ( state instanceof Sign ) {
+							try {
+								boolean isMagic = plugin.getBlockStore().isMagical( block );
+								SafeSpawn.logLine( "Block is magical == " + isMagic );
+							} catch ( Exception e ) {
+								SafeSpawn.logError( e );
+							}
+
 							MagicSign sign = SignReader.readSign( (Sign) state );
 							if ( sign.activateSign( (Sign) state, event ) ) {
 								// TODO: send a message?

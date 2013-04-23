@@ -16,4 +16,12 @@ commands:
   spawn:
     description: Return to the spawn area.
     permission: safespawn.spawn
-    permission-message: You don't have permission
+    permission-message: You don't have that ability
+  cast:
+    description: Magically enhances blocks and actions
+    permission: safespawn.magic.cast
+    permission-message: You don't have that ability
+  help-cast:
+    description: Explains how to cast magic
+    permission: safespawn.magic.cast
+    permission-message: You don't have that ability

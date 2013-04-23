@@ -12,6 +12,7 @@ public final class Const {
 	public static final String PERM_baddiespawn = "safespawn.baddie_spawn";
 	public static final String PERM_spawn = "safespawn.spawn";
 	public static final String PERM_player_dmg_from_entity = "safespawn.player_takes_dmg_from_entity";
+	public static final String PERM_magic_cast = "safespawn.magic.cast";
 
 	public static final String MISSING_MSG = "Nothing... absolutely nothing...";
 
@@ -27,6 +28,10 @@ public final class Const {
 	public static final String CFG_spawnpoint = "spawnpoint";
 
 	public static final String CMD_spawn = "spawn";
+	public static final String CMD_cast = "cast";
+	
+	public static final String CMD_casthelp = "help-cast";
+	public static final String MSG_casthelp = "help-cast";
 
 	public static final String CMD_rules = "rules";
 	public static final String MSG_rules = "rules";

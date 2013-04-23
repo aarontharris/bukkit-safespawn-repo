@@ -32,6 +32,13 @@ public class PlayerStore {
 		}
 	}
 
+	public PlayerData getPlayerDataFromCache( Player player ) {
+		if ( player != null ) {
+			return playerDataCache.get( player.getName() );
+		}
+		return null;
+	}
+
 	/**
 	 * @param player
 	 * @return null would suggest a new user, or database was deleted
@@ -94,6 +101,29 @@ public class PlayerStore {
 			}
 		} catch ( Exception e ) {
 			logError( e );
+		}
+	}
+
+	public boolean isCasting( Player player ) {
+		try {
+			PlayerData data = getPlayerDataFromCache( player );
+			if ( data != null && data.isCasting() ) {
+				return true;
+			}
+		} catch ( Exception e ) {
+			SafeSpawn.logError( e );
+		}
+		return false;
+	}
+
+	public void endCasting( Player player ) {
+		try {
+			if ( isCasting( player ) ) {
+				getPlayerDataFromCache( player ).setCasting( false );
+				player.sendMessage( "Your /cast has been consumed." );
+			}
+		} catch ( Exception e ) {
+			SafeSpawn.logError( e );
 		}
 	}
 }

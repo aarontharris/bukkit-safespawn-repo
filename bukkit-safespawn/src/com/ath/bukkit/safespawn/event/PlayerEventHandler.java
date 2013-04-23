@@ -20,6 +20,7 @@ import com.ath.bukkit.safespawn.Functions;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.Zone;
 import com.ath.bukkit.safespawn.Zone.ZoneExclude;
+import com.ath.bukkit.safespawn.data.BlockData;
 import com.ath.bukkit.safespawn.data.PlayerData;
 import com.ath.bukkit.safespawn.magic.sign.MagicSign;
 import com.ath.bukkit.safespawn.magic.sign.SignReader;
@@ -107,8 +108,7 @@ public class PlayerEventHandler {
 						BlockState state = block.getState();
 						if ( state instanceof Sign ) {
 							try {
-								boolean isMagic = plugin.getBlockStore().isMagical( block );
-								SafeSpawn.logLine( "Block is magical == " + isMagic );
+								SafeSpawn.logLine( "Block is magical == " + BlockData.isMagical( block ) );
 							} catch ( Exception e ) {
 								SafeSpawn.logError( e );
 							}

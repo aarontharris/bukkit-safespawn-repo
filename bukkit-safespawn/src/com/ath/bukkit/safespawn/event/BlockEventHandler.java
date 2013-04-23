@@ -76,7 +76,6 @@ public class BlockEventHandler {
 				if ( plugin.getPlayerStore().isCasting( player ) ) {
 					BlockData data = plugin.getBlockStore().attainBlockData( event.getBlock() );
 					data.setMagical( true );
-					plugin.getBlockStore().saveBlockData( data );
 				}
 			}
 		} catch ( Exception e ) {

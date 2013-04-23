@@ -23,6 +23,7 @@ public class BlockData implements Persisted {
 					"(" +
 					"hash TEXT," +
 					"meta BLOB," +
+					"lastModified bigint," +
 					"id INTEGER primary key autoincrement" +
 					");",
 			"CREATE INDEX BlockData_hash_INDEX ON BlockData (hash);"
@@ -38,13 +39,28 @@ public class BlockData implements Persisted {
 		}
 		return null;
 	}
-	
+
 	public static BlockData newBlockData( Block block ) {
 		BlockData out = new BlockData();
 		out.setHash( toHash( block ) );
+		out.setLastModified( System.currentTimeMillis() );
 		return out;
 	}
+
+	/** not null - but will create if doesnt exist */
+	public static BlockData attain( Block block ) {
+		return SafeSpawn.instance().getBlockStore().attainBlockData( block );
+	}
+
+	/** can be null */
+	public static BlockData get( Block block ) {
+		return SafeSpawn.instance().getBlockStore().getBlockData( toHash( block ) );
+	}
 	
+	public static boolean isMagical( Block block ) {
+		return SafeSpawn.instance().getBlockStore().isMagical( block );
+	}
+
 	public BlockData() {
 	}
 
@@ -56,6 +72,9 @@ public class BlockData implements Persisted {
 	@Id
 	private int id;
 
+	@Column( name = "lastModified" )
+	private long lastModified;
+
 	@Column( name = "hash", unique = true )
 	private String hash;
 
@@ -63,6 +82,8 @@ public class BlockData implements Persisted {
 	private String meta;
 
 	private transient JSONObject metaJSON;
+
+	private transient boolean modified;
 
 
 	public void setMagical( boolean isMagical ) {
@@ -77,6 +98,7 @@ public class BlockData implements Persisted {
 	private void putString( String key, String value ) {
 		try {
 			getMetaJSON().put( key, value );
+			setModified( true );
 		} catch ( Exception e ) {
 			SafeSpawn.logError( e );
 		}
@@ -138,5 +160,22 @@ public class BlockData implements Persisted {
 
 	public void setHash( String hash ) {
 		this.hash = hash;
+	}
+
+	public long getLastModified() {
+		return lastModified;
+	}
+
+	public void setLastModified( long lastModified ) {
+		this.lastModified = lastModified;
+	}
+
+	boolean isModified() {
+		return modified;
+	}
+
+	void setModified( boolean modified ) {
+		this.modified = modified;
+		setLastModified( System.currentTimeMillis() );
 	}
 }

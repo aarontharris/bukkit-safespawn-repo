@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.ath.bukkit.safespawn.TaskManager.Task;
 import com.ath.bukkit.safespawn.cmd.CastCmd;
 import com.ath.bukkit.safespawn.cmd.LinesReaderCmd;
 import com.ath.bukkit.safespawn.cmd.SpawnCmd;
@@ -44,6 +45,8 @@ public class SafeSpawn extends JavaPlugin {
 
 	private PlayerStore playerStore;
 	private BlockStore blockStore;
+
+	private TaskManager taskman;
 
 	public static final SafeSpawn instance() {
 		return self;
@@ -87,6 +90,13 @@ public class SafeSpawn extends JavaPlugin {
 	public void onDisable() {
 		super.onDisable();
 		logLine( "onDisable" );
+
+		try {
+			taskman.shutdown();
+			taskman = null;
+		} catch ( Exception e ) {
+			logError( e );
+		}
 	}
 
 	@Override
@@ -96,6 +106,16 @@ public class SafeSpawn extends JavaPlugin {
 			initializeEvents();
 			initializeCommands();
 			playerManager.initialize();
+
+			taskman = new TaskManager();
+			
+			// tasks
+			taskman.addTask( new Task() {
+				@Override
+				public void run() {
+					getBlockStore().syncAll();
+				}
+			} );
 		} catch ( Exception e ) {
 			logger.log( Level.SEVERE, e.getMessage(), e );
 		}

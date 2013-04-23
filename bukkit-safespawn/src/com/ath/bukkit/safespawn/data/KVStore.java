@@ -17,7 +17,7 @@ public class KVStore {
 		SafeSpawn.logError( e );
 	}
 
-	public String findStringByString( String key ) {
+	private String findStringByString( String key ) {
 		try {
 			Set<SimpleKeyVal> vals = database.find( SimpleKeyVal.class ).where().ieq( SimpleKeyVal.KEY, key ).findSet();
 			for ( SimpleKeyVal val : vals ) {
@@ -29,7 +29,7 @@ public class KVStore {
 		return null;
 	}
 
-	public void putStringByString( String key, String value ) {
+	private void putStringByString( String key, String value ) {
 		try {
 			Set<SimpleKeyVal> vals = database.find( SimpleKeyVal.class ).where().ieq( SimpleKeyVal.KEY, key ).findSet();
 			if ( vals.size() > 0 ) {

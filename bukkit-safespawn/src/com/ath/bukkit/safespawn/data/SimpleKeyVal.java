@@ -18,7 +18,7 @@ public class SimpleKeyVal implements Persisted {
 	public static final String[] SCHEMA = {
 			"create table SimpleKeyVal" +
 					"(" +
-					"key TEXT," +
+					"key varchar(255)," +
 					"value TEXT," +
 					"id INTEGER primary key autoincrement" +
 					");",

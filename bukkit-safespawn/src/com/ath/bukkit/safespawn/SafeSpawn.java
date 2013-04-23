@@ -226,6 +226,7 @@ public class SafeSpawn extends JavaPlugin {
 					SpiEbeanServer db = (SpiEbeanServer) getDatabase();
 					DdlGenerator gen = db.getDdlGenerator();
 					for ( String query : persisted.getSchema() ) {
+						SafeSpawn.logLine( gen.generateCreateDdl() );
 						gen.runScript( true, query );
 					}
 				} catch ( Exception e3 ) {

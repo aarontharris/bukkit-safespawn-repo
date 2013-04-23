@@ -8,6 +8,10 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.bukkit.entity.Player;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+import com.ath.bukkit.safespawn.SafeSpawn;
 
 @Entity
 @Table( name = "PlayerData" )
@@ -21,10 +25,21 @@ public class PlayerData implements Persisted {
 					"firstLogin timestamp," +
 					"lastLogin timestamp," +
 					"timesLoggedIn INTEGER," +
+					"flags BLOB," +
 					"id INTEGER primary key autoincrement" +
 					");",
 			"CREATE INDEX PlayerData_name_INDEX ON PlayerData (name);"
-	};
+	}; // alter table PlayerData add column flags BLOB;
+
+	/*
+	 * BEGIN TRANSACTION;
+	 * CREATE TEMPORARY TABLE backup as select * from PlayerData;
+	 * DROP TABLE PlayerData;
+	 * // paste create schema
+	 * INSERT INTO PlayerData SELECT * FROM backup;
+	 * DROP TABLE backup;
+	 * COMMIT;
+	 */
 
 	@Override
 	public String[] getSchema() {
@@ -46,6 +61,11 @@ public class PlayerData implements Persisted {
 	@Column( name = "timesLoggedIn" )
 	private int timesLoggedIn = 0;
 
+	@Column( name = "flags" )
+	private String flags;
+
+	private transient JSONObject flagsJSON;
+
 	public PlayerData() {
 	}
 
@@ -55,6 +75,27 @@ public class PlayerData implements Persisted {
 		out.setFirstLogin( new Date() );
 		out.setLastLogin( out.getFirstLogin() );
 		return out;
+	}
+
+	@SuppressWarnings( "unchecked" )
+	public void putString( String key, String value ) {
+		try {
+			getFlagsJSON().put( key, value );
+		} catch ( Exception e ) {
+			SafeSpawn.logError( e );
+		}
+	}
+
+	public String getString( String key, String defaultValue ) {
+		try {
+			String out = (String) getFlagsJSON().get( key );
+			if ( out != null ) {
+				return out;
+			}
+		} catch ( Exception e ) {
+			SafeSpawn.logError( e );
+		}
+		return defaultValue;
 	}
 
 	@Override
@@ -100,6 +141,36 @@ public class PlayerData implements Persisted {
 
 	public void setId( int id ) {
 		this.id = id;
+	}
+
+	/** @deprecated - used by ORM */
+	public String getFlags() {
+		SafeSpawn.logLine( "getFlags()" );
+		this.flags = getFlagsJSON().toString();
+		return this.flags;
+	}
+
+	/** @deprecated - used by ORM */
+	public void setFlags( String flags ) {
+		SafeSpawn.logLine( "setFlags( " + flags + " )" );
+		try {
+			if ( flags == null || flags.isEmpty() ) {
+				flags = "{}";
+			}
+			JSONParser parser = new JSONParser();
+			this.flags = flags;
+			this.flagsJSON = (JSONObject) parser.parse( flags );
+		} catch ( Exception e ) {
+			SafeSpawn.logError( e );
+		}
+	}
+
+	private JSONObject getFlagsJSON() {
+		SafeSpawn.logLine( "getFlagsJSON()" );
+		if ( flagsJSON == null ) {
+			flagsJSON = new JSONObject();
+		}
+		return flagsJSON;
 	}
 
 }

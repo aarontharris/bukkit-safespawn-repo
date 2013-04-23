@@ -12,6 +12,8 @@ import org.bukkit.entity.Player;
 @Entity
 @Table( name = "PlayerData" )
 public class PlayerData implements Persisted {
+	public static final String NAME = "name";
+
 	public static final String[] SCHEMA = {
 			"create table PlayerData" +
 					"(" +
@@ -32,7 +34,7 @@ public class PlayerData implements Persisted {
 	@Id
 	private int id;
 
-	@Column( name = "name" )
+	@Column( name = "name", unique = true )
 	private String name;
 
 	@Column( name = "firstLogin" )
@@ -49,7 +51,6 @@ public class PlayerData implements Persisted {
 
 	public static PlayerData newPlayerData( Player player ) {
 		PlayerData out = new PlayerData();
-		out.setId( player.getEntityId() );
 		out.setName( player.getName() );
 		out.setFirstLogin( new Date() );
 		out.setLastLogin( out.getFirstLogin() );

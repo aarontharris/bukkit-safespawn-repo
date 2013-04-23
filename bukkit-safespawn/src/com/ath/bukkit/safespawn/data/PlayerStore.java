@@ -11,7 +11,7 @@ import com.avaje.ebean.EbeanServer;
 public class PlayerStore {
 
 	private EbeanServer database;
-	private Map<Integer, PlayerData> playerDataCache = new HashMap<Integer, PlayerData>();
+	private Map<String, PlayerData> playerDataCache = new HashMap<String, PlayerData>();
 
 	public PlayerStore( EbeanServer database ) {
 		this.database = database;
@@ -25,7 +25,7 @@ public class PlayerStore {
 	public void removeFromCache( Player player ) {
 		try {
 			if ( player != null ) {
-				playerDataCache.remove( player.getEntityId() );
+				playerDataCache.remove( player.getName() );
 			}
 		} catch ( Exception e ) {
 			logError( e );
@@ -39,11 +39,11 @@ public class PlayerStore {
 	public PlayerData getPlayerData( Player player ) {
 		try {
 			if ( player != null ) {
-				PlayerData data = playerDataCache.get( player.getEntityId() );
+				PlayerData data = playerDataCache.get( player.getName() );
 				if ( data == null ) {
 					data = getPlayerDataByPlayer( player );
 					if ( data != null ) {
-						playerDataCache.put( data.getId(), data );
+						playerDataCache.put( data.getName(), data );
 					}
 				}
 				return data;
@@ -57,7 +57,7 @@ public class PlayerStore {
 	public void savePlayerData( PlayerData playerData ) {
 		try {
 			if ( playerData != null ) {
-				playerDataCache.put( playerData.getId(), playerData );
+				playerDataCache.put( playerData.getName(), playerData );
 				savePlayerDataToDb( playerData );
 			}
 		} catch ( Exception e ) {
@@ -67,14 +67,14 @@ public class PlayerStore {
 
 	private PlayerData getPlayerDataByPlayer( Player player ) {
 		if ( player != null ) {
-			return getPlayerDataByPlayerId( player.getEntityId() );
+			return getPlayerDataByPlayerName( player.getName() );
 		}
 		return null;
 	}
 
-	private PlayerData getPlayerDataByPlayerId( int playerId ) {
+	private PlayerData getPlayerDataByPlayerName( String name ) {
 		try {
-			PlayerData out = database.find( PlayerData.class ).where().idEq( playerId ).findUnique();
+			PlayerData out = database.find( PlayerData.class ).where().ieq( PlayerData.NAME, name ).findUnique();
 			return out;
 		} catch ( Exception e ) {
 			logError( e );
@@ -84,8 +84,8 @@ public class PlayerStore {
 
 	private void savePlayerDataToDb( PlayerData playerData ) {
 		try {
-			if ( playerData != null && playerData.getId() >= 0 ) {
-				PlayerData data = database.find( PlayerData.class ).where().idEq( playerData.getId() ).findUnique();
+			if ( playerData != null && playerData.getName() != null ) {
+				PlayerData data = database.find( PlayerData.class ).where().ieq( PlayerData.NAME, playerData.getName() ).findUnique();
 				if ( data != null ) {
 					database.update( playerData );
 				} else {

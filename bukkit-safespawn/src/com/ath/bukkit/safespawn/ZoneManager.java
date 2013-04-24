@@ -43,6 +43,7 @@ public class ZoneManager {
 	// TODO: can still be better
 	// currently doing a radius check on all zones, find a way to hash down zones
 	// also doing a new HashSet each time, maybe we can cache this
+	/** Only returns zones that overlap the given location */
 	public Set<Zone> findZones( Location l ) {
 		HashSet<Zone> out = new HashSet<Zone>();
 		for ( Zone zone : allZones ) {

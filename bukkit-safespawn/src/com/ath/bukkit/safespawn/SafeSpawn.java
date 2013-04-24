@@ -10,9 +10,11 @@ import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -29,6 +31,7 @@ import com.ath.bukkit.safespawn.data.PlayerData;
 import com.ath.bukkit.safespawn.data.PlayerStore;
 import com.ath.bukkit.safespawn.data.SimpleKeyVal;
 import com.ath.bukkit.safespawn.event.BlockEventHandler;
+import com.ath.bukkit.safespawn.event.EntityEventHandler;
 import com.ath.bukkit.safespawn.event.PlayerEventHandler;
 import com.ath.bukkit.safespawn.event.ZoneEventHandler;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
@@ -66,24 +69,53 @@ public class SafeSpawn extends JavaPlugin {
 
 	@Override
 	public void onLoad() {
-		SafeSpawn.self = this;
 		super.onLoad();
+	}
 
-		logger = getLogger();
-
+	@Override
+	public void onEnable() {
 		try {
-			setupDatabase();
-			dbTestExample();
+			SafeSpawn.self = this;
+			logger = getLogger();
+
+			try {
+				setupDatabase();
+				dbTestExample();
+			} catch ( Exception e ) {
+				logError( e );
+			}
+
+			zoneManager = new ZoneManager( this );
+			playerManager = new PlayerManager( this );
+			worldsManager = new WorldsManager( this );
+
+			playerStore = new PlayerStore( getDatabase() );
+			blockStore = new BlockStore( getDatabase() );
 		} catch ( Exception e ) {
 			logError( e );
 		}
 
-		zoneManager = new ZoneManager( this );
-		playerManager = new PlayerManager( this );
-		worldsManager = new WorldsManager( this );
 
-		playerStore = new PlayerStore( getDatabase() );
-		blockStore = new BlockStore( getDatabase() );
+		try {
+			initializeConfig();
+			initializeEvents();
+			initializeCommands();
+			playerManager.initialize();
+
+			getBlockStore().primeTheCache();
+
+			taskman = new TaskManager();
+
+			// tasks
+			taskman.addTask( new Task() {
+				@Override
+				public void run() {
+					getBlockStore().syncAll();
+				}
+			} );
+		} catch ( Exception e ) {
+			logger.log( Level.SEVERE, e.getMessage(), e );
+		}
 	}
 
 	@Override
@@ -94,30 +126,10 @@ public class SafeSpawn extends JavaPlugin {
 		try {
 			taskman.shutdown();
 			taskman = null;
+
+			blockStore.syncAll();
 		} catch ( Exception e ) {
 			logError( e );
-		}
-	}
-
-	@Override
-	public void onEnable() {
-		try {
-			initializeConfig();
-			initializeEvents();
-			initializeCommands();
-			playerManager.initialize();
-
-			taskman = new TaskManager();
-			
-			// tasks
-			taskman.addTask( new Task() {
-				@Override
-				public void run() {
-					getBlockStore().syncAll();
-				}
-			} );
-		} catch ( Exception e ) {
-			logger.log( Level.SEVERE, e.getMessage(), e );
 		}
 	}
 
@@ -171,6 +183,16 @@ public class SafeSpawn extends JavaPlugin {
 			public void blockPlaceEvent( BlockPlaceEvent event ) {
 				BlockEventHandler.onBlockPlaceEvent( SafeSpawn.this, event );
 			}
+
+			@EventHandler
+			public void blockEvent( EntityExplodeEvent event ) {
+				EntityEventHandler.onEntityExplode( SafeSpawn.this, event );
+			}
+
+			// @EventHandler
+			// public void blockEvent( BlockEvent event ) {
+			// BlockEventHandler.onBlockEvent( SafeSpawn.this, event );
+			// }
 
 			// @EventHandler
 			// public void signChangeEvent( SignChangeEvent event ) {

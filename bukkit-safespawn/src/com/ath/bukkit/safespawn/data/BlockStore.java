@@ -23,6 +23,20 @@ public class BlockStore {
 		SafeSpawn.logError( e );
 	}
 
+	public void primeTheCache() { // TODO break this down into onChunkLoad?
+		try {
+			// BlockData data = database.find( BlockData.class ).where().ieq( BlockData.HASH, blockHash ).findUnique();
+			SafeSpawn.logLine( "dbFind( * )" );
+			Set<BlockData> all = database.find( BlockData.class ).findSet();
+			for ( BlockData data : all ) {
+				SafeSpawn.logLine( " - Found: " + data.getHash() );
+				dataCache.put( data.getHash(), data );
+			}
+		} catch ( Exception e ) {
+			logError( e );
+		}
+	}
+
 	public void syncAll() {
 		try {
 			SafeSpawn.logLine( "syncAll" );
@@ -46,9 +60,9 @@ public class BlockStore {
 			if ( block != null ) {
 				String hash = BlockData.toHash( block );
 				BlockData data = getBlockData( hash );
-				if ( data == null ) {
-					data = dbFind( hash );
-				}
+				// if ( data == null ) {
+				// data = dbFind( hash );
+				// }
 				if ( data != null ) {
 					dataCache.remove( hash );
 					if ( data.getId() > 0 ) { // if persisted
@@ -90,16 +104,17 @@ public class BlockStore {
 		return null;
 	}
 
-	/** try cache then db */
+	/** try cache -- if its not in cache, its not in db */
 	public BlockData getBlockData( String blockHash ) {
 		try {
-			if ( dataCache.containsKey( blockHash ) ) {
-				return dataCache.get( blockHash );
-			} else {
-				BlockData data = dbFind( blockHash );
-				dataCache.put( blockHash, null ); // if its still null, cache it anyway to reduce future reads
-				return data;
-			}
+			// if ( dataCache.containsKey( blockHash ) ) {
+			// return dataCache.get( blockHash );
+			// } else {
+			// BlockData data = dbFind( blockHash );
+			// dataCache.put( blockHash, null ); // if its still null, cache it anyway to reduce future reads
+			// return data;
+			// }
+			return dataCache.get( blockHash );
 		} catch ( Exception e ) {
 			logError( e );
 		}

@@ -4,6 +4,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 import com.ath.bukkit.safespawn.SafeSpawn;
@@ -12,6 +13,14 @@ import com.ath.bukkit.safespawn.Zone.ZoneExclude;
 import com.ath.bukkit.safespawn.data.BlockData;
 
 public class BlockEventHandler {
+
+	public static void onBlockEvent( SafeSpawn plugin, BlockEvent event ) {
+		try {
+			SafeSpawn.logLine( event.getClass().getCanonicalName() + ", " + event.getEventName() );
+		} catch ( Exception e ) {
+			SafeSpawn.logError( e );
+		}
+	}
 
 	public static void onBlockBreakEvent( SafeSpawn plugin, BlockBreakEvent event ) {
 		try {

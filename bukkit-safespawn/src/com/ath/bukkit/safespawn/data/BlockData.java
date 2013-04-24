@@ -56,7 +56,7 @@ public class BlockData implements Persisted {
 	public static BlockData get( Block block ) {
 		return SafeSpawn.instance().getBlockStore().getBlockData( toHash( block ) );
 	}
-	
+
 	public static boolean isMagical( Block block ) {
 		return SafeSpawn.instance().getBlockStore().isMagical( block );
 	}
@@ -125,7 +125,6 @@ public class BlockData implements Persisted {
 
 	/** @deprecated - used by ORM */
 	public void setMeta( String meta ) {
-		SafeSpawn.logLine( "setMeta( " + meta + " )" );
 		try {
 			if ( meta == null || meta.isEmpty() ) {
 				meta = "{}";
@@ -139,7 +138,6 @@ public class BlockData implements Persisted {
 	}
 
 	private JSONObject getMetaJSON() {
-		SafeSpawn.logLine( "getMetaJSON()" );
 		if ( metaJSON == null ) {
 			metaJSON = new JSONObject();
 		}

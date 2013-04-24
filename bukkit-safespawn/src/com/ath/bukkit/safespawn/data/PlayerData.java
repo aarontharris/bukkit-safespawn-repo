@@ -65,7 +65,7 @@ public class PlayerData implements Persisted {
 	private String flags;
 
 	private transient JSONObject flagsJSON;
-	
+
 	private transient boolean casting;
 
 	public PlayerData() {
@@ -147,14 +147,12 @@ public class PlayerData implements Persisted {
 
 	/** @deprecated - used by ORM */
 	public String getFlags() {
-		SafeSpawn.logLine( "getFlags()" );
 		this.flags = getFlagsJSON().toString();
 		return this.flags;
 	}
 
 	/** @deprecated - used by ORM */
 	public void setFlags( String flags ) {
-		SafeSpawn.logLine( "setFlags( " + flags + " )" );
 		try {
 			if ( flags == null || flags.isEmpty() ) {
 				flags = "{}";
@@ -168,7 +166,6 @@ public class PlayerData implements Persisted {
 	}
 
 	private JSONObject getFlagsJSON() {
-		SafeSpawn.logLine( "getFlagsJSON()" );
 		if ( flagsJSON == null ) {
 			flagsJSON = new JSONObject();
 		}

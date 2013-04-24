@@ -88,20 +88,15 @@ public class MagicWords {
 		 * EX: INVALID.matches( * ) == false.
 		 */
 		public boolean matches( MagicWord magicWord ) {
-			SafeSpawn.logLine( this + ".matches( " + magicWord + " )" );
 			if ( this.equals( INVALID ) ) {
-				SafeSpawn.logLine( this + ".matches( " + magicWord + " ) false" );
 				return false;
 			}
 			if ( this.equals( AGNOSTIC ) ) {
-				SafeSpawn.logLine( this + ".matches( " + magicWord + " ) true" );
 				return true;
 			}
 			if ( this.equals( NOTHING ) ) {
-				SafeSpawn.logLine( this + ".matches( " + magicWord + " ) " + ( magicWord == null ) );
 				return magicWord == null;
 			}
-			SafeSpawn.logLine( this + ".matches( " + magicWord + " ) " + ( this.equals( magicWord ) ) );
 			return this.equals( magicWord );
 		}
 

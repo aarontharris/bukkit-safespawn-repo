@@ -46,3 +46,15 @@ zones:
     x: 50
     y: 65
     z: 330 
+  zone1:
+    description: Emerald City
+    exclude:
+      - BLOCK_BREAK
+      - BLOCK_PLACE
+      - PLAYER_DMG_FROM_ENTITY
+      - BADDIE_SPAWN
+    radius: 35 
+    world: world
+    x: 14
+    y: 66
+    z: 1306 

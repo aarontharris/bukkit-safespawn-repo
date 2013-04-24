@@ -64,6 +64,13 @@ public class MagicWords {
 		// EGGS
 		EGG_ZOMBIE( "uzooba", null ), // SPAWN_EGGs have no material
 
+		EGG_RANDOM( "uras", null ),
+		
+		RANDOM_OBJECT( "chans", null ),
+
+		// Phrases
+		SYMPATHY( "sympios", null ),
+
 		; //
 
 
@@ -138,6 +145,10 @@ public class MagicWords {
 	//
 	// HELPER FUNCTIONS
 	//
+
+	public static MagicWord readMagicWordFromLine( String line ) {
+		return readMagicWordFromLine( line, Const.MW_separator, 0 );
+	}
 
 	/**
 	 * @param line

@@ -31,11 +31,9 @@ public class ShrineSign extends MagicSign {
 			{
 				// SYMPATH
 				if ( MagicWord.SYMPATHY.equals( word ) ) {
-					SafeSpawn.logLine( "SYMPATH" );
 					boolean isEmpty = true;
 					for ( ItemStack stack : event.getPlayer().getInventory() ) {
 						if ( stack != null && stack.getAmount() > 0 ) {
-							SafeSpawn.logLine( "SYMPATH - not empty" );
 							isEmpty = false;
 							break;
 						}
@@ -48,9 +46,24 @@ public class ShrineSign extends MagicSign {
 						event.getPlayer().getInventory().addItem( new ItemStack( Material.STONE_AXE ) );
 						event.getPlayer().getInventory().addItem( new ItemStack( Material.STONE_SPADE ) );
 						event.getPlayer().getInventory().addItem( new ItemStack( Material.APPLE, 10 ) );
+						String message = Functions.randomMessage(
+								"Thank you come again!",
+								"Check your inventory...",
+								Functions.capitalize( MagicWord.SYMPATHY.getWord() ) + "!"
+								);
+						event.getPlayer().sendMessage( message );
 						return true;
 					} else {
-						event.getPlayer().sendMessage( "Hmmm... Perhaps if you were poorer..." );
+						String message = Functions.randomMessage(
+								"Hmmm... Perhaps if you were poorer...",
+								"You don't look needy.",
+								"...",
+								"None for the greedy!",
+								"The rich do not get richer here.",
+								"I see so much in your inventory",
+								"Wait while I tell you your future... NOTHING!  ABSOLUTELY NOTHING! HAHAHA!"
+								);
+						event.getPlayer().sendMessage( message );
 						return false;
 					}
 				}

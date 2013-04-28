@@ -109,7 +109,7 @@ public class PlayerEventHandler {
 						if ( state instanceof Sign ) {
 							try {
 								boolean magical = BlockData.isMagical( block );
-								SafeSpawn.logLine( "Block is magical == " + magical );
+								SafeSpawn.logLine( event.getPlayer() + " activate sign, magical= " + magical );
 								if ( magical ) {
 									MagicSign sign = SignReader.readSign( (Sign) state );
 									if ( sign.activateSign( (Sign) state, event ) ) {

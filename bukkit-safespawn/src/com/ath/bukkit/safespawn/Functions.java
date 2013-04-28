@@ -1,6 +1,8 @@
 package com.ath.bukkit.safespawn;
 
+import java.nio.CharBuffer;
 import java.util.HashMap;
+import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -193,5 +195,36 @@ public class Functions {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static String randomMessage( String... messages ) {
+		try {
+			if ( messages != null && messages.length > 0 ) {
+				if ( messages.length == 1 ) {
+					return messages[0];
+				}
+
+				Random r = new Random( System.currentTimeMillis() );
+				return messages[r.nextInt( messages.length )];
+			}
+		} catch ( Exception e ) {
+			SafeSpawn.logError( e );
+		}
+		return "...";
+	}
+
+	public static String capitalize( String word ) {
+		return capitalize( CharBuffer.wrap( word.toCharArray() ) ).toString();
+	}
+
+	public static CharBuffer capitalize( CharBuffer buffer ) {
+		char c = buffer.get( 0 );
+		buffer.put( 0, Character.toUpperCase( c ) );
+		return buffer;
+	}
+
+	public static void main( String args[] ) {
+		String word = "blah";
+		System.out.println( capitalize( word ) );
 	}
 }

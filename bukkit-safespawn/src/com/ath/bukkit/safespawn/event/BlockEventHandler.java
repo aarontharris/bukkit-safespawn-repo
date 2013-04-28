@@ -41,7 +41,9 @@ public class BlockEventHandler {
 
 		// cleanup destroyed blocks
 		try {
-			plugin.getBlockStore().remove( event.getBlock() );
+			if ( !event.isCancelled() ) {
+				plugin.getBlockStore().remove( event.getBlock() );
+			}
 		} catch ( Exception e ) {
 			SafeSpawn.logError( e );
 		}

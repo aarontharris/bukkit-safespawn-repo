@@ -65,7 +65,7 @@ public class MagicWords {
 		EGG_ZOMBIE( "uzooba", null ), // SPAWN_EGGs have no material
 
 		EGG_RANDOM( "uras", null ),
-		
+
 		RANDOM_OBJECT( "chans", null ),
 
 		// Phrases
@@ -139,6 +139,11 @@ public class MagicWords {
 				SafeSpawn.logError( e );
 			}
 			return MagicWord.INVALID;
+		}
+
+
+		public String getWord() {
+			return word;
 		}
 	}
 

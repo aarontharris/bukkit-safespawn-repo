@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.ath.bukkit.safespawn.Const;
+import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.data.PlayerData;
 
@@ -32,7 +33,7 @@ public class CastCmd implements CommandExecutor {
 				sender.sendMessage( "Something evil has happened... we can't return you to spawn" );
 			}
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 		return false;
 	}

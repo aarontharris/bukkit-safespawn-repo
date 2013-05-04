@@ -15,8 +15,8 @@ public class CfgHelper {
 			Location out = new Location( world, x, y, z );
 			return out;
 		} catch ( Exception e ) {
-			SafeSpawn.logLine( "Something was wrong with your config location, maybe a bad/missing world name? or xyz?" );
-			SafeSpawn.logError( e );
+			Log.line( "Something was wrong with your config location, maybe a bad/missing world name? or xyz?" );
+			Log.error( e );
 		}
 		return null;
 	}

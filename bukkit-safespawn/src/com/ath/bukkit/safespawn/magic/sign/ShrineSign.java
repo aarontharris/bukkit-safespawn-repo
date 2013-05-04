@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import com.ath.bukkit.safespawn.EggHatchery;
 import com.ath.bukkit.safespawn.EggHatchery.EggStackType;
 import com.ath.bukkit.safespawn.Functions;
-import com.ath.bukkit.safespawn.SafeSpawn;
+import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.magic.MagicWords;
 import com.ath.bukkit.safespawn.magic.MagicWords.MagicCommand;
 import com.ath.bukkit.safespawn.magic.MagicWords.MagicWord;
@@ -22,7 +22,7 @@ public class ShrineSign extends MagicSign {
 	@Override
 	public boolean activateSign( Sign sign, PlayerInteractEvent event ) {
 		try {
-			SafeSpawn.logLine( "shrine sign" );
+			Log.line( "shrine sign" );
 			Location l = sign.getBlock().getLocation();
 
 			MagicWord word = MagicWords.readMagicWordFromLine( sign.getLine( 1 ) );
@@ -40,7 +40,7 @@ public class ShrineSign extends MagicSign {
 					}
 
 					if ( isEmpty ) {
-						SafeSpawn.logLine( "SYMPATH - empty" );
+						Log.line( "SYMPATH - empty" );
 						event.getPlayer().getInventory().addItem( new ItemStack( Material.STONE_SWORD ) );
 						event.getPlayer().getInventory().addItem( new ItemStack( Material.STONE_PICKAXE ) );
 						event.getPlayer().getInventory().addItem( new ItemStack( Material.STONE_AXE ) );
@@ -78,10 +78,10 @@ public class ShrineSign extends MagicSign {
 
 			Block block = event.getPlayer().getWorld().getBlockAt( x, y, z );
 
-			SafeSpawn.logLine( " block is " + block.getType() );
+			Log.line( " block is " + block.getType() );
 
 			if ( block.getType().equals( Material.CHEST ) ) {
-				SafeSpawn.logLine( " is chest " );
+				Log.line( " is chest " );
 				Chest chest = Functions.blockToChest( block );
 				Inventory inv = chest.getInventory();
 
@@ -100,7 +100,7 @@ public class ShrineSign extends MagicSign {
 				}
 			}
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 		return false;
 	}

@@ -2,7 +2,7 @@ package com.ath.bukkit.safespawn.data;
 
 import java.util.Set;
 
-import com.ath.bukkit.safespawn.SafeSpawn;
+import com.ath.bukkit.safespawn.Log;
 import com.avaje.ebean.EbeanServer;
 
 public class KVStore {
@@ -14,7 +14,7 @@ public class KVStore {
 	}
 
 	private void logError( Exception e ) {
-		SafeSpawn.logError( e );
+		Log.error( e );
 	}
 
 	private String findStringByString( String key ) {

@@ -3,8 +3,6 @@ package com.ath.bukkit.safespawn;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
@@ -39,7 +37,6 @@ import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 public class SafeSpawn extends JavaPlugin {
 
 	private static SafeSpawn self;
-	private Logger logger;
 	private ZoneManager zoneManager;
 	private PlayerManager playerManager;
 	private Location spawnLocation;
@@ -57,31 +54,31 @@ public class SafeSpawn extends JavaPlugin {
 	@Override
 	public void saveConfig() {
 		super.saveConfig();
-		logLine( "saveConfig" );
+		Log.line( "saveConfig" );
 	}
 
 	@Override
 	public void saveDefaultConfig() {
 		super.saveDefaultConfig();
-		logLine( "saveDefaultConfig" );
+		Log.line( "saveDefaultConfig" );
 	}
 
 	@Override
 	public void onLoad() {
 		super.onLoad();
+		Log.init( this );
 	}
 
 	@Override
 	public void onEnable() {
 		try {
 			SafeSpawn.self = this;
-			logger = getLogger();
 
 			try {
 				setupDatabase();
 				dbTestExample();
 			} catch ( Exception e ) {
-				logError( e );
+				Log.error( e );
 			}
 
 			zoneManager = new ZoneManager( this );
@@ -91,7 +88,7 @@ public class SafeSpawn extends JavaPlugin {
 			playerStore = new PlayerStore( getDatabase() );
 			blockStore = new BlockStore( getDatabase() );
 		} catch ( Exception e ) {
-			logError( e );
+			Log.error( e );
 		}
 
 
@@ -113,14 +110,14 @@ public class SafeSpawn extends JavaPlugin {
 				}
 			} );
 		} catch ( Exception e ) {
-			logger.log( Level.SEVERE, e.getMessage(), e );
+			Log.error( e );
 		}
 	}
 
 	@Override
 	public void onDisable() {
 		super.onDisable();
-		logLine( "onDisable" );
+		Log.line( "onDisable" );
 
 		try {
 			taskman.shutdown();
@@ -133,7 +130,7 @@ public class SafeSpawn extends JavaPlugin {
 			playerManager = null;
 			zoneManager = null;
 		} catch ( Exception e ) {
-			logError( e );
+			Log.error( e );
 		}
 	}
 
@@ -230,35 +227,6 @@ public class SafeSpawn extends JavaPlugin {
 		return zoneManager;
 	}
 
-	public static void logError( Exception e ) {
-		try {
-			self.logger.log( Level.SEVERE, e.getMessage() );
-			for ( StackTraceElement el : e.getStackTrace() ) {
-				self.logger.log( Level.SEVERE, el.getFileName() + ":" + el.getLineNumber() );
-			}
-		} catch ( Exception ex ) {
-			ex.printStackTrace();
-		}
-	}
-
-	public static void logLine() {
-		logLine( null );
-	}
-
-	public static void logLine( String msg ) {
-		try {
-			Throwable t = new Throwable();
-			StackTraceElement el = t.getStackTrace()[1];
-			if ( msg == null || msg.isEmpty() ) {
-				self.logger.info( String.format( "%s: %s", el.getFileName(), el.getLineNumber() ) );
-			} else {
-				self.logger.info( String.format( "%s: %s: %s", msg, el.getFileName(), el.getLineNumber() ) );
-			}
-		} catch ( Exception e ) {
-			e.printStackTrace();
-		}
-	}
-
 	public PlayerManager getPlayerManager() {
 		return playerManager;
 	}
@@ -277,7 +245,7 @@ public class SafeSpawn extends JavaPlugin {
 				}
 			}
 		} catch ( Exception e ) {
-			logError( e );
+			Log.error( e );
 		}
 	}
 
@@ -287,21 +255,21 @@ public class SafeSpawn extends JavaPlugin {
 			if ( o instanceof Persisted ) {
 				Persisted persisted = (Persisted) o;
 				try {
-					logLine( "Initializing: " + clazz.getName() );
+					Log.line( "Initializing: " + clazz.getName() );
 					SpiEbeanServer db = (SpiEbeanServer) getDatabase();
 					DdlGenerator gen = db.getDdlGenerator();
 					for ( String query : persisted.getSchema() ) {
-						SafeSpawn.logLine( gen.generateCreateDdl() );
+						Log.line( gen.generateCreateDdl() );
 						gen.runScript( true, query );
 					}
 				} catch ( Exception e3 ) {
 					// mute
 				}
 			} else {
-				logLine( "All Database Objects must implement Pesisted" );
+				Log.line( "All Database Objects must implement Pesisted" );
 			}
 		} catch ( Exception e2 ) {
-			logError( e2 );
+			Log.error( e2 );
 		}
 	}
 
@@ -324,15 +292,15 @@ public class SafeSpawn extends JavaPlugin {
 			SimpleKeyVal testOrig = new SimpleKeyVal();
 			testOrig.setKey( "test key" );
 			testOrig.setValue( "test value" );
-			logLine( "Test: " + testOrig.getId() + ", " + testOrig.getKey() + " = " + testOrig.getValue() );
+			Log.line( "Test: " + testOrig.getId() + ", " + testOrig.getKey() + " = " + testOrig.getValue() );
 			getDatabase().save( testOrig );
 
 			SimpleKeyVal test = getDatabase().find( SimpleKeyVal.class ).where().ieq( "key", "test key" ).findUnique();
-			logLine( "Test: " + test.getId() + ", " + test.getKey() + " = " + test.getValue() );
+			Log.line( "Test: " + test.getId() + ", " + test.getKey() + " = " + test.getValue() );
 
 			getDatabase().delete( test );
 		} catch ( Exception e ) {
-			logError( e );
+			Log.error( e );
 		}
 	}
 }

@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.ath.bukkit.safespawn.Const;
 import com.ath.bukkit.safespawn.Functions;
+import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.magic.MagicWords;
 import com.ath.bukkit.safespawn.magic.MagicWords.MagicWord;
@@ -69,7 +70,7 @@ public class TeleporterSign extends MagicSign {
 				}
 			}
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e ); // TODO Mute me
+			Log.error( e ); // TODO Mute me
 		}
 		return false;
 	}

@@ -7,6 +7,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
+import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.Zone;
 import com.ath.bukkit.safespawn.Zone.ZoneExclude;
@@ -16,9 +17,9 @@ public class BlockEventHandler {
 
 	public static void onBlockEvent( SafeSpawn plugin, BlockEvent event ) {
 		try {
-			SafeSpawn.logLine( event.getClass().getCanonicalName() + ", " + event.getEventName() );
+			Log.line( event.getClass().getCanonicalName() + ", " + event.getEventName() );
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 	}
 
@@ -36,7 +37,7 @@ public class BlockEventHandler {
 				}
 			}
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 
 		// cleanup destroyed blocks
@@ -45,7 +46,7 @@ public class BlockEventHandler {
 				plugin.getBlockStore().remove( event.getBlock() );
 			}
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 	}
 
@@ -74,7 +75,7 @@ public class BlockEventHandler {
 				}
 			}
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 
 
@@ -90,14 +91,14 @@ public class BlockEventHandler {
 				}
 			}
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 
 		// always cancel the cast
 		try {
 			plugin.getPlayerStore().endCasting( event.getPlayer() );
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 	}
 	// public static void onSignChangeEvent( SafeSpawnPlugin plugin, SignChangeEvent event ) {

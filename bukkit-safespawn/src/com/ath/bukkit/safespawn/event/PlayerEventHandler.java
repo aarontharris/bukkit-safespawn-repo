@@ -17,6 +17,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.ath.bukkit.safespawn.Const;
 import com.ath.bukkit.safespawn.Functions;
+import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.Zone;
 import com.ath.bukkit.safespawn.Zone.ZoneExclude;
@@ -39,7 +40,7 @@ public class PlayerEventHandler {
 			{
 				// New User
 				if ( data == null ) {
-					SafeSpawn.logLine( "creating new user: " + player.getName() );
+					Log.line( "creating new user: " + player.getName() );
 					data = PlayerData.newPlayerData( player );
 					data.setTimesLoggedIn( 1 );
 
@@ -52,7 +53,7 @@ public class PlayerEventHandler {
 
 				// Returning users
 				else {
-					SafeSpawn.logLine( "returning user: " + player.getName() );
+					Log.line( "returning user: " + player.getName() );
 					data.setLastLogin( new Date() );
 					data.setTimesLoggedIn( data.getTimesLoggedIn() + 1 );
 				}
@@ -62,7 +63,7 @@ public class PlayerEventHandler {
 			}
 
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 	}
 
@@ -72,7 +73,7 @@ public class PlayerEventHandler {
 			Player player = event.getPlayer();
 			plugin.getPlayerManager().removePlayerFromCache( player );
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 	}
 
@@ -93,7 +94,7 @@ public class PlayerEventHandler {
 				}
 			}
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 	}
 
@@ -109,7 +110,7 @@ public class PlayerEventHandler {
 						if ( state instanceof Sign ) {
 							try {
 								boolean magical = BlockData.isMagical( block );
-								SafeSpawn.logLine( event.getPlayer() + " activate sign, magical= " + magical );
+								Log.line( event.getPlayer() + " activate sign, magical= " + magical );
 								if ( magical ) {
 									MagicSign sign = SignReader.readSign( (Sign) state );
 									if ( sign.activateSign( (Sign) state, event ) ) {
@@ -117,7 +118,7 @@ public class PlayerEventHandler {
 									}
 								}
 							} catch ( Exception e ) {
-								SafeSpawn.logError( e );
+								Log.error( e );
 							}
 
 						}
@@ -126,7 +127,7 @@ public class PlayerEventHandler {
 
 			}
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 	}
 }

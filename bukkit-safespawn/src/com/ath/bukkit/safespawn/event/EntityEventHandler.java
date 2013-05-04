@@ -2,6 +2,7 @@ package com.ath.bukkit.safespawn.event;
 
 import org.bukkit.event.entity.EntityExplodeEvent;
 
+import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.Zone;
 import com.ath.bukkit.safespawn.Zone.ZoneExclude;
@@ -16,7 +17,7 @@ public class EntityEventHandler {
 				}
 			}
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 	}
 }

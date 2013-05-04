@@ -43,7 +43,7 @@ public class EggHatchery {
 			out.setDurability( type.id );
 			return out;
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 		return null;
 	}

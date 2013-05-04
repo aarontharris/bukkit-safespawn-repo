@@ -26,7 +26,7 @@ public class ZoneManager {
 
 	public void logAllZones() {
 		for ( Zone z : allZones ) {
-			SafeSpawn.logLine( "logAllZones - zone: " + z.getName() );
+			Log.line( "logAllZones - zone: " + z.getName() );
 		}
 	}
 

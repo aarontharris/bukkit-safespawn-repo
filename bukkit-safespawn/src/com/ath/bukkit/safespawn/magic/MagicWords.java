@@ -5,7 +5,7 @@ import java.util.HashMap;
 import org.bukkit.Material;
 
 import com.ath.bukkit.safespawn.Const;
-import com.ath.bukkit.safespawn.SafeSpawn;
+import com.ath.bukkit.safespawn.Log;
 
 public class MagicWords {
 
@@ -19,6 +19,9 @@ public class MagicWords {
 		Ordinary( "un" ), //
 		Teleport( "teles" ), //
 		Manifest( "spitus" ), //
+		Lock( "colloportus" ), //
+		Unlock( "alohomora" ), //
+		Levitate( "wingardium leviosa" ), //
 		;
 
 		private String word;
@@ -124,7 +127,7 @@ public class MagicWords {
 					return out;
 				}
 			} catch ( Exception e ) {
-				SafeSpawn.logError( e );
+				Log.error( e );
 			}
 			return MagicWord.INVALID;
 		}
@@ -136,7 +139,7 @@ public class MagicWords {
 					return out;
 				}
 			} catch ( Exception e ) {
-				SafeSpawn.logError( e );
+				Log.error( e );
 			}
 			return MagicWord.INVALID;
 		}
@@ -170,7 +173,7 @@ public class MagicWords {
 				}
 			}
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 		return MagicWord.INVALID;
 	}

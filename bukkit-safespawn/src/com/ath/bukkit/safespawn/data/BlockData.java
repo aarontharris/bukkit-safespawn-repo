@@ -10,6 +10,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import com.ath.bukkit.safespawn.Functions;
+import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
 
 
@@ -35,7 +36,7 @@ public class BlockData implements Persisted {
 				return "Block(" + Functions.toString( block.getLocation() ) + ",mat=" + block.getTypeId() + ")";
 			}
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 		return null;
 	}
@@ -100,7 +101,7 @@ public class BlockData implements Persisted {
 			getMetaJSON().put( key, value );
 			setModified( true );
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 	}
 
@@ -111,7 +112,7 @@ public class BlockData implements Persisted {
 				return out;
 			}
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 		return defaultValue;
 	}
@@ -132,7 +133,7 @@ public class BlockData implements Persisted {
 			this.meta = meta;
 			this.metaJSON = (JSONObject) parser.parse( meta );
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 	}
 

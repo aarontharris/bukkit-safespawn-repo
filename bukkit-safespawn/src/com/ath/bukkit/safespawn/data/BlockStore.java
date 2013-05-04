@@ -7,7 +7,7 @@ import java.util.Set;
 
 import org.bukkit.block.Block;
 
-import com.ath.bukkit.safespawn.SafeSpawn;
+import com.ath.bukkit.safespawn.Log;
 import com.avaje.ebean.EbeanServer;
 
 public class BlockStore {
@@ -20,16 +20,16 @@ public class BlockStore {
 	}
 
 	public void logError( Exception e ) {
-		SafeSpawn.logError( e );
+		Log.error( e );
 	}
 
 	public void primeTheCache() { // TODO break this down into onChunkLoad?
 		try {
 			// BlockData data = database.find( BlockData.class ).where().ieq( BlockData.HASH, blockHash ).findUnique();
-			SafeSpawn.logLine( "dbFind( * )" );
+			Log.line( "dbFind( * )" );
 			Set<BlockData> all = database.find( BlockData.class ).findSet();
 			for ( BlockData data : all ) {
-				SafeSpawn.logLine( " - Found: " + data.getHash() );
+				Log.line( " - Found: " + data.getHash() );
 				dataCache.put( data.getHash(), data );
 			}
 		} catch ( Exception e ) {
@@ -39,12 +39,12 @@ public class BlockStore {
 
 	public void syncAll() {
 		try {
-			SafeSpawn.logLine( "syncAll" );
+			Log.line( "syncAll" );
 			Set<String> keys = new HashSet<String>( dataCache.keySet() ); // copy to reduce concurrent mod
 			for ( String hash : keys ) {
 				BlockData data = dataCache.get( hash );
 				if ( data != null && data.isModified() ) {
-					SafeSpawn.logLine( "syncAll - " + hash + " id= " + data.getId() );
+					Log.line( "syncAll - " + hash + " id= " + data.getId() );
 					saveBlockData( data );
 					data.setModified( false );
 				}
@@ -66,7 +66,7 @@ public class BlockStore {
 				if ( data != null ) {
 					dataCache.remove( hash );
 					if ( data.getId() > 0 ) { // if persisted
-						SafeSpawn.logLine( "dbDelete( " + data.getHash() + " )" );
+						Log.line( "dbDelete( " + data.getHash() + " )" );
 						database.delete( data );
 					}
 				}
@@ -95,7 +95,7 @@ public class BlockStore {
 	/** pull straight from db */
 	private BlockData dbFind( String blockHash ) {
 		try {
-			SafeSpawn.logLine( "dbFind( " + blockHash + " )" );
+			Log.line( "dbFind( " + blockHash + " )" );
 			BlockData data = database.find( BlockData.class ).where().ieq( BlockData.HASH, blockHash ).findUnique();
 			return data;
 		} catch ( Exception e ) {
@@ -126,14 +126,14 @@ public class BlockStore {
 			if ( blockData != null ) {
 				if ( blockData.getId() <= 0 ) {
 					try {
-						SafeSpawn.logLine( "dbSave( " + blockData.getHash() + " )" );
+						Log.line( "dbSave( " + blockData.getHash() + " )" );
 						database.save( blockData );
 					} catch ( Exception e ) {
-						SafeSpawn.logLine( " - BlockData.hash collision on save, updating instead" );
+						Log.line( " - BlockData.hash collision on save, updating instead" );
 						database.update( blockData );
 					}
 				} else {
-					SafeSpawn.logLine( "dbUpdate( " + blockData.getHash() + " )" );
+					Log.line( "dbUpdate( " + blockData.getHash() + " )" );
 					database.update( blockData );
 				}
 			}

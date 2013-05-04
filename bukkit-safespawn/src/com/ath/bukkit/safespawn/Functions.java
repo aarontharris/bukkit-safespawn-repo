@@ -67,7 +67,7 @@ public class Functions {
 				player.teleport( teleport );
 			}
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 	}
 
@@ -124,9 +124,9 @@ public class Functions {
 			if ( inv != null && materials != null ) {
 				// first do a quick check to see if the mats need are in the inventory before doing all the other work...
 				for ( Material mat : materials ) {
-					SafeSpawn.logLine( " contains " + mat );
+					Log.line( " contains " + mat );
 					if ( !inv.contains( mat, count ) ) {
-						SafeSpawn.logLine( " contains " + mat + " false" );
+						Log.line( " contains " + mat + " false" );
 						return false;
 					}
 				}
@@ -156,7 +156,7 @@ public class Functions {
 				return true;
 			}
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 		return false;
 	}
@@ -208,7 +208,7 @@ public class Functions {
 				return messages[r.nextInt( messages.length )];
 			}
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 		return "...";
 	}

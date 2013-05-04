@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import com.ath.bukkit.safespawn.SafeSpawn;
+import com.ath.bukkit.safespawn.Log;
 
 @Entity
 @Table( name = "PlayerData" )
@@ -84,7 +84,7 @@ public class PlayerData implements Persisted {
 		try {
 			getFlagsJSON().put( key, value );
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 	}
 
@@ -95,7 +95,7 @@ public class PlayerData implements Persisted {
 				return out;
 			}
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 		return defaultValue;
 	}
@@ -161,7 +161,7 @@ public class PlayerData implements Persisted {
 			this.flags = flags;
 			this.flagsJSON = (JSONObject) parser.parse( flags );
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 	}
 

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
-import com.ath.bukkit.safespawn.SafeSpawn;
+import com.ath.bukkit.safespawn.Log;
 import com.avaje.ebean.EbeanServer;
 
 public class PlayerStore {
@@ -18,7 +18,7 @@ public class PlayerStore {
 	}
 
 	public void logError( Exception e ) {
-		SafeSpawn.logError( e );
+		Log.error( e );
 	}
 
 	/** when the player logs out, remove from cache */
@@ -111,7 +111,7 @@ public class PlayerStore {
 				return true;
 			}
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 		return false;
 	}
@@ -123,7 +123,7 @@ public class PlayerStore {
 				player.sendMessage( "Your /cast has been consumed." );
 			}
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 	}
 }

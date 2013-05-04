@@ -30,7 +30,7 @@ public class WorldsManager {
 			cfg = worldsCfg.getConfigurationSection( Const.CFG_worlds_world_the_end );
 			add( cfg.getString( "magic" ), cfg.getString( "name" ) );
 		} catch ( Exception e ) {
-			SafeSpawn.logError( e );
+			Log.error( e );
 		}
 	}
 

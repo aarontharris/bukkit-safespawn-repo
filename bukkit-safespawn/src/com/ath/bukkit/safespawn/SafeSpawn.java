@@ -10,7 +10,6 @@ import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -40,7 +39,7 @@ import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 public class SafeSpawn extends JavaPlugin {
 
 	private static SafeSpawn self;
-	private static Logger logger;
+	private Logger logger;
 	private ZoneManager zoneManager;
 	private PlayerManager playerManager;
 	private Location spawnLocation;
@@ -127,7 +126,12 @@ public class SafeSpawn extends JavaPlugin {
 			taskman.shutdown();
 			taskman = null;
 
-			blockStore.syncAll();
+			// blockStore.syncAll();
+			blockStore = null;
+			playerStore = null;
+			worldsManager = null;
+			playerManager = null;
+			zoneManager = null;
 		} catch ( Exception e ) {
 			logError( e );
 		}
@@ -227,9 +231,13 @@ public class SafeSpawn extends JavaPlugin {
 	}
 
 	public static void logError( Exception e ) {
-		logger.log( Level.SEVERE, e.getMessage() );
-		for ( StackTraceElement el : e.getStackTrace() ) {
-			logger.log( Level.SEVERE, el.getFileName() + ":" + el.getLineNumber() );
+		try {
+			self.logger.log( Level.SEVERE, e.getMessage() );
+			for ( StackTraceElement el : e.getStackTrace() ) {
+				self.logger.log( Level.SEVERE, el.getFileName() + ":" + el.getLineNumber() );
+			}
+		} catch ( Exception ex ) {
+			ex.printStackTrace();
 		}
 	}
 
@@ -238,12 +246,16 @@ public class SafeSpawn extends JavaPlugin {
 	}
 
 	public static void logLine( String msg ) {
-		Throwable t = new Throwable();
-		StackTraceElement el = t.getStackTrace()[1];
-		if ( msg == null || msg.isEmpty() ) {
-			logger.info( String.format( "%s: %s", el.getFileName(), el.getLineNumber() ) );
-		} else {
-			logger.info( String.format( "%s: %s: %s", msg, el.getFileName(), el.getLineNumber() ) );
+		try {
+			Throwable t = new Throwable();
+			StackTraceElement el = t.getStackTrace()[1];
+			if ( msg == null || msg.isEmpty() ) {
+				self.logger.info( String.format( "%s: %s", el.getFileName(), el.getLineNumber() ) );
+			} else {
+				self.logger.info( String.format( "%s: %s: %s", msg, el.getFileName(), el.getLineNumber() ) );
+			}
+		} catch ( Exception e ) {
+			e.printStackTrace();
 		}
 	}
 

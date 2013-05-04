@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit;
 
 public class TaskManager {
 
-	public static final ScheduledExecutorService schex = Executors.newScheduledThreadPool( 1 );
 	public static final long delayBetween = 60; // seconds
 
 
@@ -16,13 +15,15 @@ public class TaskManager {
 	public static abstract class Task implements Runnable {
 	}
 
+	public ScheduledExecutorService schex;
 	public Queue<Task> tasks = new LinkedList<Task>();
 
 	public TaskManager() {
-		init();
+		reset();
 	}
 
-	public void init() {
+	public void reset() {
+		schex = Executors.newScheduledThreadPool( 1 );
 		schex.scheduleWithFixedDelay( new Runnable() {
 			@Override
 			public void run() {

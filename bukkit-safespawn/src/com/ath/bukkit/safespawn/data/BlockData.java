@@ -118,7 +118,6 @@ public class BlockData implements Persisted {
 
 	/** @deprecated - used by ORM */
 	public String getMeta() {
-		SafeSpawn.logLine( "getMeta()" );
 		this.meta = getMetaJSON().toString();
 		return this.meta;
 	}

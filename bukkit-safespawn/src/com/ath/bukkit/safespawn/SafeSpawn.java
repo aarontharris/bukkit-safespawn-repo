@@ -20,6 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.ath.bukkit.safespawn.TaskManager.Task;
 import com.ath.bukkit.safespawn.cmd.CastCmd;
 import com.ath.bukkit.safespawn.cmd.LinesReaderCmd;
+import com.ath.bukkit.safespawn.cmd.NickCmd;
 import com.ath.bukkit.safespawn.cmd.SpawnCmd;
 import com.ath.bukkit.safespawn.data.BlockData;
 import com.ath.bukkit.safespawn.data.BlockStore;
@@ -209,6 +210,7 @@ public class SafeSpawn extends JavaPlugin {
 		getCommand( Const.CMD_spawn ).setExecutor( new SpawnCmd( this ) );
 		getCommand( Const.CMD_cast ).setExecutor( new CastCmd( this ) );
 		getCommand( Const.CMD_casthelp ).setExecutor( new LinesReaderCmd( this, Const.MSG_casthelp ) );
+		getCommand( Const.CMD_nick ).setExecutor( new NickCmd( this ) );
 	}
 
 	public PlayerStore getPlayerStore() {

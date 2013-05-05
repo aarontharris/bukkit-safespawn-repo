@@ -27,6 +27,14 @@ public class PlayerManager {
 		}
 	}
 
+	public Map<String, Player> getNameCache() {
+		return new HashMap<String, Player>( nameToPlayerMap );
+	}
+
+	public Map<Integer, Player> getIdCache() {
+		return new HashMap<Integer, Player>( entityIdToPlayerMap );
+	}
+
 	public Player getActivePlayerByName( String name ) {
 		return nameToPlayerMap.get( name );
 	}

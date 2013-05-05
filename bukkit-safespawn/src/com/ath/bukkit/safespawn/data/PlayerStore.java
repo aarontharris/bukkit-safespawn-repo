@@ -72,6 +72,26 @@ public class PlayerStore {
 		}
 	}
 
+	public boolean isNicknameAvailable( Player requestor, String nickname ) {
+		try {
+			// allow player to set nickname back to real name
+			if ( requestor != null && requestor.getName().equals( nickname ) ) {
+				return true;
+			}
+			
+			PlayerData player = getPlayerDataByPlayerName( nickname );
+			if ( player == null ) { // don't allow players to use other player's account names as nicknames
+				PlayerData nick = getPlayerDataByPlayerNickname( nickname );
+				if ( nick == null ) {
+					return true;
+				}
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return false;
+	}
+
 	private PlayerData getPlayerDataByPlayer( Player player ) {
 		if ( player != null ) {
 			return getPlayerDataByPlayerName( player.getName() );
@@ -79,7 +99,17 @@ public class PlayerStore {
 		return null;
 	}
 
-	private PlayerData getPlayerDataByPlayerName( String name ) {
+	public PlayerData getPlayerDataByPlayerNickname( String nickname ) {
+		try {
+			PlayerData out = database.find( PlayerData.class ).where().ieq( PlayerData.NICKNAME, nickname ).findUnique();
+			return out;
+		} catch ( Exception e ) {
+			logError( e );
+		}
+		return null;
+	}
+
+	public PlayerData getPlayerDataByPlayerName( String name ) {
 		try {
 			PlayerData out = database.find( PlayerData.class ).where().ieq( PlayerData.NAME, name ).findUnique();
 			return out;
@@ -126,4 +156,5 @@ public class PlayerStore {
 			Log.error( e );
 		}
 	}
+
 }

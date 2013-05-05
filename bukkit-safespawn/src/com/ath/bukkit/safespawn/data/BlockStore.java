@@ -142,18 +142,4 @@ public class BlockStore {
 		}
 	}
 
-	public boolean isMagical( Block block ) {
-		try {
-			if ( block != null ) {
-				BlockData data = getBlockData( BlockData.toHash( block ) );
-				if ( data != null && data.isMagical() ) {
-					return true;
-				}
-			}
-		} catch ( Exception e ) {
-			logError( e );
-		}
-		return false;
-	}
-
 }

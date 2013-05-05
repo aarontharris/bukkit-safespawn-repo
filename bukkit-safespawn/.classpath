@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="BUKKIT_LIB"/>
 	<classpathentry kind="lib" path="libs/json-lib-2.4-jdk15.jar"/>
+	<classpathentry kind="lib" path="/Users/aharris/dev/github/bukkit-safespawn-repo/libs/craftbukkit-1.5.2-R0.2-20130503.224215-1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

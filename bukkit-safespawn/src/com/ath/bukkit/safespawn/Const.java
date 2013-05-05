@@ -26,6 +26,8 @@ public final class Const {
 
 	public static final String CFG_spawn = "spawn";
 	public static final String CFG_spawnpoint = "spawnpoint";
+	
+	public static final String CMD_nick = "nick";
 
 	public static final String CMD_spawn = "spawn";
 	public static final String CMD_cast = "cast";

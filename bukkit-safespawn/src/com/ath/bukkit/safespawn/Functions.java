@@ -15,7 +15,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.google.common.base.Joiner;
+
 public class Functions {
+
+	public static Joiner spaceJoiner = Joiner.on( " " );
+
+	public static String joinSpace( String... strings ) {
+		return spaceJoiner.join( strings );
+	}
 
 	public static boolean insideZone( Zone z, Location l ) {
 		if ( z != null && z.getLocation() != null && l != null ) { // data is good

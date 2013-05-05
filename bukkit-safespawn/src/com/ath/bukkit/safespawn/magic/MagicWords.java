@@ -46,6 +46,26 @@ public class MagicWords {
 
 
 
+	public static enum MagicCast {
+		Charge( "charge" ),
+		Lock( "colloportus" ), //
+		Unlock( "alohomora" ), //
+		Levitate( "wingardium-leviosa" ), //
+		;
+
+		private String word;
+
+		MagicCast( String word ) {
+			this.word = word;
+		}
+
+		public String getWord() {
+			return word;
+		}
+	}
+
+
+
 	// ITEM WORDS
 	public static enum MagicWord {
 		INVALID( null, null ), // bad

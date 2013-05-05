@@ -1,17 +1,21 @@
 package com.ath.bukkit.safespawn.data;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.bukkit.block.Block;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import com.ath.bukkit.safespawn.Functions;
 import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
+import com.google.common.collect.Lists;
 
 
 @Entity
@@ -58,10 +62,6 @@ public class BlockData implements Persisted {
 		return SafeSpawn.instance().getBlockStore().getBlockData( toHash( block ) );
 	}
 
-	public static boolean isMagical( Block block ) {
-		return SafeSpawn.instance().getBlockStore().isMagical( block );
-	}
-
 	public BlockData() {
 	}
 
@@ -86,17 +86,34 @@ public class BlockData implements Persisted {
 
 	private transient boolean modified;
 
-
-	public void setMagical( boolean isMagical ) {
-		putString( "magical", String.valueOf( isMagical ) );
+	public void putStringArray( String key, List<String> strings ) {
+		try {
+			JSONArray ary = new JSONArray();
+			ary.addAll( strings );
+			getMetaJSON().put( key, ary );
+			setModified( true );
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
 	}
 
-	public boolean isMagical() {
-		return Boolean.valueOf( getString( "magical", "false" ) );
+	public List<String> getStringArray( String key ) {
+		List<String> out = Lists.newArrayList();
+		try {
+			JSONArray ary = (JSONArray) getMetaJSON().get( key );
+			if ( ary != null ) {
+				for ( String s : (String[]) ary.toArray() ) {
+					out.add( s );
+				}
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return out;
 	}
 
 	@SuppressWarnings( "unchecked" )
-	private void putString( String key, String value ) {
+	public void putString( String key, String value ) {
 		try {
 			getMetaJSON().put( key, value );
 			setModified( true );
@@ -105,11 +122,43 @@ public class BlockData implements Persisted {
 		}
 	}
 
-	private String getString( String key, String defaultValue ) {
+	public String getString( String key, String defaultValue ) {
 		try {
 			String out = (String) getMetaJSON().get( key );
 			if ( out != null ) {
 				return out;
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return defaultValue;
+	}
+
+	public void putBoolean( String key, boolean value ) {
+		putString( key, String.valueOf( value ) );
+	}
+
+	public boolean getBoolean( String key, boolean defaultValue ) {
+		try {
+			String strVal = getString( key, null );
+			if ( strVal != null ) {
+				return Boolean.valueOf( strVal );
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return defaultValue;
+	}
+
+	public void putInt( String key, int value ) {
+		putString( key, String.valueOf( value ) );
+	}
+
+	public int getInt( String key, int defaultValue ) {
+		try {
+			String strVal = getString( key, null );
+			if ( strVal != null ) {
+				return Integer.valueOf( strVal );
 			}
 		} catch ( Exception e ) {
 			Log.error( e );

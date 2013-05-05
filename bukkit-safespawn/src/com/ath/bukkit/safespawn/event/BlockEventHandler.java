@@ -11,7 +11,7 @@ import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.Zone;
 import com.ath.bukkit.safespawn.Zone.ZoneExclude;
-import com.ath.bukkit.safespawn.data.BlockData;
+import com.ath.bukkit.safespawn.data.Blocks;
 
 public class BlockEventHandler {
 
@@ -86,8 +86,7 @@ public class BlockEventHandler {
 
 				// is the block magical
 				if ( plugin.getPlayerStore().isCasting( player ) ) {
-					BlockData data = plugin.getBlockStore().attainBlockData( event.getBlock() );
-					data.setMagical( true );
+					Blocks.setMagical( event.getBlock(), true );
 				}
 			}
 		} catch ( Exception e ) {

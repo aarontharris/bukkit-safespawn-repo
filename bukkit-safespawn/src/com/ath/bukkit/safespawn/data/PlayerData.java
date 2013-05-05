@@ -12,24 +12,28 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import com.ath.bukkit.safespawn.Log;
+import com.ath.bukkit.safespawn.SafeSpawn;
 
 @Entity
 @Table( name = "PlayerData" )
 public class PlayerData implements Persisted {
 	public static final String NAME = "name";
+	public static final String NICKNAME = "nickname";
 
 	public static final String[] SCHEMA = {
 			"create table PlayerData" +
 					"(" +
 					"name TEXT," +
+					"nickname TEXT," +
 					"firstLogin timestamp," +
 					"lastLogin timestamp," +
 					"timesLoggedIn INTEGER," +
 					"flags BLOB," +
 					"id INTEGER primary key autoincrement" +
 					");",
-			"CREATE INDEX PlayerData_name_INDEX ON PlayerData (name);"
-	}; // alter table PlayerData add column flags BLOB;
+			"CREATE INDEX PlayerData_name_INDEX ON PlayerData (name);",
+			"CREATE INDEX PlayerData_nickname_INDEX ON PlayerData (nickname);"
+	}; // alter table PlayerData add column nickname TEXT;
 
 	/*
 	 * BEGIN TRANSACTION;
@@ -51,6 +55,9 @@ public class PlayerData implements Persisted {
 
 	@Column( name = "name", unique = true )
 	private String name;
+
+	@Column( name = "nickname", unique = true )
+	private String nickname;
 
 	@Column( name = "firstLogin" )
 	private Date firstLogin;
@@ -77,6 +84,22 @@ public class PlayerData implements Persisted {
 		out.setFirstLogin( new Date() );
 		out.setLastLogin( out.getFirstLogin() );
 		return out;
+	}
+
+	public static void save( PlayerData data ) {
+		try {
+			SafeSpawn.instance().getPlayerStore().savePlayerData( data );
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+	}
+
+	public static PlayerData get( Player player ) {
+		return SafeSpawn.instance().getPlayerStore().getPlayerData( player );
+	}
+
+	public static void setCasting( Player player, boolean isCasting ) {
+		SafeSpawn.instance().getPlayerStore().getPlayerData( player ).setCasting( isCasting );
 	}
 
 	@SuppressWarnings( "unchecked" )
@@ -178,6 +201,14 @@ public class PlayerData implements Persisted {
 
 	public void setCasting( boolean casting ) {
 		this.casting = casting;
+	}
+
+	public String getNickname() {
+		return nickname;
+	}
+
+	public void setNickname( String nickname ) {
+		this.nickname = nickname;
 	}
 
 }

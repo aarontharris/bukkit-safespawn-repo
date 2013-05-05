@@ -22,6 +22,7 @@ import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.Zone;
 import com.ath.bukkit.safespawn.Zone.ZoneExclude;
 import com.ath.bukkit.safespawn.data.BlockData;
+import com.ath.bukkit.safespawn.data.Blocks;
 import com.ath.bukkit.safespawn.data.PlayerData;
 import com.ath.bukkit.safespawn.magic.sign.MagicSign;
 import com.ath.bukkit.safespawn.magic.sign.SignReader;
@@ -34,7 +35,7 @@ public class PlayerEventHandler {
 			plugin.getPlayerManager().cachePlayer( player );
 			player.sendMessage( plugin.getConfig().getString( Const.MSG_welcome_message ) );
 
-			PlayerData data = plugin.getPlayerStore().getPlayerData( player );
+			PlayerData data = PlayerData.get( player );
 
 			// User Maintenance
 			{
@@ -49,17 +50,30 @@ public class PlayerEventHandler {
 						player.setBedSpawnLocation( plugin.getSpawnLocation().clone(), true );
 						Functions.teleport( plugin, player, plugin.getSpawnLocation() );
 					}
+
+					// Make sure existing users don't have a nickname that matches this player's account name
+					// and resolve if collision is found
+					PlayerData nameCollision = plugin.getPlayerStore().getPlayerDataByPlayerNickname( player.getName() );
+					if ( nameCollision != null ) {
+						nameCollision.setNickname( nameCollision.getName() );
+						PlayerData.save( nameCollision );
+					}
 				}
 
 				// Returning users
 				else {
-					Log.line( "returning user: " + player.getName() );
+					if ( data.getNickname() != null && !player.getName().equals( data.getNickname() ) ) {
+						player.setDisplayName( data.getNickname() );
+						player.setCustomName( data.getNickname() );
+						player.setPlayerListName( data.getNickname() );
+					}
+					Log.line( "returning user: " + player.getName() + " aka " + player.getDisplayName() );
 					data.setLastLogin( new Date() );
 					data.setTimesLoggedIn( data.getTimesLoggedIn() + 1 );
 				}
 
 				// Save
-				plugin.getPlayerStore().savePlayerData( data );
+				PlayerData.save( data );
 			}
 
 		} catch ( Exception e ) {
@@ -109,7 +123,7 @@ public class PlayerEventHandler {
 						BlockState state = block.getState();
 						if ( state instanceof Sign ) {
 							try {
-								boolean magical = BlockData.isMagical( block );
+								boolean magical = Blocks.isMagical( BlockData.get( block ) );
 								Log.line( event.getPlayer() + " activate sign, magical= " + magical );
 								if ( magical ) {
 									MagicSign sign = SignReader.readSign( (Sign) state );
@@ -130,4 +144,5 @@ public class PlayerEventHandler {
 			Log.error( e );
 		}
 	}
+
 }

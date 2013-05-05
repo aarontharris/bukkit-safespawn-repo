@@ -25,3 +25,5 @@ commands:
     description: Explains how to cast magic
     permission: safespawn.magic.cast
     permission-message: You don't have that ability
+  nick:
+    description: Change your player name.

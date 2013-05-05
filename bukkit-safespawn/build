@@ -22,7 +22,7 @@ jar cf $jarname config.yml plugin.yml com ../libs
 rm config.yml plugin.yml
 
 # backup the previous jar
-ssh `getMCServerUsername`@`getMCServerIP` "~/backup_safespawn_plugin.sh $jarname";
+#ssh `getMCServerUsername`@`getMCServerIP` "~/backup_safespawn_plugin.sh $jarname";
 
 # push jar to minecraft server
 push_bukkit $jarname 

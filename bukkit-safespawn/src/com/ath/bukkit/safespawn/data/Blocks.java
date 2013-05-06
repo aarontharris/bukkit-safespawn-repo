@@ -1,14 +1,20 @@
 package com.ath.bukkit.safespawn.data;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import com.ath.bukkit.safespawn.Const;
 import com.ath.bukkit.safespawn.Log;
 
 public class Blocks {
+
+	private static final String WRITE_ACCESS = "write_access";
+	private static final String READ_ACCESS = "read_access";
 
 	public static boolean isMagical( BlockData bd ) {
 		try {
@@ -28,60 +34,65 @@ public class Blocks {
 		}
 	}
 
-	public static void grantReadWriteAccess( Block b, List<String> playerNames ) {
+	public static void grantReadWriteAccess( Block b, Collection<String> playerNames ) {
 		try {
-			grantReadAccess( b, playerNames );
-			grantWriteAccess( b, playerNames );
+			setReadAccess( b, playerNames );
+			setWriteAccess( b, playerNames );
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
 	}
 
-	public static void grantReadAccess( Block b, List<String> playerNames ) {
+	/** overwrite */
+	public static void setReadAccess( Block b, Collection<String> playerNames ) {
 		try {
 			BlockData bd = BlockData.attain( b );
-			bd.putStringArray( "read_access", playerNames );
+			bd.putStringArray( READ_ACCESS, new ArrayList<String>( playerNames ) );
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
 	}
 
-	public static void grantWriteAccess( Block b, List<String> playerNames ) {
+	/** overwrite */
+	public static void setWriteAccess( Block b, Collection<String> playerNames ) {
 		try {
 			BlockData bd = BlockData.attain( b );
-			bd.putStringArray( "write_access", playerNames );
+			bd.putStringArray( WRITE_ACCESS, new ArrayList<String>( playerNames ) );
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
 	}
 
-	public static List<String> getReadAccess( BlockData bd ) {
+	/** never null */
+	public static Set<String> getReadAccess( BlockData bd ) {
 		try {
 			if ( bd != null )
-				return bd.getStringArray( "read_access" );
+				return bd.getStringSet( READ_ACCESS );
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
-		return Collections.emptyList();
+		return Collections.emptySet();
 	}
 
-	public static List<String> getWriteAccess( BlockData bd ) {
+	/** never null */
+	public static Set<String> getWriteAccess( BlockData bd ) {
 		try {
 			if ( bd != null )
-				return bd.getStringArray( "write_access" );
+				return bd.getStringSet( WRITE_ACCESS );
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
-		return Collections.emptyList();
+		return Collections.emptySet();
 	}
 
 	/** do not use in a loop */
-	public static boolean hasReadAccess( BlockData bd, Player player ) {
+	public static boolean canRead( BlockData bd, Player player ) {
 		try {
-			List<String> access = getReadAccess( bd );
-			if ( access.size() == 0 ) {
+			if ( canWrite( bd, player ) ) {
 				return true;
-			} else if ( access.contains( player.getName() ) ) {
+			}
+			Set<String> rAccess = getReadAccess( bd );
+			if ( rAccess.contains( player.getName() ) ) {
 				return true;
 			}
 		} catch ( Exception e ) {
@@ -91,10 +102,25 @@ public class Blocks {
 	}
 
 	/** do not use in a loop */
-	public static boolean hasWriteAccess( BlockData bd, Player player ) {
+	public static boolean canWrite( BlockData bd, Player player ) {
 		try {
-			List<String> access = getWriteAccess( bd );
-			if ( access.size() == 0 ) {
+			Set<String> access = getWriteAccess( bd );
+			return hasWriteAccess( bd, access, player );
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return false;
+	}
+
+	/** Loop safe */
+	public static boolean hasWriteAccess( BlockData bd, Set<String> access, Player player ) {
+		try {
+			if ( player.hasPermission( Const.PERM_skeleton_key ) ) {
+				player.sendMessage( "Accessed with Skeleton Key" );
+				return true;
+			}
+
+			if ( access.isEmpty() ) {
 				return true;
 			} else if ( access.contains( player.getName() ) ) {
 				return true;
@@ -108,10 +134,10 @@ public class Blocks {
 	public static void grantReadAccess( Block b, Player player ) {
 		try {
 			BlockData bd = BlockData.attain( b );
-			List<String> access = getReadAccess( bd );
+			Set<String> access = getReadAccess( bd );
 			if ( !access.contains( player.getName() ) ) {
 				access.add( player.getName() );
-				grantReadAccess( b, access );
+				setReadAccess( b, access );
 			}
 		} catch ( Exception e ) {
 			Log.error( e );
@@ -119,13 +145,27 @@ public class Blocks {
 	}
 
 	public static void grantWriteAccess( Block b, Player player ) {
+		grantWriteAccess( b, player.getName() );
+	}
+
+	public static void grantWriteAccess( Block b, String playerName ) {
 		try {
 			BlockData bd = BlockData.attain( b );
-			List<String> access = getWriteAccess( bd );
-			if ( !access.contains( player.getName() ) ) {
-				access.add( player.getName() );
-				grantWriteAccess( b, access );
+			Set<String> access = getWriteAccess( bd );
+			if ( !access.contains( playerName ) ) {
+				access.add( playerName );
+				setWriteAccess( b, access );
 			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+	}
+
+	public static void clearReadWriteAccess( Block b ) {
+		try {
+			BlockData bd = BlockData.attain( b );
+			bd.removeKey( READ_ACCESS );
+			bd.removeKey( WRITE_ACCESS );
 		} catch ( Exception e ) {
 			Log.error( e );
 		}

@@ -75,6 +75,11 @@ public class PlayerData implements Persisted {
 
 	private transient boolean casting;
 
+	private transient int chatCount = 0;
+	private transient long firstChatTime = 0;
+	private transient long lastChatTime = 0;
+	private transient int spamWarnings = 0;
+
 	public PlayerData() {
 	}
 
@@ -209,6 +214,40 @@ public class PlayerData implements Persisted {
 
 	public void setNickname( String nickname ) {
 		this.nickname = nickname;
+	}
+
+	public int getChatCount() {
+		return chatCount;
+	}
+
+	public void setChatCount( int chatCount ) {
+		this.chatCount = chatCount;
+	}
+
+	/** millis */
+	public long getLastChatTime() {
+		return lastChatTime;
+	}
+
+	/** millis */
+	public void setLastChatTime( long lastChatTime ) {
+		this.lastChatTime = lastChatTime;
+	}
+
+	public int getSpamWarnings() {
+		return spamWarnings;
+	}
+
+	public void setSpamWarnings( int spamWarnings ) {
+		this.spamWarnings = spamWarnings;
+	}
+
+	public long getFirstChatTime() {
+		return firstChatTime;
+	}
+
+	public void setFirstChatTime( long firstChatTime ) {
+		this.firstChatTime = firstChatTime;
 	}
 
 }

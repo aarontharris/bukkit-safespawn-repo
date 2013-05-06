@@ -1,5 +1,6 @@
 package com.ath.bukkit.safespawn.data;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -7,13 +8,15 @@ import java.util.Set;
 
 import org.bukkit.block.Block;
 
+import com.ath.bukkit.safespawn.Functions;
 import com.ath.bukkit.safespawn.Log;
 import com.avaje.ebean.EbeanServer;
+import com.avaje.ebean.SqlUpdate;
 
 public class BlockStore {
 
 	private EbeanServer database;
-	private Map<String, BlockData> dataCache = new HashMap<String, BlockData>();
+	private Map<String, BlockData> dataCache = new HashMap<String, BlockData>(); // FIXME: make me a WeakHashMap
 
 	public BlockStore( EbeanServer database ) {
 		this.database = database;
@@ -27,9 +30,8 @@ public class BlockStore {
 		try {
 			// BlockData data = database.find( BlockData.class ).where().ieq( BlockData.HASH, blockHash ).findUnique();
 			Log.line( "dbFind( * )" );
-			Set<BlockData> all = database.find( BlockData.class ).findSet();
+			Set<BlockData> all = dbFindAll();
 			for ( BlockData data : all ) {
-				Log.line( " - Found: " + data.getHash() );
 				dataCache.put( data.getHash(), data );
 			}
 		} catch ( Exception e ) {
@@ -93,15 +95,32 @@ public class BlockStore {
 	}
 
 	/** pull straight from db */
+	@SuppressWarnings( { "deprecation", "unused" } )
 	private BlockData dbFind( String blockHash ) {
 		try {
 			Log.line( "dbFind( " + blockHash + " )" );
 			BlockData data = database.find( BlockData.class ).where().ieq( BlockData.HASH, blockHash ).findUnique();
+			data.setMeta( Functions.fromDbSafeString( data.getMeta() ) );
 			return data;
 		} catch ( Exception e ) {
-			logError( e );
+			Log.error( e );
 		}
 		return null;
+	}
+
+	@SuppressWarnings( "deprecation" )
+	private Set<BlockData> dbFindAll() {
+		try {
+			Log.line( "dbFind( * )" );
+			Set<BlockData> all = database.find( BlockData.class ).findSet();
+			for ( BlockData data : all ) {
+				data.setMeta( Functions.fromDbSafeString( data.getMeta() ) );
+			}
+			return all;
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return Collections.emptySet();
 	}
 
 	/** try cache -- if its not in cache, its not in db */
@@ -127,18 +146,40 @@ public class BlockStore {
 				if ( blockData.getId() <= 0 ) {
 					try {
 						Log.line( "dbSave( " + blockData.getHash() + " )" );
+						@SuppressWarnings( "unused" )
+						String meta = Functions.toDbSafeString( blockData.getMeta() );
+						blockData.setMeta( meta );
 						database.save( blockData );
 					} catch ( Exception e ) {
 						Log.line( " - BlockData.hash collision on save, updating instead" );
-						database.update( blockData );
+						updateBlockData( blockData );
 					}
 				} else {
-					Log.line( "dbUpdate( " + blockData.getHash() + " )" );
-					database.update( blockData );
+					updateBlockData( blockData );
 				}
 			}
 		} catch ( Exception e ) {
 			logError( e );
+		}
+	}
+
+	/** expects the blockdata to have an Id > 0 */
+	private void updateBlockData( BlockData blockData ) {
+		try {
+			if ( blockData != null ) {
+				Log.line( "dbUpdate( " + blockData.toString() + " )" );
+				// database.update( blockData ); // broken for some reason :(
+				String meta = blockData.getMeta();
+				Log.line( "BEFORE %S", meta );
+				meta = Functions.toDbSafeString( meta );
+				Log.line( "AFTER  %S", meta );
+				String update = String.format( "update BlockData set lastModified=%s, meta='%s' where id=%s", blockData.getLastModified(), meta, blockData.getId() );
+				Log.line( update );
+				SqlUpdate sqlUpdate = database.createSqlUpdate( update );
+				database.execute( sqlUpdate );
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
 		}
 	}
 

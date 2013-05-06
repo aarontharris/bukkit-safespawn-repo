@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TaskManager {
 
-	public static final long delayBetween = 60; // seconds
+	public static final long delayBetween = 10; // seconds
 
 
 

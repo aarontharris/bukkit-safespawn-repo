@@ -12,8 +12,11 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -170,10 +173,25 @@ public class SafeSpawn extends JavaPlugin {
 			public void playerLeave( PlayerQuitEvent event ) {
 				PlayerEventHandler.onPlayerLeave( SafeSpawn.this, event );
 			}
+			
+			@EventHandler
+			public void playerKick( PlayerKickEvent event ) {
+				PlayerEventHandler.onPlayerKicked( SafeSpawn.this, event );
+			}
 
 			@EventHandler
 			public void playerInteractEvent( PlayerInteractEvent event ) {
 				PlayerEventHandler.onPlayerInteractEvent( SafeSpawn.this, event );
+			}
+
+			@EventHandler
+			public void playerChatEvent( AsyncPlayerChatEvent event ) {
+				PlayerEventHandler.onAsyncPlayerChatEvent( SafeSpawn.this, event );
+			}
+
+			@EventHandler
+			public void onInventoryOpenEvent( InventoryOpenEvent event ) {
+				PlayerEventHandler.onInventoryOpenEvent( SafeSpawn.this, event );
 			}
 
 			@EventHandler

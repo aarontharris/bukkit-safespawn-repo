@@ -7,8 +7,10 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
+import com.ath.bukkit.safespawn.Functions;
 import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
+import com.ath.bukkit.safespawn.TestTimer;
 import com.ath.bukkit.safespawn.Zone;
 import com.ath.bukkit.safespawn.Zone.ZoneExclude;
 import com.ath.bukkit.safespawn.data.Blocks;
@@ -24,6 +26,8 @@ public class BlockEventHandler {
 	}
 
 	public static void onBlockBreakEvent( SafeSpawn plugin, BlockBreakEvent event ) {
+
+		// Zone protection
 		try {
 			Block block = event.getBlock();
 			for ( Zone zone : plugin.getZoneManager().findZones( block.getLocation() ) ) {
@@ -34,6 +38,18 @@ public class BlockEventHandler {
 						player.sendMessage( "This is a no block breaking zone" );
 						break;
 					}
+				}
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+
+		// Ownership protection
+		try {
+			if ( !event.isCancelled() ) {
+				Block b = event.getBlock();
+				if ( Functions.canUserAccessBlock( b.getLocation(), b.getType(), event.getPlayer() ) ) {
+					event.setCancelled( true );
 				}
 			}
 		} catch ( Exception e ) {

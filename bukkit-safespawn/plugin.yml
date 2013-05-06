@@ -21,7 +21,7 @@ commands:
     description: Magically enhances blocks and actions
     permission: safespawn.magic.cast
     permission-message: You don't have that ability
-  help-cast:
+  casthelp:
     description: Explains how to cast magic
     permission: safespawn.magic.cast
     permission-message: You don't have that ability

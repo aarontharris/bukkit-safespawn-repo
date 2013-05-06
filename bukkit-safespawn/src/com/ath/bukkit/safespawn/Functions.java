@@ -1,8 +1,12 @@
 package com.ath.bukkit.safespawn;
 
 import java.nio.CharBuffer;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,13 +19,20 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.ath.bukkit.safespawn.data.BlockData;
+import com.ath.bukkit.safespawn.data.Blocks;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Sets;
 
 public class Functions {
 
 	public static Joiner spaceJoiner = Joiner.on( " " );
 
 	public static String joinSpace( String... strings ) {
+		return spaceJoiner.join( strings );
+	}
+
+	public static String joinSpace( Collection<String> strings ) {
 		return spaceJoiner.join( strings );
 	}
 
@@ -194,15 +205,26 @@ public class Functions {
 		return chest;
 	}
 
+	public static String toString( Block b ) {
+		try {
+			if ( b != null ) {
+				return toString( b.getLocation() ) + ",mat=" + b.getType();
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return "null";
+	}
+
 	public static String toString( Location l ) {
 		try {
 			if ( l != null ) {
 				return "x=" + (int) l.getX() + ",y=" + (int) l.getY() + ",z=" + (int) l.getZ() + ",w=" + l.getWorld().getName();
 			}
 		} catch ( Exception e ) {
-			e.printStackTrace();
+			Log.error( e );
 		}
-		return null;
+		return "null";
 	}
 
 	public static String randomMessage( String... messages ) {
@@ -231,8 +253,191 @@ public class Functions {
 		return buffer;
 	}
 
-	public static void main( String args[] ) {
-		String word = "blah";
-		System.out.println( capitalize( word ) );
+	public static Block getTargetBlock( Player player, int maxDist, Material mat ) {
+		try {
+			List<Block> blocks = player.getLastTwoTargetBlocks( null, 5 );
+
+			Block block = null;
+			for ( Block b : blocks ) {
+				if ( b.getType().equals( mat ) ) {
+					block = b;
+					break;
+				}
+			}
+
+			return block;
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return null;
+	}
+
+	public static void debugBlock( Block block ) {
+		if ( block == null ) {
+			Log.line( "blocks is null" );
+		} else {
+			Log.line( "block: %s is %s", BlockData.toHash( block ), block.getType() );
+		}
+	}
+
+	public static void debugBlocks( List<Block> blocks ) {
+		if ( blocks == null ) {
+			Log.line( "blocks is null" );
+		} else if ( blocks.isEmpty() ) {
+			Log.line( "blocks is empty" );
+		} else {
+			for ( int i = 0; i < blocks.size(); i++ ) {
+				Log.line( "blocks[%s]: %s is %s", i, BlockData.toHash( blocks.get( i ) ), blocks.get( i ).getType() );
+			}
+		}
+	}
+
+	public static String fromDbSafeString( String string ) {
+		try {
+			if ( string != null ) {
+				return string.replaceAll( "''", "'" );
+				// return string.replaceAll( "\\\\([^\\\\])", "$1" );
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return null;
+	}
+
+	/** returns null on error */
+	public static String toDbSafeString( String string ) {
+		try {
+			if ( string != null ) {
+				// return string.replaceAll( "([^a-zA-Z0-9_,:\\s\\{\\}\\\"\\[\\]\\(\\)])", "\\\\$1" );
+				return string.replaceAll( "'", "''" );
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return null;
+	}
+
+	/**
+	 * ignores the block at location 'nearThis'<br>
+	 * cubic dist check<br>
+	 * dist must be >= 0<br>
+	 * careful, bigger maxDist gets O^3 more expensive -- try to keep it small<br>
+	 * 
+	 * @return never null;
+	 */
+	public static Set<Block> findBlock( Location nearThis, Material likeThis, int maxDist, boolean ignoreOrigin ) {
+		return findBlock( nearThis, likeThis, maxDist, maxDist, maxDist, ignoreOrigin );
+	}
+
+	/**
+	 * cubic dist check<br>
+	 * dist must be >= 0<br>
+	 * careful, bigger maxDist gets O^3 more expensive -- try to keep it small<br>
+	 * 
+	 * @return never null;
+	 */
+	public static Set<Block> findBlock( Location nearThis, Material likeThis, int maxDistX, int maxDistY, int maxDistZ, boolean ignoreOrigin ) {
+		try {
+			if ( nearThis != null && likeThis != null ) {
+				int ox = nearThis.getBlockX();
+				int oy = nearThis.getBlockY();
+				int oz = nearThis.getBlockZ();
+
+				int sx = ox - maxDistX;
+				int sy = oy - maxDistY;
+				int sz = oz - maxDistZ;
+
+				int ex = sx + ( 2 * maxDistX );
+				int ey = sy + ( 2 * maxDistY );
+				int ez = sz + ( 2 * maxDistZ );
+
+				Set<Block> out = Sets.newHashSet();
+				World w = nearThis.getWorld();
+				for ( int x = sx; x <= ex; x++ ) {
+					for ( int y = sy; y <= ey; y++ ) {
+						for ( int z = sz; z <= ez; z++ ) {
+							Block block = w.getBlockAt( x, y, z );
+							if ( block.getTypeId() == likeThis.getId() ) {
+								if ( !ignoreOrigin || ( x != ox || y != oy || z != oz ) ) {
+									out.add( block );
+								}
+							}
+						}
+					}
+				}
+				return out;
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return Collections.emptySet();
+	}
+
+	/**
+	 * not ordered if more than one matching is found but does search left to right
+	 */
+	public static Block findFirstMatchingAdjacentBlock( Location nearThis, Material likeThis, boolean ignoreOrigin ) {
+		Set<Block> blocks = findBlock( nearThis, likeThis, 1, ignoreOrigin );
+		for ( Block b : blocks ) {
+			return b;
+		}
+		return null;
+	}
+
+	/**
+	 * magic signs can lock a relative position<br>
+	 * the magic sign itself and the block at the relative position are owned and protected<br>
+	 * <br>
+	 * lock
+	 * 0
+	 * -1
+	 * 0
+	 */
+	public static boolean isOwnedBlock( Location l, Material m ) {
+		try {
+			if ( l != null && m != null ) {
+				if ( Material.WALL_SIGN.equals( m ) ) {
+					BlockData bd = BlockData.get( l, m );
+					if ( bd != null ) {
+						if ( Blocks.isMagical( bd ) ) {
+							if ( Blocks.getWriteAccess( bd ).size() > 0 ) {
+								return true;
+							}
+						}
+					}
+				}
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return false;
+	}
+
+	public static boolean canUserAccessBlock( Location l, Material m, Player p ) {
+		try {
+			if ( isOwnedBlock( l, m ) ) {
+				BlockData bd = BlockData.get( l, m );
+				if ( Blocks.canRead( bd, p ) ) {
+					return true;
+				}
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return false;
+	}
+
+	/**
+	 * @deprecated
+	 * @param l
+	 * @param m
+	 * @return
+	 */
+	public static boolean isUserOwnerOfBlock( Location l, Material m ) {
+		try {
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return false;
 	}
 }

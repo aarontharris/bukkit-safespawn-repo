@@ -31,8 +31,13 @@ rules:
   - 1. Dont be a dick.
   - 2. Dont ask to change the server settings.
   - 3. Obey the rules.
-help-cast:
-  - If you have figured out how to encode a magic sign, type /cast and then place it.
+casthelp:
+  - /cast charge to make the next block you place a magic block.
+  - /cast lock to lock a chest so that only you may open it.
+  - /cast unlock to unlock a chest so that anyone may open it.
+  - /cast grant Joe to allow Joe to open a locked chest.
+  - /cast revoke Joe to disallow Joe from opening a locked chest.
+  - /cast access to display current access rights.
 zones:
   zone0:
     description: Iron Spawn 

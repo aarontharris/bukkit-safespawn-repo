@@ -13,6 +13,7 @@ public final class Const {
 	public static final String PERM_spawn = "safespawn.spawn";
 	public static final String PERM_player_dmg_from_entity = "safespawn.player_takes_dmg_from_entity";
 	public static final String PERM_magic_cast = "safespawn.magic.cast";
+	public static final String PERM_skeleton_key = "safespawn.skeleton_key"; // access to all locked blocks
 
 	public static final String MISSING_MSG = "Nothing... absolutely nothing...";
 
@@ -32,8 +33,8 @@ public final class Const {
 	public static final String CMD_spawn = "spawn";
 	public static final String CMD_cast = "cast";
 	
-	public static final String CMD_casthelp = "help-cast";
-	public static final String MSG_casthelp = "help-cast";
+	public static final String CMD_casthelp = "casthelp";
+	public static final String MSG_casthelp = "casthelp";
 
 	public static final String CMD_rules = "rules";
 	public static final String MSG_rules = "rules";
@@ -41,5 +42,6 @@ public final class Const {
 	public static final String CMD_gamedesc = "gamedesc";
 	public static final String MSG_gamedesc = "gamedesc";
 
-
+	public static final int SPAM_PERIOD_MILLIS = 10000;
+	public static final int SPAM_TIMES_PER_PERIOD = 5;
 }

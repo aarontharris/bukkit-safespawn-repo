@@ -8,13 +8,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Log {
 
 	private static Log self = new Log();
-	private Logger logger;
+	private Logger logger = null;
 
 	public static void init( JavaPlugin plugin ) {
 		self.logger = plugin.getLogger();
 	}
 
 	public static void line() {
+		line( "" );
 	}
 
 	public static void line( String format, Object... args ) {
@@ -27,7 +28,7 @@ public class Log {
 				self.logger.info( String.format( "%s: %s: %s", String.format( format, args ), el.getFileName(), el.getLineNumber() ) );
 			}
 		} catch ( Exception e ) {
-			e.printStackTrace();
+			System.out.printf( format + "\n", args );
 		}
 	}
 
@@ -38,7 +39,7 @@ public class Log {
 				self.logger.log( Level.SEVERE, el.getFileName() + ":" + el.getLineNumber() );
 			}
 		} catch ( Exception ex ) {
-			ex.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 }

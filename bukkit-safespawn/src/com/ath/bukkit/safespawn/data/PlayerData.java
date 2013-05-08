@@ -73,8 +73,6 @@ public class PlayerData implements Persisted {
 
 	private transient JSONObject flagsJSON;
 
-	private transient boolean casting;
-
 	private transient int chatCount = 0;
 	private transient long firstChatTime = 0;
 	private transient long lastChatTime = 0;
@@ -101,10 +99,6 @@ public class PlayerData implements Persisted {
 
 	public static PlayerData get( Player player ) {
 		return SafeSpawn.instance().getPlayerStore().getPlayerData( player );
-	}
-
-	public static void setCasting( Player player, boolean isCasting ) {
-		SafeSpawn.instance().getPlayerStore().getPlayerData( player ).setCasting( isCasting );
 	}
 
 	@SuppressWarnings( "unchecked" )
@@ -198,14 +192,6 @@ public class PlayerData implements Persisted {
 			flagsJSON = new JSONObject();
 		}
 		return flagsJSON;
-	}
-
-	public boolean isCasting() {
-		return casting;
-	}
-
-	public void setCasting( boolean casting ) {
-		this.casting = casting;
 	}
 
 	public String getNickname() {

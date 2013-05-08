@@ -13,11 +13,13 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 
 import com.ath.bukkit.safespawn.data.BlockData;
 import com.ath.bukkit.safespawn.data.Blocks;
@@ -143,9 +145,7 @@ public class Functions {
 			if ( inv != null && materials != null ) {
 				// first do a quick check to see if the mats need are in the inventory before doing all the other work...
 				for ( Material mat : materials ) {
-					Log.line( " contains " + mat );
 					if ( !inv.contains( mat, count ) ) {
-						Log.line( " contains " + mat + " false" );
 						return false;
 					}
 				}
@@ -199,10 +199,93 @@ public class Functions {
 		}
 	}
 
+	/** return null if not a sign or not found */
+	@SuppressWarnings( "incomplete-switch" )
+	public static Block getBlockWallSignIsAttachedTo( Location l, Material m ) {
+		try {
+			if ( l != null && m != null ) {
+				Block block = l.getWorld().getBlockAt( l );
+				BlockFace facing = getFacing( block );
+				if ( facing != null ) {
+					int x = l.getBlockX();
+					int y = l.getBlockY();
+					int z = l.getBlockZ();
+
+					switch ( facing.getOppositeFace() ) {
+					case NORTH:
+						z -= 1;
+						break;
+					case SOUTH:
+						z += 1;
+						break;
+					case EAST:
+						x += 1;
+						break;
+					case WEST:
+						x -= 1;
+						break;
+					}
+
+					Block attachedTo = l.getWorld().getBlockAt( x, y, z );
+					if ( attachedTo != null ) {
+						return attachedTo;
+					}
+				}
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return null;
+	}
+
 	/** assumes the block IS material.chest */
 	public static Chest blockToChest( Block block ) {
 		Chest chest = (Chest) block.getState();
 		return chest;
+	}
+
+	/** return null if block is not a sign */
+	public static org.bukkit.block.Sign blockToBlockSign( Block block ) {
+		try {
+			if ( block != null ) {
+				BlockState state = block.getState();
+				if ( state instanceof org.bukkit.block.Sign ) {
+					return (org.bukkit.block.Sign) state;
+				}
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return null;
+	}
+
+	/** return null if block is not a sign */
+	public static org.bukkit.material.Sign blockToMatSign( Block block ) {
+		try {
+			if ( block != null ) {
+				BlockState state = block.getState();
+				MaterialData data = state.getData();
+				if ( data != null && data instanceof org.bukkit.material.Sign ) {
+					return (org.bukkit.material.Sign) data;
+				}
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return null;
+	}
+
+	/** returns null if has no facing aka not a sign */
+	public static BlockFace getFacing( Block block ) {
+		try {
+			org.bukkit.material.Sign sign = blockToMatSign( block );
+			if ( sign != null ) {
+				return sign.getFacing();
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return null;
 	}
 
 	public static String toString( Block b ) {
@@ -384,25 +467,15 @@ public class Functions {
 		return null;
 	}
 
-	/**
-	 * magic signs can lock a relative position<br>
-	 * the magic sign itself and the block at the relative position are owned and protected<br>
-	 * <br>
-	 * lock
-	 * 0
-	 * -1
-	 * 0
-	 */
-	public static boolean isOwnedBlock( Location l, Material m ) {
+	/** @return the controlling block (sign) or null */
+	public static Block isOwnedWallSign( Location l, Material m ) {
 		try {
-			if ( l != null && m != null ) {
-				if ( Material.WALL_SIGN.equals( m ) ) {
-					BlockData bd = BlockData.get( l, m );
-					if ( bd != null ) {
-						if ( Blocks.isMagical( bd ) ) {
-							if ( Blocks.getWriteAccess( bd ).size() > 0 ) {
-								return true;
-							}
+			if ( Material.WALL_SIGN.equals( m ) ) {
+				BlockData bd = BlockData.get( l, m );
+				if ( bd != null ) {
+					if ( Blocks.isMagical( bd ) ) {
+						if ( Blocks.getWriteAccess( bd ).size() > 0 ) {
+							return l.getBlock();
 						}
 					}
 				}
@@ -410,16 +483,77 @@ public class Functions {
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
-		return false;
+		return null;
+	}
+
+	/** @return the controlling block (sign) or null */
+	public static Block isBelowOwnedWallSign( Location l, Material m ) {
+		try {
+			Block blockAbove = l.getWorld().getBlockAt( l.getBlockX(), l.getBlockY() + 1, l.getBlockZ() );
+			if ( null != isOwnedWallSign( blockAbove.getLocation(), blockAbove.getType() ) ) {
+				return blockAbove;
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return null;
+	}
+
+	/** @return the controlling block (sign) or null */
+	public static Block isAdjacentToOwnedWallSign( Location l, Material m ) {
+		try {
+			int idx = 0;
+			while ( AdjBlockIterator.hasNext( idx ) ) {
+				Block adj = AdjBlockIterator.next( l, idx );
+				if ( null != isOwnedWallSign( adj.getLocation(), adj.getType() ) ) {
+					return adj;
+				}
+				idx++ ;
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return null;
+	}
+
+	/**
+	 * magic signs can lock a relative position<br>
+	 * the magic sign itself, the block the sign is attached to, and the block below are protected<br>
+	 * <br>
+	 * lock
+	 * 0
+	 * -1
+	 * 0
+	 * 
+	 * @return the block (sign) controlling this owned block or null
+	 */
+	public static Block isOwnedBlock( Location l, Material m ) {
+		try {
+			if ( l != null && m != null ) {
+				Block ctrl = isOwnedWallSign( l, m );
+				if ( ctrl != null ) {
+					return ctrl;
+				}
+				
+				ctrl = isAdjacentToOwnedWallSign( l, m );
+				if ( ctrl != null ) {
+					return ctrl;
+				}
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return null;
 	}
 
 	public static boolean canUserAccessBlock( Location l, Material m, Player p ) {
 		try {
-			if ( isOwnedBlock( l, m ) ) {
-				BlockData bd = BlockData.get( l, m );
-				if ( Blocks.canRead( bd, p ) ) {
-					return true;
-				}
+			BlockData bd = BlockData.get( l, m );
+			if ( bd == null ) {
+				return true;
+			}
+			if ( Blocks.canRead( bd, p ) ) {
+				return true;
 			}
 		} catch ( Exception e ) {
 			Log.error( e );
@@ -428,16 +562,36 @@ public class Functions {
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated not implemented yet
 	 * @param l
 	 * @param m
 	 * @return
 	 */
 	public static boolean isUserOwnerOfBlock( Location l, Material m ) {
 		try {
+			// FIXME: isUserOwnerOfBlock
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
 		return false;
 	}
+
+	public static boolean isMagicAllowed( Location l, Material m ) {
+		try {
+			if ( Material.WALL_SIGN.equals( m ) ) {
+				Block attachedTo = getBlockWallSignIsAttachedTo( l, m );
+
+				Material am = attachedTo.getType();
+				if ( am.hasGravity() ) {
+					return false;
+				}
+
+				return true;
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return false;
+	}
+
 }

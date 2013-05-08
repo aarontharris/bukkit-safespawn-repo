@@ -16,7 +16,6 @@ import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.data.BlockData;
 import com.ath.bukkit.safespawn.data.Blocks;
-import com.ath.bukkit.safespawn.data.PlayerData;
 import com.ath.bukkit.safespawn.magic.MagicWords.MagicCast;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -45,7 +44,6 @@ public class CastCmd implements CommandExecutor {
 						}
 
 						if ( castWord != null ) {
-
 							switch ( castWord ) {
 							case Charge:
 								return doCharge( player, cmd, label, args );
@@ -80,10 +78,29 @@ public class CastCmd implements CommandExecutor {
 
 	// /cast charge
 	protected boolean doCharge( Player player, Command cmd, String label, String[] args ) {
-		PlayerData.setCasting( player, true );
-		player.sendMessage( "Your next placed block or sign will be magically enhanced, see /help-cast for help" );
-		Log.line( "%s successfully cast %s", player.getName(), Functions.joinSpace( args ) );
-		return true;
+		try {
+			Block block = Functions.getTargetBlock( player, 5, Material.WALL_SIGN );
+
+			// distance or no chest fail
+			if ( block == null ) {
+				player.sendMessage( "You're too far from a Wall Sign" );
+				return false;
+			}
+
+			Log.line( "%s.doCharge", player.getName() );
+			if ( Functions.isMagicAllowed( block.getLocation(), block.getType() ) ) {
+				Log.line( "%s.doCharge - magic allowed", player.getName() );
+				Blocks.setMagical( block, true );
+				Log.line( "%s successfully cast %s", player.getName(), Functions.joinSpace( args ) );
+				player.sendMessage( MagicCast.Charge.getMagicWord() + " -- charge successful" );
+				return true;
+			} else {
+				player.sendMessage( "You cannot charge a sign that is placed on a block with gravity" );
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return false;
 	}
 
 	// /cast lock
@@ -99,12 +116,14 @@ public class CastCmd implements CommandExecutor {
 		BlockData bd = BlockData.get( block );
 
 		// initial lock, self access only
-		if ( Blocks.canWrite( bd, player ) ) {
-			Blocks.grantWriteAccess( block, player );
-			Blocks.setMagical( block, true );
-			player.sendMessage( MagicCast.Lock.getMagicWord() + " -- lock successful" );
-		} else {
-			player.sendMessage( "You don't have permission." );
+		if ( Functions.isMagicAllowed( block.getLocation(), block.getType() ) ) {
+			if ( Blocks.canWrite( bd, player ) ) {
+				Blocks.grantWriteAccess( block, player );
+				Blocks.setMagical( block, true );
+				player.sendMessage( MagicCast.Lock.getMagicWord() + " -- lock successful" );
+			} else {
+				player.sendMessage( "You cannot lock a sign that is placed on a block with gravity" );
+			}
 		}
 
 		return true;
@@ -122,11 +141,15 @@ public class CastCmd implements CommandExecutor {
 		BlockData bd = BlockData.get( block );
 
 		// initial lock, self access only
-		if ( Blocks.canWrite( bd, player ) ) {
-			Blocks.clearReadWriteAccess( block );
-			player.sendMessage( MagicCast.Unlock.getMagicWord() + " -- unlock successful" );
+		if ( Functions.isMagicAllowed( block.getLocation(), block.getType() ) ) {
+			if ( Blocks.canWrite( bd, player ) ) {
+				Blocks.clearReadWriteAccess( block );
+				player.sendMessage( MagicCast.Unlock.getMagicWord() + " -- unlock successful" );
+			} else {
+				player.sendMessage( "You don't have permission." );
+			}
 		} else {
-			player.sendMessage( "You don't have permission." );
+			player.sendMessage( "You cannot unlock a sign that is placed on a block with gravity" );
 		}
 
 		return true;
@@ -136,6 +159,16 @@ public class CastCmd implements CommandExecutor {
 	protected boolean doGrant( Player player, Command cmd, String label, String[] args ) {
 		List<Block> blocks = player.getLastTwoTargetBlocks( null, 5 );
 		Block block = blocks.get( 1 );
+
+		if ( !Material.WALL_SIGN.equals( block.getType() ) ) {
+			player.sendMessage( "What is it you're trying to access?" );
+			return false;
+		}
+
+		if ( !Functions.isMagicAllowed( block.getLocation(), block.getType() ) ) {
+			player.sendMessage( "You cannot grant access to a sign that is placed on a block with gravity" );
+		}
+
 		BlockData bd = BlockData.get( block );
 
 		// verify usage
@@ -175,6 +208,16 @@ public class CastCmd implements CommandExecutor {
 	protected boolean doRevoke( Player player, Command cmd, String label, String[] args ) {
 		List<Block> blocks = player.getLastTwoTargetBlocks( null, 5 );
 		Block block = blocks.get( 1 );
+
+		if ( !Material.WALL_SIGN.equals( block.getType() ) ) {
+			player.sendMessage( "What is it you're trying to access?" );
+			return false;
+		}
+
+		if ( !Functions.isMagicAllowed( block.getLocation(), block.getType() ) ) {
+			player.sendMessage( "You cannot grant access to a sign that is placed on a block with gravity" );
+		}
+
 		BlockData bd = BlockData.get( block );
 
 		// verify usage
@@ -211,43 +254,54 @@ public class CastCmd implements CommandExecutor {
 
 	// /cast access
 	private boolean doAccess( Player player, Command cmd, String label, String[] args ) {
-		Log.line( player.getName() + ".doAccess" );
+		try {
+			Log.line( player.getName() + ".doAccess" );
 
-		List<Block> blocks = player.getLastTwoTargetBlocks( null, 5 );
-		Functions.debugBlocks( blocks );
-		if ( blocks == null || blocks.isEmpty() ) {
-			player.sendMessage( "What is it you're trying to access?" );
-			return false;
-		}
+			List<Block> blocks = player.getLastTwoTargetBlocks( null, 5 );
+			if ( blocks == null || blocks.isEmpty() ) {
+				player.sendMessage( "What is it you're trying to access?" );
+				return false;
+			}
 
-		Block block = blocks.get( 1 );
-		Functions.debugBlock( block );
+			Block block = blocks.get( 1 );
 
-		BlockData bd = BlockData.get( block );
-		if ( bd == null ) {
-			player.sendMessage( "You've tried to access a non-magical " + block.getType() );
-			return false;
-		}
+			if ( !Material.WALL_SIGN.equals( block.getType() ) ) {
+				player.sendMessage( "What is it you're trying to access?" );
+				return false;
+			}
 
-		Log.line( "BD: " + bd.getHash() );
+			if ( !Functions.isMagicAllowed( block.getLocation(), block.getType() ) ) {
+				player.sendMessage( "You cannot grant access to a sign that is placed on a block with gravity" );
+			}
 
-		if ( Blocks.isMagical( bd ) ) {
-			Log.line( "is magical" );
-			Set<String> access = Blocks.getWriteAccess( bd );
-			if ( Blocks.hasWriteAccess( bd, access, player ) ) {
-				Log.line( "has write" );
-				if ( access.isEmpty() ) {
-					player.sendMessage( "Write: none" );
+			BlockData bd = BlockData.get( block );
+			if ( bd == null ) {
+				player.sendMessage( "You've tried to access a non-magical " + block.getType() );
+				return false;
+			}
+
+			Log.line( "BD: " + bd.getHash() );
+
+			if ( Blocks.isMagical( bd ) ) {
+				Log.line( "is magical" );
+				Set<String> access = Blocks.getWriteAccess( bd );
+				if ( Blocks.hasWriteAccess( bd, access, player ) ) {
+					Log.line( "has write" );
+					if ( access.isEmpty() ) {
+						player.sendMessage( "Write: none" );
+					} else {
+						player.sendMessage( "Write: " + Functions.joinSpace( access ) );
+					}
 				} else {
-					player.sendMessage( "Write: " + Functions.joinSpace( access ) );
+					player.sendMessage( "You don't have permission." );
 				}
 			} else {
-				player.sendMessage( "You don't have permission." );
+				player.sendMessage( "You've tried to access a non-magical " + block.getType() );
 			}
-		} else {
-			player.sendMessage( "You've tried to access a non-magical " + block.getType() );
-		}
 
-		return true;
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return false;
 	}
 }

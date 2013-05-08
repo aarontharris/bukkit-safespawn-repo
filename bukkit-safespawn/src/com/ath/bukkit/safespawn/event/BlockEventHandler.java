@@ -4,28 +4,24 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockEvent;
+import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 import com.ath.bukkit.safespawn.Functions;
 import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
-import com.ath.bukkit.safespawn.TestTimer;
 import com.ath.bukkit.safespawn.Zone;
 import com.ath.bukkit.safespawn.Zone.ZoneExclude;
-import com.ath.bukkit.safespawn.data.Blocks;
 
 public class BlockEventHandler {
 
-	public static void onBlockEvent( SafeSpawn plugin, BlockEvent event ) {
-		try {
-			Log.line( event.getClass().getCanonicalName() + ", " + event.getEventName() );
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-	}
-
 	public static void onBlockBreakEvent( SafeSpawn plugin, BlockBreakEvent event ) {
+		Log.line( "%s.break @ %s - chunk = %s,%s",
+				event.getPlayer().getName(),
+				Functions.toString( event.getBlock().getLocation() ),
+				event.getBlock().getChunk().getX(),
+				event.getBlock().getChunk().getZ()
+				);
 
 		// Zone protection
 		try {
@@ -48,8 +44,15 @@ public class BlockEventHandler {
 		try {
 			if ( !event.isCancelled() ) {
 				Block b = event.getBlock();
-				if ( Functions.canUserAccessBlock( b.getLocation(), b.getType(), event.getPlayer() ) ) {
-					event.setCancelled( true );
+				Player player = event.getPlayer();
+				Block ctrl = Functions.isOwnedBlock( b.getLocation(), b.getType() );
+				if ( ctrl != null ) {
+					if ( Functions.canUserAccessBlock( ctrl.getLocation(), ctrl.getType(), event.getPlayer() ) ) {
+						player.sendMessage( "You just destroyed a magic block" );
+					} else {
+						player.sendMessage( "This block is protected, talk to the owner" );
+						event.setCancelled( true );
+					}
 				}
 			}
 		} catch ( Exception e ) {
@@ -75,6 +78,8 @@ public class BlockEventHandler {
 		// maybe only get zones that care about the event:
 		// - - EX: onBlockPlaceEvent, only get zones that exclude the BlockPlaceEvent
 
+		// FIXME: even better -- when a block is created, destroyed, restored or generated from the world, maintain a ref to BlockData
+
 		// First see if the event gets cancelled in here
 		try {
 			Block block = event.getBlock();
@@ -93,30 +98,26 @@ public class BlockEventHandler {
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
+	}
 
+	// public static void onSignChangeEvent( SafeSpawnPlugin plugin, SignChangeEvent event ) {
+	// Functions.teleport( plugin, event.getPlayer(), plugin.getSpawnLocation() );
+	// }
 
-		// if the event didn't get cancelled
+	public static void onBlockFadeEvent( SafeSpawn plugin, BlockFadeEvent event ) {
+		Log.line( "block fade @ %s", Functions.toString( event.getBlock() ) );
+
+		// Ownership protection
 		try {
 			if ( !event.isCancelled() ) {
-				Player player = event.getPlayer();
-
-				// is the block magical
-				if ( plugin.getPlayerStore().isCasting( player ) ) {
-					Blocks.setMagical( event.getBlock(), true );
+				Block b = event.getBlock();
+				Block ctrl = Functions.isOwnedBlock( b.getLocation(), b.getType() );
+				if ( ctrl != null ) {
+					event.setCancelled( true );
 				}
 			}
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
-
-		// always cancel the cast
-		try {
-			plugin.getPlayerStore().endCasting( event.getPlayer() );
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
 	}
-	// public static void onSignChangeEvent( SafeSpawnPlugin plugin, SignChangeEvent event ) {
-	// Functions.teleport( plugin, event.getPlayer(), plugin.getSpawnLocation() );
-	// }
 }

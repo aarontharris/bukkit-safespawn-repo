@@ -88,46 +88,57 @@ public class Blocks {
 	/** do not use in a loop */
 	public static boolean canRead( BlockData bd, Player player ) {
 		try {
+			Log.line( "canRead( %s, %s )", bd.toString(), player.getName() );
 			if ( canWrite( bd, player ) ) {
+				Log.line( "canRead( %s, %s ) - canWrite", bd.toString(), player.getName() );
 				return true;
 			}
 			Set<String> rAccess = getReadAccess( bd );
 			if ( rAccess.contains( player.getName() ) ) {
+				Log.line( "canRead( %s, %s ) - read.contains", bd.toString(), player.getName() );
 				return true;
 			}
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
+		Log.line( "canRead( %s, %s ) - no", bd.toString(), player.getName() );
 		return false;
 	}
 
 	/** do not use in a loop */
 	public static boolean canWrite( BlockData bd, Player player ) {
 		try {
+			Log.line( "canWrite( %s, %s )", bd.toString(), player.getName() );
 			Set<String> access = getWriteAccess( bd );
 			return hasWriteAccess( bd, access, player );
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
+		Log.line( "canWrite( %s, %s ) - no", bd.toString(), player.getName() );
 		return false;
 	}
 
 	/** Loop safe */
 	public static boolean hasWriteAccess( BlockData bd, Set<String> access, Player player ) {
 		try {
+			Log.line( "hasWriteAccess( %s, %s )", bd.toString(), player.getName() );
 			if ( player.hasPermission( Const.PERM_skeleton_key ) ) {
+				Log.line( "hasWriteAccess( %s, %s ) - skeleton key", bd.toString(), player.getName() );
 				player.sendMessage( "Accessed with Skeleton Key" );
 				return true;
 			}
 
 			if ( access.isEmpty() ) {
+				Log.line( "hasWriteAccess( %s, %s ) - access is empty", bd.toString(), player.getName() );
 				return true;
 			} else if ( access.contains( player.getName() ) ) {
+				Log.line( "hasWriteAccess( %s, %s ) - access.contains", bd.toString(), player.getName() );
 				return true;
 			}
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
+		Log.line( "hasWriteAccess( %s, %s ) - no", bd.toString(), player.getName() );
 		return false;
 	}
 

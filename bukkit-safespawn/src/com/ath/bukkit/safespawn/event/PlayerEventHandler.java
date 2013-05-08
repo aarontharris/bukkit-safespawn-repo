@@ -136,8 +136,8 @@ public class PlayerEventHandler {
 			if ( event.getAction().equals( Action.LEFT_CLICK_BLOCK ) ) {
 				Block block = event.getClickedBlock();
 
-				// WALL SIGN
-				if ( block.getType().equals( Material.WALL_SIGN ) || block.getType().equals( Material.SIGN_POST ) ) { // || block.getType().equals( Material.SIGN ) ) {
+				// SIGN
+				if ( Material.WALL_SIGN.equals( block.getType() ) ) {
 					if ( event.getPlayer().hasPermission( Const.PERM_magic_sign ) ) {
 						BlockState state = block.getState();
 						if ( state instanceof Sign ) {

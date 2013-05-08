@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.Chunk;
 import org.bukkit.block.Block;
 
 import com.ath.bukkit.safespawn.Functions;
@@ -29,7 +30,6 @@ public class BlockStore {
 	public void primeTheCache() { // TODO break this down into onChunkLoad?
 		try {
 			// BlockData data = database.find( BlockData.class ).where().ieq( BlockData.HASH, blockHash ).findUnique();
-			Log.line( "dbFind( * )" );
 			Set<BlockData> all = dbFindAll();
 			for ( BlockData data : all ) {
 				dataCache.put( data.getHash(), data );
@@ -56,6 +56,34 @@ public class BlockStore {
 		}
 	}
 
+	public void onChunkLoad( Chunk chunk ) {
+		try {
+			Set<BlockData> all = dbFindAll( chunk );
+			for ( BlockData data : all ) {
+				Log.line( "+ syncAll( %s, %s ) - " + data.getHash() + " id= " + data.getId(), chunk.getX(), chunk.getZ() );
+				dataCache.put( data.getHash(), data );
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+	}
+
+	public void onChunkUnload( Chunk chunk ) {
+		try {
+			Set<BlockData> blocks = dbFindAll( chunk );
+			for ( BlockData data : blocks ) {
+				if ( data != null && data.isModified() ) {
+					Log.line( "- syncAll( %s, %s ) - " + data.getHash() + " id= " + data.getId(), chunk.getX(), chunk.getZ() );
+					saveBlockData( data );
+					data.setModified( false );
+				}
+				dataCache.remove( data );
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+	}
+
 	/** when the block is destroyed */
 	public void remove( Block block ) {
 		try {
@@ -68,8 +96,9 @@ public class BlockStore {
 				if ( data != null ) {
 					dataCache.remove( hash );
 					if ( data.getId() > 0 ) { // if persisted
-						Log.line( "dbDelete( " + data.getHash() + " )" );
-						database.delete( data );
+						// Log.line( "dbDelete( " + data.getHash() + " )" );
+						// database.delete( data );
+						deleteBlockData( data );
 					}
 				}
 			}
@@ -117,6 +146,21 @@ public class BlockStore {
 				data.setMeta( Functions.fromDbSafeString( data.getMeta() ) );
 			}
 			return all;
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return Collections.emptySet();
+	}
+
+	private Set<BlockData> dbFindAll( Chunk chunk ) {
+		try {
+			Log.line( "dbFind( chunk=%s, %s )", chunk.getX(), chunk.getZ() );
+			// String query = "select * from BlockData where chunk_x=" + chunk.getX() + ", chunk_z=" + chunk.getZ();
+			String query = "chunk_x=" + chunk.getX() + ", chunk_z=" + chunk.getZ();
+			Log.line( " -- %s", query );
+			return database.find( BlockData.class ).where( query ).findSet();
+
+			// return database.find( BlockData.class ).where().eq( BlockData.CHUNK_X, chunk.getX() ).eq( BlockData.CHUNK_Z, chunk.getZ() ).findSet();
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
@@ -183,4 +227,15 @@ public class BlockStore {
 		}
 	}
 
+	/** expects the blockdata to have an Id > 0 */
+	private void deleteBlockData( BlockData blockData ) {
+		try {
+			Log.line( "dbDelete( %s )", blockData );
+			String update = String.format( "delete from BlockData where id=%s", blockData.getId() );
+			SqlUpdate sqlUpdate = database.createSqlUpdate( update );
+			database.execute( sqlUpdate );
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+	}
 }

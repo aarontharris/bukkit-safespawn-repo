@@ -78,7 +78,7 @@ public class PlayerStore {
 			if ( requestor != null && requestor.getName().equals( nickname ) ) {
 				return true;
 			}
-			
+
 			PlayerData player = getPlayerDataByPlayerName( nickname );
 			if ( player == null ) { // don't allow players to use other player's account names as nicknames
 				PlayerData nick = getPlayerDataByPlayerNickname( nickname );
@@ -131,29 +131,6 @@ public class PlayerStore {
 			}
 		} catch ( Exception e ) {
 			logError( e );
-		}
-	}
-
-	public boolean isCasting( Player player ) {
-		try {
-			PlayerData data = getPlayerDataFromCache( player );
-			if ( data != null && data.isCasting() ) {
-				return true;
-			}
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-		return false;
-	}
-
-	public void endCasting( Player player ) {
-		try {
-			if ( isCasting( player ) ) {
-				getPlayerDataFromCache( player ).setCasting( false );
-				player.sendMessage( "Your /cast has been consumed." );
-			}
-		} catch ( Exception e ) {
-			Log.error( e );
 		}
 	}
 

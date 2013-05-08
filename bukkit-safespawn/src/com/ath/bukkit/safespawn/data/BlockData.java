@@ -26,6 +26,8 @@ import com.google.common.collect.Sets;
 @Table( name = "BlockData" )
 public class BlockData implements Persisted {
 	public static final String HASH = "hash";
+	public static final String CHUNK_X = "chunk_x";
+	public static final String CHUNK_Z = "chunk_z";
 
 	public static final String[] SCHEMA = {
 			"create table BlockData" +
@@ -33,10 +35,27 @@ public class BlockData implements Persisted {
 					"hash TEXT," +
 					"meta BLOB," +
 					"lastModified bigint," +
+					"chunk_x INTEGER," +
+					"chunk_z INTEGER," +
+					"block_x INTEGER," +
+					"block_y INTEGER," +
+					"block_z INTEGER," +
+					"block_w TEXT," +
+					"block_m INTEGER," +
 					"id INTEGER primary key autoincrement" +
 					");",
-			"CREATE INDEX BlockData_hash_INDEX ON BlockData (hash);"
+			"CREATE INDEX BlockData_hash_INDEX ON BlockData (hash);",
+			"CREATE INDEX BlockData_chkx_INDEX ON BlockData (chunk_x);",
+			"CREATE INDEX BlockData_chkz_INDEX ON BlockData (chunk_z);"
 	};
+
+	/*
+	 * create table temp as select hash, meta, lastModified, id from BlockData;
+	 * -
+	 * insert into BlockData ( hash, meta, lastModified, id )
+	 * select hash, meta, lastModified, id
+	 * from temp;
+	 */
 
 	public static final String toHash( Block block ) {
 		if ( block != null ) {
@@ -59,6 +78,13 @@ public class BlockData implements Persisted {
 	public static BlockData newBlockData( Block block ) {
 		BlockData out = new BlockData();
 		out.setHash( toHash( block ) );
+		out.setChunkX( block.getChunk().getX() );
+		out.setChunkZ( block.getChunk().getZ() );
+		out.setBlockX( block.getX() );
+		out.setBlockY( block.getY() );
+		out.setBlockZ( block.getZ() );
+		out.setBlockW( block.getLocation().getWorld().getName() );
+		out.setBlockM( block.getTypeId() );
 		out.setLastModified( System.currentTimeMillis() );
 		return out;
 	}
@@ -81,8 +107,26 @@ public class BlockData implements Persisted {
 	@Id
 	private int id;
 
-	@Column( name = "lastModified", updatable = true )
-	private long lastModified;
+	@Column( name = "chunk_x", updatable = false )
+	private int chunkX;
+
+	@Column( name = "chunk_z", updatable = false )
+	private int chunkZ;
+
+	@Column( name = "block_x", updatable = false )
+	private int blockX;
+
+	@Column( name = "block_y", updatable = false )
+	private int blockY;
+
+	@Column( name = "block_z", updatable = false )
+	private int blockZ;
+
+	@Column( name = "block_w", updatable = false )
+	private String blockW;
+
+	@Column( name = "block_m", updatable = false )
+	private int blockM;
 
 	@Column( name = "hash", unique = true, updatable = false )
 	private String hash;
@@ -90,12 +134,17 @@ public class BlockData implements Persisted {
 	@Column( name = "meta", updatable = true )
 	private String meta;
 
+	@Column( name = "lastModified", updatable = true )
+	private long lastModified;
+
 	private transient JSONObject metaJSON;
 
 	private transient boolean modified;
 
 	public BlockData() {
 	}
+
+	// FIXME: add l1 cached read/write access support
 
 	@Override
 	public String toString() {
@@ -263,5 +312,63 @@ public class BlockData implements Persisted {
 	void setModified( boolean modified ) {
 		this.modified = modified;
 		setLastModified( System.currentTimeMillis() );
+	}
+
+	public int getChunkX() {
+		return chunkX;
+	}
+
+	/** @deprecated only used by ORM */
+	public void setChunkX( int chunkX ) {
+		this.chunkX = chunkX;
+	}
+
+	public int getChunkZ() {
+		return chunkZ;
+	}
+
+	/** @deprecated only used by ORM */
+	public void setChunkZ( int chunkZ ) {
+		this.chunkZ = chunkZ;
+	}
+
+	public int getBlockX() {
+		return blockX;
+	}
+
+	public void setBlockX( int blockX ) {
+		this.blockX = blockX;
+	}
+
+	public int getBlockY() {
+		return blockY;
+	}
+
+	public void setBlockY( int blockY ) {
+		this.blockY = blockY;
+	}
+
+	public int getBlockZ() {
+		return blockZ;
+	}
+
+	public void setBlockZ( int blockZ ) {
+		this.blockZ = blockZ;
+	}
+
+	public String getBlockW() {
+		return blockW;
+	}
+
+	public void setBlockW( String blockW ) {
+		this.blockW = blockW;
+	}
+
+	public int getBlockM() {
+		return blockM;
+	}
+
+	public void setBlockM( int blockM ) {
+		this.blockM = blockM;
 	}
 }

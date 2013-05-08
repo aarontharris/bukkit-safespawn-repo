@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -173,7 +174,7 @@ public class SafeSpawn extends JavaPlugin {
 			public void playerLeave( PlayerQuitEvent event ) {
 				PlayerEventHandler.onPlayerLeave( SafeSpawn.this, event );
 			}
-			
+
 			@EventHandler
 			public void playerKick( PlayerKickEvent event ) {
 				PlayerEventHandler.onPlayerKicked( SafeSpawn.this, event );
@@ -200,12 +201,32 @@ public class SafeSpawn extends JavaPlugin {
 			}
 
 			@EventHandler
+			public void blockFadeEvent( BlockFadeEvent event ) {
+				BlockEventHandler.onBlockFadeEvent( SafeSpawn.this, event );
+			}
+
+			@EventHandler
 			public void blockPlaceEvent( BlockPlaceEvent event ) {
 				BlockEventHandler.onBlockPlaceEvent( SafeSpawn.this, event );
 			}
 
+			// @EventHandler
+			// public void chunkLoadEvent( ChunkLoadEvent event ) {
+			// ChunkEventHandler.onChunkLoadEvent( SafeSpawn.this, event );
+			// }
+			//
+			// @EventHandler
+			// public void chunkUnloadEvent( ChunkUnloadEvent event ) {
+			// ChunkEventHandler.onChunkUnloadEvent( SafeSpawn.this, event );
+			// }
+			//
+			// @EventHandler
+			// public void chunkPopulateEvent( ChunkPopulateEvent event ) {
+			// ChunkEventHandler.onChunkPopulateEvent( SafeSpawn.this, event );
+			// }
+
 			@EventHandler
-			public void blockEvent( EntityExplodeEvent event ) {
+			public void entityExplodeEvent( EntityExplodeEvent event ) {
 				EntityEventHandler.onEntityExplode( SafeSpawn.this, event );
 			}
 

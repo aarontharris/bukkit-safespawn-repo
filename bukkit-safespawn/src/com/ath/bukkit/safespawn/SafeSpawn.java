@@ -200,10 +200,10 @@ public class SafeSpawn extends JavaPlugin {
 				BlockEventHandler.onBlockBreakEvent( SafeSpawn.this, event );
 			}
 
-			@EventHandler
-			public void blockFadeEvent( BlockFadeEvent event ) {
-				BlockEventHandler.onBlockFadeEvent( SafeSpawn.this, event );
-			}
+			// @EventHandler
+			// public void blockFadeEvent( BlockFadeEvent event ) {
+			// BlockEventHandler.onBlockFadeEvent( SafeSpawn.this, event );
+			// }
 
 			@EventHandler
 			public void blockPlaceEvent( BlockPlaceEvent event ) {

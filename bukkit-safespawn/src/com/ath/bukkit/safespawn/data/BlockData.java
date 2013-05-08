@@ -1,5 +1,6 @@
 package com.ath.bukkit.safespawn.data;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -56,6 +57,9 @@ public class BlockData implements Persisted {
 	 * select hash, meta, lastModified, id
 	 * from temp;
 	 */
+
+	private static final String WRITE_ACCESS = "write_access";
+	private static final String READ_ACCESS = "read_access";
 
 	public static final String toHash( Block block ) {
 		if ( block != null ) {
@@ -141,10 +145,11 @@ public class BlockData implements Persisted {
 
 	private transient boolean modified;
 
+	private transient Set<String> rAccess;
+	private transient Set<String> wAccess;
+
 	public BlockData() {
 	}
-
-	// FIXME: add l1 cached read/write access support
 
 	@Override
 	public String toString() {
@@ -156,7 +161,7 @@ public class BlockData implements Persisted {
 		return SCHEMA;
 	}
 
-	public void putStringArray( String key, List<String> strings ) {
+	public void putStringCollection( String key, Collection<String> strings ) {
 		try {
 			JSONArray ary = new JSONArray();
 			ary.addAll( strings );
@@ -251,6 +256,40 @@ public class BlockData implements Persisted {
 			Log.error( e );
 		}
 		return defaultValue;
+	}
+
+	public Set<String> getReadAccess() {
+		if ( rAccess == null ) {
+			rAccess = getStringSet( READ_ACCESS );
+		}
+		return rAccess;
+	}
+
+	public void setReadAccess( Set<String> access ) {
+		if ( access == null ) {
+			rAccess = null;
+			removeKey( READ_ACCESS );
+		} else {
+			rAccess = Sets.newHashSet( access );
+			putStringCollection( READ_ACCESS, rAccess );
+		}
+	}
+
+	public Set<String> getWriteAccess() {
+		if ( wAccess == null ) {
+			wAccess = getStringSet( WRITE_ACCESS );
+		}
+		return wAccess;
+	}
+
+	public void setWriteAccess( Set<String> access ) {
+		if ( access == null ) {
+			wAccess = null;
+			removeKey( WRITE_ACCESS );
+		} else {
+			rAccess = Sets.newHashSet( access );
+			putStringCollection( WRITE_ACCESS, wAccess );
+		}
 	}
 
 	/** @deprecated - used by ORM */

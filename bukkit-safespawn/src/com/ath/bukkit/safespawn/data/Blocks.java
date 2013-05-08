@@ -1,7 +1,5 @@
 package com.ath.bukkit.safespawn.data;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
@@ -12,9 +10,6 @@ import com.ath.bukkit.safespawn.Const;
 import com.ath.bukkit.safespawn.Log;
 
 public class Blocks {
-
-	private static final String WRITE_ACCESS = "write_access";
-	private static final String READ_ACCESS = "read_access";
 
 	public static boolean isMagical( BlockData bd ) {
 		try {
@@ -34,7 +29,7 @@ public class Blocks {
 		}
 	}
 
-	public static void grantReadWriteAccess( Block b, Collection<String> playerNames ) {
+	public static void grantReadWriteAccess( Block b, Set<String> playerNames ) {
 		try {
 			setReadAccess( b, playerNames );
 			setWriteAccess( b, playerNames );
@@ -44,30 +39,33 @@ public class Blocks {
 	}
 
 	/** overwrite */
-	public static void setReadAccess( Block b, Collection<String> playerNames ) {
+	public static void setReadAccess( Block b, Set<String> playerNames ) {
 		try {
 			BlockData bd = BlockData.attain( b );
-			bd.putStringArray( READ_ACCESS, new ArrayList<String>( playerNames ) );
+			// bd.putStringCollection( READ_ACCESS, playerNames );
+			bd.setReadAccess( playerNames );
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
 	}
 
 	/** overwrite */
-	public static void setWriteAccess( Block b, Collection<String> playerNames ) {
+	public static void setWriteAccess( Block b, Set<String> playerNames ) {
 		try {
 			BlockData bd = BlockData.attain( b );
-			bd.putStringArray( WRITE_ACCESS, new ArrayList<String>( playerNames ) );
+			// bd.putStringCollection( WRITE_ACCESS, playerNames );
+			bd.setWriteAccess( playerNames );
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
 	}
 
+
 	/** never null */
 	public static Set<String> getReadAccess( BlockData bd ) {
 		try {
 			if ( bd != null )
-				return bd.getStringSet( READ_ACCESS );
+				return bd.getReadAccess();
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
@@ -78,7 +76,7 @@ public class Blocks {
 	public static Set<String> getWriteAccess( BlockData bd ) {
 		try {
 			if ( bd != null )
-				return bd.getStringSet( WRITE_ACCESS );
+				return bd.getWriteAccess();
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
@@ -175,8 +173,8 @@ public class Blocks {
 	public static void clearReadWriteAccess( Block b ) {
 		try {
 			BlockData bd = BlockData.attain( b );
-			bd.removeKey( READ_ACCESS );
-			bd.removeKey( WRITE_ACCESS );
+			bd.setReadAccess( null );
+			bd.setWriteAccess( null );
 		} catch ( Exception e ) {
 			Log.error( e );
 		}

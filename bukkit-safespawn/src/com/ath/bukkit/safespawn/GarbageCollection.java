@@ -38,7 +38,7 @@ public class GarbageCollection {
 							int cz = pChunk.getZ();
 							for ( int x = ( cx - 1 ); x <= ( cx + 1 ); x++ ) {
 								for ( int z = ( cz - 1 ); z <= ( cz + 1 ); z++ ) {
-									activeChunks.add( BlockStore.toChunkHash( w.getName(), cx, cz ) );
+									activeChunks.add( BlockStore.toChunkHash( w.getName(), x, z ) );
 								}
 							}
 						}
@@ -52,7 +52,8 @@ public class GarbageCollection {
 						}
 
 						boolean hasPlayers = false;
-						for ( Entity e : BlockStore.toChunk( chunkHash ).getEntities() ) {
+						Chunk chunk = BlockStore.toChunk( chunkHash );
+						for ( Entity e : chunk.getEntities() ) {
 							if ( e instanceof Player ) {
 								hasPlayers = true;
 								break;
@@ -61,10 +62,10 @@ public class GarbageCollection {
 
 						if ( !hasPlayers ) {
 							SafeSpawn.instance().getBlockStore().removeFromCache( chunkHash );
+							getCounter( chunk ).set( 0 ); // no players, make sure its zero'd
 						}
 					}
 				} catch ( Exception e ) {
-					Log.line( "Error occured :(" );
 					Log.error( e );
 				}
 			}

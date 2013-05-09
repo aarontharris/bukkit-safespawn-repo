@@ -107,7 +107,7 @@ public class SafeSpawn extends JavaPlugin {
 			initializeCommands();
 			playerManager.initialize();
 
-			getBlockStore().primeTheCache();
+			//getBlockStore().primeTheCache();
 
 			taskman = new TaskManager();
 

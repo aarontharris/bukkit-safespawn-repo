@@ -8,7 +8,6 @@ import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -17,11 +16,14 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.ath.bukkit.safespawn.TaskManager.Task;
 import com.ath.bukkit.safespawn.cmd.CastCmd;
 import com.ath.bukkit.safespawn.cmd.LinesReaderCmd;
 import com.ath.bukkit.safespawn.cmd.NickCmd;
@@ -32,7 +34,9 @@ import com.ath.bukkit.safespawn.data.Persisted;
 import com.ath.bukkit.safespawn.data.PlayerData;
 import com.ath.bukkit.safespawn.data.PlayerStore;
 import com.ath.bukkit.safespawn.data.SimpleKeyVal;
+import com.ath.bukkit.safespawn.data.Task;
 import com.ath.bukkit.safespawn.event.BlockEventHandler;
+import com.ath.bukkit.safespawn.event.ChunkEventHandler;
 import com.ath.bukkit.safespawn.event.EntityEventHandler;
 import com.ath.bukkit.safespawn.event.PlayerEventHandler;
 import com.ath.bukkit.safespawn.event.ZoneEventHandler;
@@ -108,12 +112,14 @@ public class SafeSpawn extends JavaPlugin {
 			taskman = new TaskManager();
 
 			// tasks
-			taskman.addTask( new Task() {
+			getTaskman().addRepeatingTask( new Task() {
 				@Override
 				public void run() {
 					getBlockStore().syncAll();
 				}
 			} );
+			
+			GarbageCollection.init( getTaskman() );
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
@@ -125,7 +131,7 @@ public class SafeSpawn extends JavaPlugin {
 		Log.line( "onDisable" );
 
 		try {
-			taskman.shutdown();
+			getTaskman().shutdown();
 			taskman = null;
 
 			// blockStore.syncAll();
@@ -141,10 +147,6 @@ public class SafeSpawn extends JavaPlugin {
 
 	private void initializeConfig() {
 		this.saveDefaultConfig(); // this does not overwrite if config.yml already exists, bad naming...
-
-		// FIXME: if this fails, the plugin is useless
-		// the plugin should shut its services down
-		// maybe just disable the server?
 
 		worldsManager.initialize();
 		getZoneManager().initializeFromConfig();
@@ -168,21 +170,33 @@ public class SafeSpawn extends JavaPlugin {
 			@EventHandler
 			public void playerJoin( PlayerJoinEvent event ) {
 				PlayerEventHandler.onPlayerJoin( SafeSpawn.this, event );
+				GarbageCollection.onPlayerJoinEvent( SafeSpawn.this, event );
 			}
 
 			@EventHandler
 			public void playerLeave( PlayerQuitEvent event ) {
 				PlayerEventHandler.onPlayerLeave( SafeSpawn.this, event );
-			}
-
-			@EventHandler
-			public void playerKick( PlayerKickEvent event ) {
-				PlayerEventHandler.onPlayerKicked( SafeSpawn.this, event );
+				GarbageCollection.onPlayerQuitEvent( SafeSpawn.this, event );
 			}
 
 			@EventHandler
 			public void playerInteractEvent( PlayerInteractEvent event ) {
 				PlayerEventHandler.onPlayerInteractEvent( SafeSpawn.this, event );
+			}
+
+			@EventHandler
+			public void playerMoveEvent( PlayerMoveEvent event ) {
+				GarbageCollection.onPlayerMoveEvent( SafeSpawn.this, event );
+			}
+
+			@EventHandler
+			public void playerTeleportEvent( PlayerTeleportEvent event ) {
+				GarbageCollection.onPlayerMoveEvent( SafeSpawn.this, event );
+			}
+
+			@EventHandler
+			public void playerPortalEvent( PlayerPortalEvent event ) {
+				GarbageCollection.onPlayerMoveEvent( SafeSpawn.this, event );
 			}
 
 			@EventHandler
@@ -210,20 +224,15 @@ public class SafeSpawn extends JavaPlugin {
 				BlockEventHandler.onBlockPlaceEvent( SafeSpawn.this, event );
 			}
 
-			// @EventHandler
-			// public void chunkLoadEvent( ChunkLoadEvent event ) {
-			// ChunkEventHandler.onChunkLoadEvent( SafeSpawn.this, event );
-			// }
-			//
-			// @EventHandler
-			// public void chunkUnloadEvent( ChunkUnloadEvent event ) {
-			// ChunkEventHandler.onChunkUnloadEvent( SafeSpawn.this, event );
-			// }
-			//
-			// @EventHandler
-			// public void chunkPopulateEvent( ChunkPopulateEvent event ) {
-			// ChunkEventHandler.onChunkPopulateEvent( SafeSpawn.this, event );
-			// }
+			@EventHandler
+			public void chunkLoadEvent( ChunkLoadEvent event ) {
+				ChunkEventHandler.onChunkLoadEvent( SafeSpawn.this, event );
+			}
+
+			@EventHandler
+			public void chunkUnloadEvent( ChunkUnloadEvent event ) {
+				ChunkEventHandler.onChunkUnloadEvent( SafeSpawn.this, event );
+			}
 
 			@EventHandler
 			public void entityExplodeEvent( EntityExplodeEvent event ) {
@@ -344,4 +353,9 @@ public class SafeSpawn extends JavaPlugin {
 			Log.error( e );
 		}
 	}
+
+	public TaskManager getTaskman() {
+		return taskman;
+	}
+
 }

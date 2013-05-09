@@ -55,6 +55,7 @@ public class MagicWords {
 		Grant( "grant", "grant" ), //
 		Revoke( "revoke", "revoke" ), //
 		Access( "access", "access" ), //
+		Debug( "debug", "debug" ), //
 		;
 
 		private String eWord;

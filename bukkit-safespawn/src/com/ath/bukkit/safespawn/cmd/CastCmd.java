@@ -57,6 +57,8 @@ public class CastCmd implements CommandExecutor {
 								return doRevoke( player, cmd, label, args );
 							case Access:
 								return doAccess( player, cmd, label, args );
+							case Debug:
+								return doDebug( player, cmd, label, args );
 								// case Levitate: return doCharge( player, cmd, label, args );
 							default:
 								break;
@@ -69,6 +71,34 @@ public class CastCmd implements CommandExecutor {
 				}
 			} else {
 				sender.sendMessage( "Something evil has happened... Your cast failed..." );
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return false;
+	}
+
+	private boolean doDebug( Player player, Command cmd, String label, String[] args ) {
+		try {
+			if ( args.length < 2 ) {
+				return false;
+			}
+
+			String subcmd = args[1];
+
+			if ( "chunkblocks".equals( subcmd ) ) {
+				for ( String chunkHash : SafeSpawn.instance().getBlockStore().getCachedChunks() ) {
+					Log.line( "CHUNK: %s", chunkHash );
+					for ( BlockData bd : SafeSpawn.instance().getBlockStore().getBlockDatasByChunk( chunkHash ) ) {
+						Log.line( " - In Chunk BlockData: %s", bd );
+					}
+				}
+			}
+			else if ( "allblocks".equals( subcmd ) ) {
+				Log.line( "ALL BLOCKS" );
+				for ( BlockData bd : SafeSpawn.instance().getBlockStore().getCachedBlockDatas() ) {
+					Log.line( " -      All BlockData: %s", bd );
+				}
 			}
 		} catch ( Exception e ) {
 			Log.error( e );

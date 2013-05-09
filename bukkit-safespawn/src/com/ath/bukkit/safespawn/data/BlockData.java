@@ -27,6 +27,7 @@ import com.google.common.collect.Sets;
 @Table( name = "BlockData" )
 public class BlockData implements Persisted {
 	public static final String HASH = "hash";
+	public static final String BLOCK_W = "block_w";
 	public static final String CHUNK_X = "chunk_x";
 	public static final String CHUNK_Z = "chunk_z";
 

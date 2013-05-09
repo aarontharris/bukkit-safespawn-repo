@@ -5,6 +5,8 @@ public final class Const {
 	public static final String MW_separator = " ";
 	
 	public static final String MW_empty = "non";
+	
+	public static final String PERM_admin = "safespawn.admin";
 
 	public static final String PERM_magic_sign = "safespawn.magic.sign";
 	public static final String PERM_blockbreak = "safespawn.block_break";

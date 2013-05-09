@@ -18,7 +18,6 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.InventoryHolder;
 
@@ -98,17 +97,6 @@ public class PlayerEventHandler {
 			Log.error( e );
 		}
 	}
-
-	public static void onPlayerKicked( SafeSpawn plugin, PlayerKickEvent event ) {
-		try {
-			Log.line( "onPlayerKicked: %s", event.getPlayer().getName() );
-			Player player = event.getPlayer();
-			plugin.getPlayerManager().removePlayerFromCache( player );
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-	}
-
 
 	public static void onEntityDamagedByEntity( SafeSpawn plugin, EntityDamageByEntityEvent event ) {
 		try {

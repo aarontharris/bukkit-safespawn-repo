@@ -1,5 +1,6 @@
 package com.ath.bukkit.safespawn.data;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,17 +8,28 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.Chunk;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 
 import com.ath.bukkit.safespawn.Functions;
 import com.ath.bukkit.safespawn.Log;
+import com.ath.bukkit.safespawn.SafeSpawn;
 import com.avaje.ebean.EbeanServer;
+import com.avaje.ebean.Query;
 import com.avaje.ebean.SqlUpdate;
+import com.google.common.collect.Sets;
 
 public class BlockStore {
 
 	private EbeanServer database;
-	private Map<String, BlockData> dataCache = new HashMap<String, BlockData>(); // FIXME: make me a WeakHashMap
+	private Map<String, BlockData> dataCache = new HashMap<String, BlockData>(); //
+	private Map<String, Set<BlockData>> chunkToBlockHashes = new HashMap<String, Set<BlockData>>();
+
+	// TODO: make sure its the same chunk for each read and not just a copy with the same data which would break the cache
+	// TODO: maybe convert back to hash instead of chunk
+
+	// private Queue<BlockData> outgoing = new ConcurrentLinkedQueue<BlockData>();
+	// private Queue<BlockData> incoming = new ConcurrentLinkedQueue<BlockData>();
 
 	public BlockStore( EbeanServer database ) {
 		this.database = database;
@@ -27,24 +39,143 @@ public class BlockStore {
 		Log.error( e );
 	}
 
-	public void primeTheCache() { // TODO break this down into onChunkLoad?
+	/** immutable */
+	public Set<String> getCachedChunks() {
+		return chunkToBlockHashes.keySet();
+	}
+
+	public Collection<BlockData> getCachedBlockDatas() {
+		return dataCache.values();
+	}
+
+	/** careful its mutable */
+	public Set<BlockData> getBlockDatasByChunk( String chunkHash ) {
 		try {
-			// BlockData data = database.find( BlockData.class ).where().ieq( BlockData.HASH, blockHash ).findUnique();
+			Set<BlockData> data = chunkToBlockHashes.get( chunkHash );
+			if ( data == null ) {
+				data = Sets.newHashSet();
+				chunkToBlockHashes.put( chunkHash, data );
+			}
+			return data;
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		Log.line( "WARN WARN WARN - getBlockDatasByChunk returning untracked set for chunk %s", chunkHash );
+		return Sets.newHashSet();
+	}
+
+	public static String toHash( Chunk chunk ) {
+		if ( chunk != null ) {
+			return toChunkHash( chunk.getWorld().getName(), chunk.getX(), chunk.getZ() );
+		}
+		return null;
+	}
+
+	public static String toChunkHash( String worldName, int chunkx, int chunkz ) {
+		return worldName + "," + chunkx + "," + chunkz;
+	}
+
+	public static Chunk toChunk( String hash ) {
+		try {
+			String[] parts = hash.split( "," );
+			String worldName = parts[0];
+			int x = Integer.valueOf( parts[1] );
+			int z = Integer.valueOf( parts[2] );
+			return SafeSpawn.instance().getServer().getWorld( worldName ).getChunkAt( x, z );
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return null;
+	}
+
+	public void primeTheCache() { // FIXME: make this go away when replaced with chunk load/unload
+		try {
 			Set<BlockData> all = dbFindAll();
 			for ( BlockData data : all ) {
-				dataCache.put( data.getHash(), data );
+				if ( !cacheBlockData( data ) ) {
+					// skip the cache and remove the invalid block
+					Log.line( "WARNING: forced to remove %s", data.toString() );
+					deleteBlockData( data );
+				}
 			}
 		} catch ( Exception e ) {
 			logError( e );
 		}
 	}
 
+	/** returns true if after this call, the BlockData is in the cache */
+	public boolean cacheBlockData( BlockData data ) {
+		try {
+			if ( data != null ) {
+				BlockData exists = getBlockData( data.getHash() );
+				if ( exists != null ) {
+					if ( exists.getLastModified() >= data.getLastModified() ) {
+						return true; // bail out - dont overwrite newer copy
+					}
+				}
+
+				String wName = data.getBlockW();
+				int cx = data.getChunkX();
+				int cz = data.getChunkZ();
+				if ( wName != null && cx != 0 && cz != 0 ) {
+					World w = SafeSpawn.instance().getServer().getWorld( wName );
+					if ( w != null ) {
+						Log.line( "cacheBlockData( %s ) added", data );
+						Chunk chunk = w.getChunkAt( cx, cz );
+						Set<BlockData> chunkblocks = getBlockDatasByChunk( toHash( chunk ) );
+						chunkblocks.add( data );
+						dataCache.put( data.getHash(), data );
+						return true;
+					}
+				}
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		Log.line( "cacheBlockData( %s ) not added", data );
+		return false;
+	}
+
+	public void removeFromCache( BlockData data ) {
+		try {
+			if ( data != null ) {
+				String wName = data.getBlockW();
+				int cx = data.getChunkX();
+				int cz = data.getChunkZ();
+				if ( wName != null && cx != 0 && cz != 0 ) {
+					World w = SafeSpawn.instance().getServer().getWorld( wName );
+					if ( w != null ) {
+						Chunk chunk = w.getChunkAt( cx, cz );
+						getBlockDatasByChunk( toHash( chunk ) ).remove( data );
+					}
+				}
+				Log.line( "removeFromCache( %s )", data );
+				dataCache.remove( data.getHash() );
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+	}
+
+	public void removeFromCache( String chunkHash ) {
+		try {
+			Set<BlockData> datas = getBlockDatasByChunk( chunkHash );
+			for ( BlockData data : datas ) {
+				Log.line( "removeFromCache( %s )", data );
+				dataCache.remove( data.getHash() );
+			}
+			datas.clear();
+			chunkToBlockHashes.remove( chunkHash );
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+	}
+
 	public void syncAll() {
 		try {
-			Log.line( "syncAll" );
 			Set<String> keys = new HashSet<String>( dataCache.keySet() ); // copy to reduce concurrent mod
 			for ( String hash : keys ) {
-				BlockData data = dataCache.get( hash );
+				BlockData data = getBlockData( hash );
 				if ( data != null && data.isModified() ) {
 					Log.line( "syncAll - " + hash + " id= " + data.getId() );
 					saveBlockData( data );
@@ -56,48 +187,15 @@ public class BlockStore {
 		}
 	}
 
-	public void onChunkLoad( Chunk chunk ) {
-		try {
-			Set<BlockData> all = dbFindAll( chunk );
-			for ( BlockData data : all ) {
-				Log.line( "+ syncAll( %s, %s ) - " + data.getHash() + " id= " + data.getId(), chunk.getX(), chunk.getZ() );
-				dataCache.put( data.getHash(), data );
-			}
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-	}
-
-	public void onChunkUnload( Chunk chunk ) {
-		try {
-			Set<BlockData> blocks = dbFindAll( chunk );
-			for ( BlockData data : blocks ) {
-				if ( data != null && data.isModified() ) {
-					Log.line( "- syncAll( %s, %s ) - " + data.getHash() + " id= " + data.getId(), chunk.getX(), chunk.getZ() );
-					saveBlockData( data );
-					data.setModified( false );
-				}
-				dataCache.remove( data );
-			}
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-	}
-
 	/** when the block is destroyed */
 	public void remove( Block block ) {
 		try {
 			if ( block != null ) {
 				String hash = BlockData.toHash( block );
 				BlockData data = getBlockData( hash );
-				// if ( data == null ) {
-				// data = dbFind( hash );
-				// }
 				if ( data != null ) {
-					dataCache.remove( hash );
+					removeFromCache( data );
 					if ( data.getId() > 0 ) { // if persisted
-						// Log.line( "dbDelete( " + data.getHash() + " )" );
-						// database.delete( data );
 						deleteBlockData( data );
 					}
 				}
@@ -114,8 +212,8 @@ public class BlockStore {
 			BlockData data = getBlockData( hash );
 			if ( data == null ) {
 				data = BlockData.newBlockData( block );
-				dataCache.put( hash, data );
 			}
+			cacheBlockData( data );
 			return data;
 		} catch ( Exception e ) {
 			logError( e );
@@ -152,15 +250,40 @@ public class BlockStore {
 		return Collections.emptySet();
 	}
 
-	private Set<BlockData> dbFindAll( Chunk chunk ) {
+	/** careful - kinda heavy */
+	public Set<BlockData> dbFindAll( Chunk chunk ) {
 		try {
-			Log.line( "dbFind( chunk=%s, %s )", chunk.getX(), chunk.getZ() );
-			// String query = "select * from BlockData where chunk_x=" + chunk.getX() + ", chunk_z=" + chunk.getZ();
-			String query = "chunk_x=" + chunk.getX() + ", chunk_z=" + chunk.getZ();
-			Log.line( " -- %s", query );
-			return database.find( BlockData.class ).where( query ).findSet();
+			int cx = chunk.getX();
+			int cz = chunk.getZ();
 
-			// return database.find( BlockData.class ).where().eq( BlockData.CHUNK_X, chunk.getX() ).eq( BlockData.CHUNK_Z, chunk.getZ() ).findSet();
+			Log.line( "dbFind( chunk=%s, %s )", cx, cz );
+			String queryString = "find BlockData where chunk_x=:chunk_x and chunk_z=:chunk_z and block_w=:block_w";
+			Query<BlockData> query = database.createQuery( BlockData.class, queryString );
+			query.setParameter( "chunk_x", cx );
+			query.setParameter( "chunk_z", cz );
+			query.setParameter( "block_w", chunk.getWorld().getName() );
+			return query.findSet();
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return Collections.emptySet();
+	}
+
+	public Set<BlockData> dbFindAllNearBy( Chunk chunk ) {
+		try {
+			int cx = chunk.getX();
+			int cz = chunk.getZ();
+
+			Log.line( "dbFind( chunk=%s, %s )", cx, cz );
+			// String queryString = "find BlockData where chunk_x=:chunk_x and chunk_z=:chunk_z and block_w=:block_w";
+			Query<BlockData> query = database.createQuery( BlockData.class ).where()
+					.between( "chunk_x", ( cx - 1 ), ( cx + 1 ) )
+					.between( "chunk_z", ( cz - 1 ), ( cz + 1 ) )
+					.query();
+			// query.setParameter( "chunk_x", cx );
+			// query.setParameter( "chunk_z", cz );
+			// query.setParameter( "block_w", chunk.getWorld().getName() );
+			return query.findSet();
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
@@ -170,13 +293,6 @@ public class BlockStore {
 	/** try cache -- if its not in cache, its not in db */
 	public BlockData getBlockData( String blockHash ) {
 		try {
-			// if ( dataCache.containsKey( blockHash ) ) {
-			// return dataCache.get( blockHash );
-			// } else {
-			// BlockData data = dbFind( blockHash );
-			// dataCache.put( blockHash, null ); // if its still null, cache it anyway to reduce future reads
-			// return data;
-			// }
 			return dataCache.get( blockHash );
 		} catch ( Exception e ) {
 			logError( e );

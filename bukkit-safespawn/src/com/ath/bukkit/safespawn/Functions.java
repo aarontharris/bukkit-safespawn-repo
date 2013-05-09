@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -310,6 +311,17 @@ public class Functions {
 		return "null";
 	}
 
+	public static String toString( Chunk c ) {
+		try {
+			if ( c != null ) {
+				return "w=" + c.getWorld().getName() + ",x=" + c.getX() + ",z=" + c.getZ();
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return "null";
+	}
+
 	public static String randomMessage( String... messages ) {
 		try {
 			if ( messages != null && messages.length > 0 ) {
@@ -534,7 +546,7 @@ public class Functions {
 				if ( ctrl != null ) {
 					return ctrl;
 				}
-				
+
 				ctrl = isAdjacentToOwnedWallSign( l, m );
 				if ( ctrl != null ) {
 					return ctrl;

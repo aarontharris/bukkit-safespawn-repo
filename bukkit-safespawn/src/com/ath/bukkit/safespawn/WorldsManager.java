@@ -7,12 +7,10 @@ import org.bukkit.configuration.ConfigurationSection;
 
 public class WorldsManager {
 	private SafeSpawn plugin;
-	private Map<String, String> nameToMagic;
 	private Map<String, String> magicToName;
 
 	public WorldsManager( SafeSpawn plugin ) {
 		this.plugin = plugin;
-		nameToMagic = new HashMap<String, String>();
 		magicToName = new HashMap<String, String>();
 	}
 
@@ -35,12 +33,7 @@ public class WorldsManager {
 	}
 
 	private void add( String magic, String name ) {
-		nameToMagic.put( name, magic );
 		magicToName.put( magic, name );
-	}
-
-	public String findByName( String name ) {
-		return nameToMagic.get( name );
 	}
 
 	public String findByMagic( String magic ) {

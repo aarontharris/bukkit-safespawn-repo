@@ -88,21 +88,6 @@ public class BlockStore {
 		return null;
 	}
 
-	public void primeTheCache() { // FIXME: make this go away when replaced with chunk load/unload
-		try {
-			Set<BlockData> all = dbFindAll();
-			for ( BlockData data : all ) {
-				if ( !cacheBlockData( data ) ) {
-					// skip the cache and remove the invalid block
-					Log.line( "WARNING: forced to remove %s", data.toString() );
-					deleteBlockData( data );
-				}
-			}
-		} catch ( Exception e ) {
-			logError( e );
-		}
-	}
-
 	/** returns true if after this call, the BlockData is in the cache */
 	public boolean cacheBlockData( BlockData data ) {
 		try {
@@ -235,21 +220,6 @@ public class BlockStore {
 		return null;
 	}
 
-	@SuppressWarnings( "deprecation" )
-	private Set<BlockData> dbFindAll() {
-		try {
-			Log.line( "dbFind( * )" );
-			Set<BlockData> all = database.find( BlockData.class ).findSet();
-			for ( BlockData data : all ) {
-				data.setMeta( Functions.fromDbSafeString( data.getMeta() ) );
-			}
-			return all;
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-		return Collections.emptySet();
-	}
-
 	/** careful - kinda heavy */
 	public Set<BlockData> dbFindAll( Chunk chunk ) {
 		try {
@@ -300,13 +270,13 @@ public class BlockStore {
 		return null;
 	}
 
+	@SuppressWarnings( "deprecation" )
 	private void saveBlockData( BlockData blockData ) {
 		try {
 			if ( blockData != null ) {
 				if ( blockData.getId() <= 0 ) {
 					try {
 						Log.line( "dbSave( " + blockData.getHash() + " )" );
-						@SuppressWarnings( "unused" )
 						String meta = Functions.toDbSafeString( blockData.getMeta() );
 						blockData.setMeta( meta );
 						database.save( blockData );
@@ -329,6 +299,7 @@ public class BlockStore {
 			if ( blockData != null ) {
 				Log.line( "dbUpdate( " + blockData.toString() + " )" );
 				// database.update( blockData ); // broken for some reason :(
+				@SuppressWarnings( "deprecation" )
 				String meta = blockData.getMeta();
 				Log.line( "BEFORE %S", meta );
 				meta = Functions.toDbSafeString( meta );

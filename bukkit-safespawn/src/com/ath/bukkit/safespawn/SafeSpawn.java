@@ -20,8 +20,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.ath.bukkit.safespawn.cmd.CastCmd;
@@ -36,7 +34,6 @@ import com.ath.bukkit.safespawn.data.PlayerStore;
 import com.ath.bukkit.safespawn.data.SimpleKeyVal;
 import com.ath.bukkit.safespawn.data.Task;
 import com.ath.bukkit.safespawn.event.BlockEventHandler;
-import com.ath.bukkit.safespawn.event.ChunkEventHandler;
 import com.ath.bukkit.safespawn.event.EntityEventHandler;
 import com.ath.bukkit.safespawn.event.PlayerEventHandler;
 import com.ath.bukkit.safespawn.event.ZoneEventHandler;
@@ -222,16 +219,6 @@ public class SafeSpawn extends JavaPlugin {
 			@EventHandler
 			public void blockPlaceEvent( BlockPlaceEvent event ) {
 				BlockEventHandler.onBlockPlaceEvent( SafeSpawn.this, event );
-			}
-
-			@EventHandler
-			public void chunkLoadEvent( ChunkLoadEvent event ) {
-				ChunkEventHandler.onChunkLoadEvent( SafeSpawn.this, event );
-			}
-
-			@EventHandler
-			public void chunkUnloadEvent( ChunkUnloadEvent event ) {
-				ChunkEventHandler.onChunkUnloadEvent( SafeSpawn.this, event );
 			}
 
 			@EventHandler

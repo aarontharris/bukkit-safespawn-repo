@@ -107,18 +107,18 @@ public class SafeSpawn extends JavaPlugin {
 			initializeCommands();
 			playerManager.initialize();
 
-			//getBlockStore().primeTheCache();
+			// getBlockStore().primeTheCache();
 
 			taskman = new TaskManager();
 
 			// tasks
-			getTaskman().addRepeatingTask( new Task() {
+			getTaskman().addSlowRepeatingTask( new Task() {
 				@Override
 				public void run() {
 					getBlockStore().syncAll();
 				}
 			} );
-			
+
 			GarbageCollection.init( getTaskman() );
 		} catch ( Exception e ) {
 			Log.error( e );

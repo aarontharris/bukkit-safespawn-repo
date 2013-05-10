@@ -3,6 +3,7 @@ package com.ath.bukkit.safespawn;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -11,13 +12,15 @@ import com.ath.bukkit.safespawn.data.Task;
 
 public class TaskManager {
 
-	private static final long repeatingdelayBetween = 5; // seconds
+	private static final long slowrepeatingdelayBetween = 5000; // millis
+	private static final long fastrepeatingdelayBetween = 5; // millis
 	private static final long doOncedelayBetween = 5; // millis
 
-	private ScheduledExecutorService repeatingExc;
-	private Queue<Task> repeatingTasks = new LinkedList<Task>();
+	private static ExecutorService mainExc = Executors.newFixedThreadPool( 8 ); // work is done here
+	private ScheduledExecutorService scheduler; // polls for work at various intervals
 
-	private ScheduledExecutorService doOnceExc;
+	private Queue<Task> slowRepeatingTasks = new LinkedList<Task>();
+	private Queue<Task> fastRepeatingTasks = new LinkedList<Task>();
 	private Queue<Task> doOnceTasks = new ConcurrentLinkedQueue<Task>();
 
 	public TaskManager() {
@@ -25,14 +28,15 @@ public class TaskManager {
 	}
 
 	public void reset() {
-		repeatingExc = Executors.newScheduledThreadPool( 1 );
-		repeatingExc.scheduleWithFixedDelay( new Runnable() {
+		scheduler = Executors.newScheduledThreadPool( 2 );
+
+		scheduler.scheduleWithFixedDelay( new Runnable() {
 			@Override
 			public void run() {
 				try {
-					for ( Task task : repeatingTasks ) { // don't pop them off, we plan to rerun these tasks indefinitely
+					for ( Task task : slowRepeatingTasks ) { // don't pop them off, we plan to rerun these tasks indefinitely
 						try {
-							task.run();
+							mainExc.execute( task );
 						} catch ( Exception e ) {
 							Log.error( e );
 						}
@@ -41,26 +45,47 @@ public class TaskManager {
 					Log.error( e );
 				}
 			}
-		}, repeatingdelayBetween, repeatingdelayBetween, TimeUnit.SECONDS );
+		}, slowrepeatingdelayBetween, slowrepeatingdelayBetween, TimeUnit.MILLISECONDS );
 
-		doOnceExc = Executors.newScheduledThreadPool( 1 );
-		doOnceExc.scheduleWithFixedDelay( new Runnable() {
+		scheduler.scheduleWithFixedDelay( new Runnable() {
 			@Override
 			public void run() {
-				Task t = doOnceTasks.poll();
-				if ( t != null ) {
-					t.run();
+				try {
+					for ( Task task : fastRepeatingTasks ) { // don't pop them off, we plan to rerun these tasks indefinitely
+						try {
+							mainExc.execute( task );
+						} catch ( Exception e ) {
+							Log.error( e );
+						}
+					}
+				} catch ( Exception e ) {
+					Log.error( e );
 				}
 			}
-		}, 0, doOncedelayBetween, TimeUnit.MILLISECONDS );
+		}, fastrepeatingdelayBetween, fastrepeatingdelayBetween, TimeUnit.MILLISECONDS );
+
+
+		scheduler.scheduleWithFixedDelay( new Runnable() { // check for tasks
+					@Override
+					public void run() {
+						Task task = doOnceTasks.poll();
+						if ( task != null ) {
+							mainExc.execute( task );
+						}
+					}
+				}, 0, doOncedelayBetween, TimeUnit.MILLISECONDS );
 	}
 
 	public void shutdown() {
-		repeatingExc.shutdown();
+		scheduler.shutdown();
 	}
 
-	public void addRepeatingTask( Task task ) {
-		repeatingTasks.add( task );
+	public void addSlowRepeatingTask( Task task ) {
+		slowRepeatingTasks.add( task );
+	}
+
+	public void addFastRepeatingTask( Task task ) {
+		fastRepeatingTasks.add( task );
 	}
 
 	public void addNonRepeatingTask( final Task task ) {

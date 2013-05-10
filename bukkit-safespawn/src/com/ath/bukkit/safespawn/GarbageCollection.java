@@ -1,10 +1,8 @@
 package com.ath.bukkit.safespawn;
 
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -22,27 +20,13 @@ import com.google.common.collect.Sets;
 
 public class GarbageCollection {
 
-	private static Map<String, AtomicInteger> chunkPlayerCount = new ConcurrentHashMap<String, AtomicInteger>();
-
-	public static void init( TaskManager taskmgr ) {
-		taskmgr.addRepeatingTask( new Task() {
+	public static void init( final TaskManager taskmgr ) {
+		taskmgr.addSlowRepeatingTask( new Task() { // clean up unused blocks slowly
 			@Override
 			public void run() {
 				try {
 					// find all active chunks
-					Set<String> activeChunks = Sets.newHashSet();
-					for ( World w : SafeSpawn.instance().getServer().getWorlds() ) {
-						for ( Player p : SafeSpawn.instance().getServer().getWorld( w.getUID() ).getPlayers() ) {
-							Chunk pChunk = p.getLocation().getChunk();
-							int cx = pChunk.getX();
-							int cz = pChunk.getZ();
-							for ( int x = ( cx - 1 ); x <= ( cx + 1 ); x++ ) {
-								for ( int z = ( cz - 1 ); z <= ( cz + 1 ); z++ ) {
-									activeChunks.add( BlockStore.toChunkHash( w.getName(), x, z ) );
-								}
-							}
-						}
-					}
+					Set<String> activeChunks = findActiveChunkHashes( 1 );
 
 					// now clear cache for chunks that are cached but are not found as active above.
 					Set<String> chunkKeys = new HashSet<String>( SafeSpawn.instance().getBlockStore().getCachedChunks() );
@@ -62,7 +46,6 @@ public class GarbageCollection {
 
 						if ( !hasPlayers ) {
 							SafeSpawn.instance().getBlockStore().removeFromCache( chunkHash );
-							getCounter( chunk ).set( 0 ); // no players, make sure its zero'd
 						}
 					}
 				} catch ( Exception e ) {
@@ -70,28 +53,36 @@ public class GarbageCollection {
 				}
 			}
 		} );
+
 	}
 
-	private static AtomicInteger getCounter( Chunk chunk ) {
-		String hash = BlockStore.toHash( chunk );
-		AtomicInteger i = chunkPlayerCount.get( hash );
-		if ( i == null ) {
-			i = new AtomicInteger();
-			chunkPlayerCount.put( hash, i );
+	/**
+	 * R can only be positive or zero and preferably rather small say like no more than 2 or 3?
+	 * 
+	 * @param r refers to the number of blocks outward from the center block to search, r of 1 will give diameter of 3.
+	 * @return
+	 */
+	private static Set<String> findActiveChunkHashes( int r ) {
+		try {
+			// find all active chunks
+			Set<String> activeChunks = Sets.newHashSet();
+			for ( World w : SafeSpawn.instance().getServer().getWorlds() ) {
+				for ( Player p : SafeSpawn.instance().getServer().getWorld( w.getUID() ).getPlayers() ) {
+					Chunk pChunk = p.getLocation().getChunk();
+					int cx = pChunk.getX();
+					int cz = pChunk.getZ();
+					for ( int x = ( cx - r ); x <= ( cx + r ); x++ ) {
+						for ( int z = ( cz - r ); z <= ( cz + r ); z++ ) {
+							activeChunks.add( BlockStore.toChunkHash( w.getName(), x, z ) );
+						}
+					}
+				}
+			}
+			return activeChunks;
+		} catch ( Exception e ) {
+			Log.error( e );
 		}
-		return i;
-	}
-
-	private static void inc( Chunk chunk ) {
-		int changed = getCounter( chunk ).incrementAndGet();
-		if ( changed == 1 ) {
-			onPlayerEnteredNewChunk( SafeSpawn.instance(), chunk );
-		}
-	}
-
-	// don't automate cleanup of chunks, we'll let a scheduled task take care of that
-	private static void dec( Chunk chunk ) {
-		getCounter( chunk ).decrementAndGet();
+		return Collections.emptySet();
 	}
 
 	public static void onPlayerPortalEvent( SafeSpawn plugin, PlayerMoveEvent event ) {
@@ -107,8 +98,7 @@ public class GarbageCollection {
 			Location from = event.getFrom();
 			Location to = event.getTo();
 			if ( from.getChunk() != to.getChunk() ) { // chunk change
-				dec( from.getChunk() );
-				inc( to.getChunk() );
+				onPlayerEnteredNewChunk( plugin, to.getChunk() );
 			}
 		} catch ( Exception e ) {
 			Log.error( e );
@@ -117,8 +107,7 @@ public class GarbageCollection {
 
 	public static void onPlayerQuitEvent( SafeSpawn plugin, PlayerQuitEvent event ) {
 		try {
-			Location from = event.getPlayer().getLocation();
-			dec( from.getChunk() );
+			// Location from = event.getPlayer().getLocation();
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
@@ -127,7 +116,7 @@ public class GarbageCollection {
 	public static void onPlayerJoinEvent( SafeSpawn plugin, PlayerJoinEvent event ) {
 		try {
 			Location to = event.getPlayer().getLocation();
-			inc( to.getChunk() );
+			onPlayerEnteredNewChunk( plugin, to.getChunk() );
 		} catch ( Exception e ) {
 			Log.error( e );
 		}

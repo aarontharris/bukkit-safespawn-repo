@@ -21,10 +21,8 @@ public class ChunkBlocksLoader implements Task {
 	@Override
 	public void run() {
 		try {
-			// Log.line( "Running ChunkBlocksLoader for %sx%s", chunk.getX(), chunk.getZ() );
 			Set<BlockData> blocks = store.dbFindAllNearBy( chunk );
 			for ( BlockData bd : blocks ) {
-				// Log.line( "BlockLoaded: " + bd.toString() + " in " + chunk.getX() + "x" + chunk.getZ() );
 				store.cacheBlockData( bd );
 			}
 		} catch ( Exception e ) {

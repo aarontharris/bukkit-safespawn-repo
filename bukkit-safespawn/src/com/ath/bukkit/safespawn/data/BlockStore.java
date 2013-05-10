@@ -256,7 +256,7 @@ public class BlockStore {
 			int cx = chunk.getX();
 			int cz = chunk.getZ();
 
-			Log.line( "dbFind( chunk=%s, %s )", cx, cz );
+			Log.line( "dbFindAll( chunk=%s, %s )", cx, cz );
 			String queryString = "find BlockData where chunk_x=:chunk_x and chunk_z=:chunk_z and block_w=:block_w";
 			Query<BlockData> query = database.createQuery( BlockData.class, queryString );
 			query.setParameter( "chunk_x", cx );
@@ -274,7 +274,7 @@ public class BlockStore {
 			int cx = chunk.getX();
 			int cz = chunk.getZ();
 
-			Log.line( "dbFind( chunk=%s, %s )", cx, cz );
+			Log.line( "dbFindAllNearBy( chunk=%s, %s )", cx, cz );
 			// String queryString = "find BlockData where chunk_x=:chunk_x and chunk_z=:chunk_z and block_w=:block_w";
 			Query<BlockData> query = database.createQuery( BlockData.class ).where()
 					.between( "chunk_x", ( cx - 1 ), ( cx + 1 ) )

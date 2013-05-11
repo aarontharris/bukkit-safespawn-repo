@@ -11,6 +11,8 @@ import com.ath.bukkit.safespawn.SafeSpawn;
 
 public class PVPEventHandler {
 
+	// FIXME: handle config.yml property pvp-mode: day|night|on|off
+	// FIXME: allow for whitelisting(always) and blacklisting(never) players from pvp
 	public static void onEntityDamagedByEntity( SafeSpawn plugin, EntityDamageByEntityEvent event ) {
 		try {
 			// skip if another handler has already cancelled the event
@@ -34,9 +36,6 @@ public class PVPEventHandler {
 								"Maybe if it were night time."
 								) );
 					}
-				}
-				// success
-				else {
 					event.setCancelled( true );
 				}
 			}

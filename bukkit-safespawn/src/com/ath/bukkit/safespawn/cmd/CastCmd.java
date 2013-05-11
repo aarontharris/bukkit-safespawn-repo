@@ -13,7 +13,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import com.ath.bukkit.safespawn.Const;
-import com.ath.bukkit.safespawn.Functions;
+import com.ath.bukkit.safespawn.F;
 import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.data.BlockData;
@@ -150,10 +150,10 @@ public class CastCmd implements CommandExecutor {
 			if ( EntityType.PLAYER.equals( p.getType() ) && EntityType.PLAYER.equals( p.getType() ) ) {
 
 				// fail if sun is up
-				if ( Functions.isSunUp( w ) ) {
+				if ( F.isSunUp( w ) ) {
 					// send a random fail message
 					if ( p instanceof Player ) {
-						( (Player) p ).sendMessage( Functions.randomMessage(
+						( (Player) p ).sendMessage( F.randomMessage(
 								"You can't do that yet.",
 								"Wait until it gets darker.",
 								"Have patience...",
@@ -175,7 +175,7 @@ public class CastCmd implements CommandExecutor {
 	// /cast charge
 	protected boolean doCharge( Player player, Command cmd, String label, String[] args ) {
 		try {
-			Block block = Functions.getTargetBlock( player, 5, Material.WALL_SIGN );
+			Block block = F.getTargetBlock( player, 5, Material.WALL_SIGN );
 
 			// distance or no chest fail
 			if ( block == null ) {
@@ -184,12 +184,14 @@ public class CastCmd implements CommandExecutor {
 			}
 
 			Log.line( "%s.doCharge", player.getName() );
-			if ( Functions.isMagicAllowed( block.getLocation(), block.getType() ) ) {
-				Log.line( "%s.doCharge - magic allowed", player.getName() );
-				Blocks.setMagical( block, true );
-				Log.line( "%s successfully cast %s", player.getName(), Functions.joinSpace( args ) );
-				player.sendMessage( MagicCast.Charge.getMagicWord() + " -- charge successful" );
-				return true;
+			if ( F.isMagicAllowed( block.getLocation(), block.getType() ) ) {
+				if ( F.isOwnedWallSign( block.getLocation(), block.getType() ) == null ) { // if not owned
+					Log.line( "%s.doCharge - magic allowed", player.getName() );
+					Blocks.setMagical( block, true );
+					Log.line( "%s successfully cast %s", player.getName(), F.joinSpace( args ) );
+					player.sendMessage( MagicCast.Charge.getMagicWord() + " -- charge successful" );
+					return true;
+				}
 			} else {
 				player.sendMessage( "You cannot charge a sign that is placed on a block with gravity" );
 			}
@@ -202,7 +204,7 @@ public class CastCmd implements CommandExecutor {
 	// /cast lock
 	protected boolean doLock( Player player, Command cmd, String label, String[] args ) {
 		try {
-			Block block = Functions.getTargetBlock( player, 5, Material.WALL_SIGN );
+			Block block = F.getTargetBlock( player, 5, Material.WALL_SIGN );
 
 			// distance or no chest fail
 			if ( block == null ) {
@@ -213,7 +215,7 @@ public class CastCmd implements CommandExecutor {
 			BlockData bd = BlockData.get( block );
 
 			// initial lock, self access only
-			if ( Functions.isMagicAllowed( block.getLocation(), block.getType() ) ) {
+			if ( F.isMagicAllowed( block.getLocation(), block.getType() ) ) {
 				if ( Blocks.canWrite( bd, player ) ) {
 					Blocks.grantWriteAccess( block, player );
 					Blocks.setMagical( block, true );
@@ -232,7 +234,7 @@ public class CastCmd implements CommandExecutor {
 	// /cast unlock
 	protected boolean doUnlock( Player player, Command cmd, String label, String[] args ) {
 		try {
-			Block block = Functions.getTargetBlock( player, 5, Material.WALL_SIGN );
+			Block block = F.getTargetBlock( player, 5, Material.WALL_SIGN );
 			// distance or no chest fail
 			if ( block == null ) {
 				player.sendMessage( "You're too far from a Wall Sign" );
@@ -242,7 +244,7 @@ public class CastCmd implements CommandExecutor {
 			BlockData bd = BlockData.get( block );
 
 			// initial lock, self access only
-			if ( Functions.isMagicAllowed( block.getLocation(), block.getType() ) ) {
+			if ( F.isMagicAllowed( block.getLocation(), block.getType() ) ) {
 				if ( Blocks.canWrite( bd, player ) ) {
 					Blocks.clearReadWriteAccess( block );
 					player.sendMessage( MagicCast.Unlock.getMagicWord() + " -- unlock successful" );
@@ -271,7 +273,7 @@ public class CastCmd implements CommandExecutor {
 				return false;
 			}
 
-			if ( !Functions.isMagicAllowed( block.getLocation(), block.getType() ) ) {
+			if ( !F.isMagicAllowed( block.getLocation(), block.getType() ) ) {
 				player.sendMessage( "You cannot grant access to a sign that is placed on a block with gravity" );
 			}
 
@@ -294,8 +296,8 @@ public class CastCmd implements CommandExecutor {
 			// check permissions
 			if ( newAccess != null ) {
 				if ( Blocks.isMagical( bd ) ) {
-					Set<String> access = Blocks.getWriteAccess( bd );
-					if ( Blocks.hasWriteAccess( bd, access, player ) ) { // FIXME: switch to Blocks.isOwner( bd, player )
+					if ( Blocks.isOwner( bd, player ) ) {
+						Set<String> access = Blocks.getWriteAccess( bd );
 						access.addAll( newAccess );
 						Blocks.setWriteAccess( block, access );
 						player.sendMessage( "Granted" );
@@ -325,7 +327,7 @@ public class CastCmd implements CommandExecutor {
 				return false;
 			}
 
-			if ( !Functions.isMagicAllowed( block.getLocation(), block.getType() ) ) {
+			if ( !F.isMagicAllowed( block.getLocation(), block.getType() ) ) {
 				player.sendMessage( "You cannot grant access to a sign that is placed on a block with gravity" );
 			}
 
@@ -348,7 +350,7 @@ public class CastCmd implements CommandExecutor {
 			// check permissions
 			if ( access != null ) {
 				if ( Blocks.isMagical( bd ) ) {
-					if ( Blocks.canWrite( bd, player ) ) {
+					if ( Blocks.isOwner( bd, player ) ) {
 						Set<String> writes = Blocks.getWriteAccess( bd );
 						writes.removeAll( access );
 						Blocks.setWriteAccess( block, writes );
@@ -385,7 +387,7 @@ public class CastCmd implements CommandExecutor {
 				return false;
 			}
 
-			if ( !Functions.isMagicAllowed( block.getLocation(), block.getType() ) ) {
+			if ( !F.isMagicAllowed( block.getLocation(), block.getType() ) ) {
 				player.sendMessage( "You cannot grant access to a sign that is placed on a block with gravity" );
 			}
 
@@ -399,13 +401,13 @@ public class CastCmd implements CommandExecutor {
 
 			if ( Blocks.isMagical( bd ) ) {
 				Log.line( "is magical" );
-				Set<String> access = Blocks.getWriteAccess( bd );
-				if ( Blocks.hasWriteAccess( bd, access, player ) ) {
+				if ( Blocks.isOwner( bd, player ) ) {
+					Set<String> access = Blocks.getWriteAccess( bd );
 					Log.line( "has write" );
 					if ( access.isEmpty() ) {
 						player.sendMessage( "Write: none" );
 					} else {
-						player.sendMessage( "Write: " + Functions.joinSpace( access ) );
+						player.sendMessage( "Write: " + F.joinSpace( access ) );
 					}
 					return true;
 				} else {

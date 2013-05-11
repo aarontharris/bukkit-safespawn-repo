@@ -3,7 +3,7 @@ package com.ath.bukkit.safespawn.event;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
-import com.ath.bukkit.safespawn.Functions;
+import com.ath.bukkit.safespawn.F;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.Zone;
 import com.ath.bukkit.safespawn.Zone.ZoneExclude;
@@ -16,7 +16,7 @@ public class ZoneEventHandler {
 		// BADDIE BLOCKER
 		for ( Zone zone : plugin.getZoneManager().findZones( event.getLocation() ) ) {
 			if ( zone.caresAbout( event.getLocation() ) ) {
-				if ( Functions.isBaddie( entityType ) ) {
+				if ( F.isBaddie( entityType ) ) {
 					if ( zone.caresAbout( ZoneExclude.BADDIE_SPAWN ) ) {
 						event.setCancelled( true );
 						break;

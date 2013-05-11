@@ -22,7 +22,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.InventoryHolder;
 
 import com.ath.bukkit.safespawn.Const;
-import com.ath.bukkit.safespawn.Functions;
+import com.ath.bukkit.safespawn.F;
 import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.Zone;
@@ -55,7 +55,7 @@ public class PlayerEventHandler {
 					// Teleport first time users to spawn area
 					{
 						player.setBedSpawnLocation( plugin.getSpawnLocation().clone(), true );
-						Functions.teleport( plugin, player, plugin.getSpawnLocation() );
+						F.teleport( plugin, player, plugin.getSpawnLocation() );
 					}
 
 					// Make sure existing users don't have a nickname that matches this player's account name
@@ -172,21 +172,21 @@ public class PlayerEventHandler {
 
 					if ( holder instanceof Chest ) { // check vertically only
 						Chest c = (Chest) holder;
-						signBlocks.addAll( Functions.findBlock( c.getLocation(), Material.WALL_SIGN, 0, 1, 0, true ) ); // vertical only
+						signBlocks.addAll( F.findBlock( c.getLocation(), Material.WALL_SIGN, 0, 1, 0, true ) ); // vertical only
 					} else if ( holder instanceof DoubleChest ) { // check vertically here and to the left 1 block vertically
 						DoubleChest dc = (DoubleChest) holder;
-						Log.line( "DC " + Functions.toString( dc.getLocation() ) );
+						Log.line( "DC " + F.toString( dc.getLocation() ) );
 
-						Set<Block> chests = Functions.findBlock( dc.getLocation(), Material.CHEST, 1, 0, 1, false ); // horizontal only
+						Set<Block> chests = F.findBlock( dc.getLocation(), Material.CHEST, 1, 0, 1, false ); // horizontal only
 
 						for ( Block c : chests ) { // should only be 2
-							Log.line( "FOUND: %s", Functions.toString( c ) );
-							signBlocks.addAll( Functions.findBlock( c.getLocation(), Material.WALL_SIGN, 0, 1, 0, true ) ); // vertical only
+							Log.line( "FOUND: %s", F.toString( c ) );
+							signBlocks.addAll( F.findBlock( c.getLocation(), Material.WALL_SIGN, 0, 1, 0, true ) ); // vertical only
 						}
 					}
 
 					for ( Block s : signBlocks ) {
-						Log.line( "FOUND SIGN: %s", Functions.toString( s ) );
+						Log.line( "FOUND SIGN: %s", F.toString( s ) );
 
 						BlockData bd = BlockData.get( s );
 						if ( bd != null && Blocks.isMagical( bd ) ) {

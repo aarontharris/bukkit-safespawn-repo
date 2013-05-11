@@ -11,7 +11,7 @@ import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
-import com.ath.bukkit.safespawn.Functions;
+import com.ath.bukkit.safespawn.F;
 import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.avaje.ebean.EbeanServer;
@@ -212,7 +212,7 @@ public class BlockStore {
 		try {
 			Log.line( "dbFind( " + blockHash + " )" );
 			BlockData data = database.find( BlockData.class ).where().ieq( BlockData.HASH, blockHash ).findUnique();
-			data.setMeta( Functions.fromDbSafeString( data.getMeta() ) );
+			data.setMeta( F.fromDbSafeString( data.getMeta() ) );
 			return data;
 		} catch ( Exception e ) {
 			Log.error( e );
@@ -277,7 +277,7 @@ public class BlockStore {
 				if ( blockData.getId() <= 0 ) {
 					try {
 						Log.line( "dbSave( " + blockData.getHash() + " )" );
-						String meta = Functions.toDbSafeString( blockData.getMeta() );
+						String meta = F.toDbSafeString( blockData.getMeta() );
 						blockData.setMeta( meta );
 						database.save( blockData );
 					} catch ( Exception e ) {
@@ -302,7 +302,7 @@ public class BlockStore {
 				@SuppressWarnings( "deprecation" )
 				String meta = blockData.getMeta();
 				Log.line( "BEFORE %S", meta );
-				meta = Functions.toDbSafeString( meta );
+				meta = F.toDbSafeString( meta );
 				Log.line( "AFTER  %S", meta );
 				String update = String.format( "update BlockData set lastModified=%s, meta='%s' where id=%s", blockData.getLastModified(), meta, blockData.getId() );
 				Log.line( update );

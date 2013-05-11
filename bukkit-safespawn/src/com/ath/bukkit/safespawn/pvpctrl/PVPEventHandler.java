@@ -5,7 +5,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-import com.ath.bukkit.safespawn.Functions;
+import com.ath.bukkit.safespawn.F;
 import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
 
@@ -23,10 +23,10 @@ public class PVPEventHandler {
 				World w = event.getEntity().getLocation().getWorld();
 
 				// fail if sun is up
-				if ( Functions.isSunUp( w ) ) {
+				if ( F.isSunUp( w ) ) {
 					// send a random fail message
 					if ( event.getDamager() instanceof Player ) {
-						( (Player) event.getDamager() ).sendMessage( Functions.randomMessage(
+						( (Player) event.getDamager() ).sendMessage( F.randomMessage(
 								"You can't do that yet.",
 								"Wait until it gets darker.",
 								"Have patience...",

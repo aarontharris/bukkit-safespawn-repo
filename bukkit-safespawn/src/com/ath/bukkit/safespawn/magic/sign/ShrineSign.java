@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.ath.bukkit.safespawn.EggHatchery;
 import com.ath.bukkit.safespawn.EggHatchery.EggStackType;
-import com.ath.bukkit.safespawn.Functions;
+import com.ath.bukkit.safespawn.F;
 import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.magic.MagicWords;
 import com.ath.bukkit.safespawn.magic.MagicWords.MagicCommand;
@@ -46,15 +46,15 @@ public class ShrineSign extends MagicSign {
 						event.getPlayer().getInventory().addItem( new ItemStack( Material.STONE_AXE ) );
 						event.getPlayer().getInventory().addItem( new ItemStack( Material.STONE_SPADE ) );
 						event.getPlayer().getInventory().addItem( new ItemStack( Material.APPLE, 10 ) );
-						String message = Functions.randomMessage(
+						String message = F.randomMessage(
 								"Thank you come again!",
 								"Check your inventory...",
-								Functions.capitalize( MagicWord.SYMPATHY.getWord() ) + "!"
+								F.capitalize( MagicWord.SYMPATHY.getWord() ) + "!"
 								);
 						event.getPlayer().sendMessage( message );
 						return true;
 					} else {
-						String message = Functions.randomMessage(
+						String message = F.randomMessage(
 								"Hmmm... Perhaps if you were poorer...",
 								"You don't look needy.",
 								"...",
@@ -82,7 +82,7 @@ public class ShrineSign extends MagicSign {
 
 			if ( block.getType().equals( Material.CHEST ) ) {
 				Log.line( " is chest " );
-				Chest chest = Functions.blockToChest( block );
+				Chest chest = F.blockToChest( block );
 				Inventory inv = chest.getInventory();
 
 
@@ -92,7 +92,7 @@ public class ShrineSign extends MagicSign {
 				}
 
 				// For now we'll leave this but lets make this an action like those above
-				if ( Functions.removeFromInventory( inv, 2, Material.STICK, Material.STONE, Material.BONE ) ) {
+				if ( F.removeFromInventory( inv, 2, Material.STICK, Material.STONE, Material.BONE ) ) {
 					event.getPlayer().sendMessage( MagicCommand.Manifest.getWord() );
 					ItemStack stack = EggHatchery.newEgg( EggStackType.Zombie );
 					inv.addItem( stack );

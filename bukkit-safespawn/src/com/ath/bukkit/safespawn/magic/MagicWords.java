@@ -77,7 +77,7 @@ public class MagicWords {
 		public String getMagicWord() {
 			return mWord;
 		}
-		
+
 		public int getCost() {
 			return xpCost;
 		}
@@ -242,10 +242,11 @@ public class MagicWords {
 	}
 
 	public static int readCoordinateFromLine( String line ) {
-		if ( line.startsWith( "-" ) ) {
-			return -Integer.decode( "0x" + line.substring( 1 ) );
-		} else {
-			return Integer.decode( "0x" + line );
+		try {
+			return Integer.valueOf( line.trim() );
+		} catch ( Exception e ) {
+			Log.line( "Not a proper number" );
 		}
+		return 0;
 	}
 }

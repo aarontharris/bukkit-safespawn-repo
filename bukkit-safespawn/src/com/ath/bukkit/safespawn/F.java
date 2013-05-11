@@ -27,7 +27,7 @@ import com.ath.bukkit.safespawn.data.Blocks;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 
-public class Functions {
+public class F {
 
 	public static Joiner spaceJoiner = Joiner.on( " " );
 
@@ -486,7 +486,7 @@ public class Functions {
 				BlockData bd = BlockData.get( l, m );
 				if ( bd != null ) {
 					if ( Blocks.isMagical( bd ) ) {
-						if ( Blocks.getWriteAccess( bd ).size() > 0 ) {
+						if ( Blocks.hasOwner( bd ) ) {
 							return l.getBlock();
 						}
 					}

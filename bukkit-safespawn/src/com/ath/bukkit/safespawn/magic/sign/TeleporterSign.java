@@ -7,7 +7,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.ath.bukkit.safespawn.Const;
-import com.ath.bukkit.safespawn.Functions;
+import com.ath.bukkit.safespawn.F;
 import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.magic.MagicWords;
@@ -65,7 +65,7 @@ public class TeleporterSign extends MagicSign {
 
 				if ( world != null ) {
 					Location location = new Location( world, x, y, z );
-					Functions.teleport( SafeSpawn.instance(), event.getPlayer(), location );
+					F.teleport( SafeSpawn.instance(), event.getPlayer(), location );
 					return true;
 				}
 			}

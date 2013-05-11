@@ -4,10 +4,9 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-import com.ath.bukkit.safespawn.Functions;
+import com.ath.bukkit.safespawn.F;
 import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.Zone;
@@ -18,7 +17,7 @@ public class BlockEventHandler {
 	public static void onBlockBreakEvent( SafeSpawn plugin, BlockBreakEvent event ) {
 		Log.line( "%s.break @ %s - chunk = %s,%s",
 				event.getPlayer().getName(),
-				Functions.toString( event.getBlock().getLocation() ),
+				F.toString( event.getBlock().getLocation() ),
 				event.getBlock().getChunk().getX(),
 				event.getBlock().getChunk().getZ()
 				);
@@ -45,9 +44,9 @@ public class BlockEventHandler {
 			if ( !event.isCancelled() ) {
 				Block b = event.getBlock();
 				Player player = event.getPlayer();
-				Block ctrl = Functions.isOwnedBlock( b.getLocation(), b.getType() );
+				Block ctrl = F.isOwnedBlock( b.getLocation(), b.getType() );
 				if ( ctrl != null ) {
-					if ( Functions.canUserAccessBlock( ctrl.getLocation(), ctrl.getType(), event.getPlayer() ) ) {
+					if ( F.canUserAccessBlock( ctrl.getLocation(), ctrl.getType(), event.getPlayer() ) ) {
 						player.sendMessage( "You just destroyed a magic block" );
 					} else {
 						player.sendMessage( "This block is protected, talk to the owner" );
@@ -100,24 +99,4 @@ public class BlockEventHandler {
 		}
 	}
 
-	// public static void onSignChangeEvent( SafeSpawnPlugin plugin, SignChangeEvent event ) {
-	// Functions.teleport( plugin, event.getPlayer(), plugin.getSpawnLocation() );
-	// }
-
-	public static void onBlockFadeEvent( SafeSpawn plugin, BlockFadeEvent event ) {
-		Log.line( "block fade @ %s", Functions.toString( event.getBlock() ) );
-
-		// Ownership protection
-		try {
-			if ( !event.isCancelled() ) {
-				Block b = event.getBlock();
-				Block ctrl = Functions.isOwnedBlock( b.getLocation(), b.getType() );
-				if ( ctrl != null ) {
-					event.setCancelled( true );
-				}
-			}
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-	}
 }

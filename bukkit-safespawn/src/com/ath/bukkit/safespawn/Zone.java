@@ -115,7 +115,7 @@ public class Zone {
 	}
 
 	public boolean caresAbout( Location l ) {
-		return Functions.insideZone( this, l );
+		return F.insideZone( this, l );
 	}
 
 	public boolean caresAbout( ZoneExclude ex ) {
@@ -126,7 +126,7 @@ public class Zone {
 		if ( !hasExclude( ex ) ) {
 			return false;
 		}
-		return Functions.insideZone( this, l );
+		return F.insideZone( this, l );
 	}
 
 	@Override

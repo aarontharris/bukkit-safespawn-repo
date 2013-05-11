@@ -83,60 +83,68 @@ public class Blocks {
 		return Collections.emptySet();
 	}
 
-	/** do not use in a loop */
-	public static boolean canRead( BlockData bd, Player player ) {
+	public static void setOwner( Block b, Player p ) {
 		try {
-			Log.line( "canRead( %s, %s )", bd.toString(), player.getName() );
-			if ( canWrite( bd, player ) ) {
-				Log.line( "canRead( %s, %s ) - canWrite", bd.toString(), player.getName() );
+			BlockData bd = BlockData.attain( b );
+			bd.setOwner( p.getName() );
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+	}
+
+	public static boolean isOwner( BlockData bd, Player p ) {
+		try {
+			if ( p.getName().equals( bd.getOwner() ) ) {
 				return true;
 			}
-			Set<String> rAccess = getReadAccess( bd );
-			if ( rAccess.contains( player.getName() ) ) {
-				Log.line( "canRead( %s, %s ) - read.contains", bd.toString(), player.getName() );
+			if ( p.hasPermission( Const.PERM_skeleton_key ) ) {
+				p.sendMessage( "Used Skeleton Key" );
 				return true;
 			}
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
-		Log.line( "canRead( %s, %s ) - no", bd.toString(), player.getName() );
+		return false;
+	}
+
+	public static boolean hasOwner( BlockData bd ) {
+		try {
+			if ( bd.getOwner() != null ) {
+				return true;
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return false;
+	}
+
+	/** do not use in a loop */
+	public static boolean canRead( BlockData bd, Player player ) {
+		try {
+			if ( canWrite( bd, player ) ) {
+				return true;
+			}
+			if ( getReadAccess( bd ).contains( player.getName() ) ) {
+				return true;
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
 		return false;
 	}
 
 	/** do not use in a loop */
 	public static boolean canWrite( BlockData bd, Player player ) {
 		try {
-			Log.line( "canWrite( %s, %s )", bd.toString(), player.getName() );
-			Set<String> access = getWriteAccess( bd );
-			return hasWriteAccess( bd, access, player );
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-		Log.line( "canWrite( %s, %s ) - no", bd.toString(), player.getName() );
-		return false;
-	}
-
-	/** Loop safe */
-	public static boolean hasWriteAccess( BlockData bd, Set<String> access, Player player ) {
-		try {
-			Log.line( "hasWriteAccess( %s, %s )", bd.toString(), player.getName() );
-			if ( player.hasPermission( Const.PERM_skeleton_key ) ) {
-				Log.line( "hasWriteAccess( %s, %s ) - skeleton key", bd.toString(), player.getName() );
-				player.sendMessage( "Accessed with Skeleton Key" );
+			if ( isOwner( bd, player ) ) {
 				return true;
 			}
-
-			if ( access.isEmpty() ) {
-				Log.line( "hasWriteAccess( %s, %s ) - access is empty", bd.toString(), player.getName() );
-				return true;
-			} else if ( access.contains( player.getName() ) ) {
-				Log.line( "hasWriteAccess( %s, %s ) - access.contains", bd.toString(), player.getName() );
+			if ( getWriteAccess( bd ).contains( player.getName() ) ) {
 				return true;
 			}
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
-		Log.line( "hasWriteAccess( %s, %s ) - no", bd.toString(), player.getName() );
 		return false;
 	}
 

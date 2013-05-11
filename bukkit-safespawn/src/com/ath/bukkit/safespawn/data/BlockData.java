@@ -16,7 +16,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import com.ath.bukkit.safespawn.Functions;
+import com.ath.bukkit.safespawn.F;
 import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.google.common.collect.Lists;
@@ -61,6 +61,8 @@ public class BlockData implements Persisted {
 
 	private static final String WRITE_ACCESS = "write_access";
 	private static final String READ_ACCESS = "read_access";
+	private static final String OWNER = "owner";
+	private static final String NO_OWNER = "-"; // for improved caching
 
 	public static final String toHash( Block block ) {
 		if ( block != null ) {
@@ -72,7 +74,7 @@ public class BlockData implements Persisted {
 	public static final String toHash( Location l, Material m ) {
 		try {
 			if ( l != null && m != null ) {
-				return "Block(" + Functions.toString( l ) + ",mat=" + m.getId() + ")";
+				return "Block(" + F.toString( l ) + ",mat=" + m.getId() + ")";
 			}
 		} catch ( Exception e ) {
 			Log.error( e );
@@ -146,6 +148,7 @@ public class BlockData implements Persisted {
 
 	private transient boolean modified;
 
+	private transient String owner;
 	private transient Set<String> rAccess;
 	private transient Set<String> wAccess;
 
@@ -288,7 +291,7 @@ public class BlockData implements Persisted {
 			wAccess = null;
 			removeKey( WRITE_ACCESS );
 		} else {
-			rAccess = Sets.newHashSet( access );
+			wAccess = Sets.newHashSet( access );
 			putStringCollection( WRITE_ACCESS, wAccess );
 		}
 	}
@@ -410,5 +413,21 @@ public class BlockData implements Persisted {
 
 	public void setBlockM( int blockM ) {
 		this.blockM = blockM;
+	}
+
+	public String getOwner() {
+		if ( owner == null ) {
+			owner = getString( OWNER, NO_OWNER );
+		}
+		if ( NO_OWNER == owner ) { // our sentinal to keep from digging out of the dictionary
+			return null;
+		}
+		return owner;
+	}
+
+	public void setOwner( String owner ) {
+		this.owner = owner;
+		putString( OWNER, owner );
+		this.setModified( true );
 	}
 }

@@ -100,6 +100,11 @@ public class PlayerEventHandler {
 
 	public static void onEntityDamagedByEntity( SafeSpawn plugin, EntityDamageByEntityEvent event ) {
 		try {
+			// skip if another handler has already cancelled the event
+			if ( event.isCancelled() ) {
+				return;
+			}
+
 			if ( event.getEntityType() == EntityType.PLAYER ) {
 				Entity entity = event.getEntity();
 				Player player = plugin.getPlayerManager().getActivePlayerByEntityId( entity.getEntityId() );

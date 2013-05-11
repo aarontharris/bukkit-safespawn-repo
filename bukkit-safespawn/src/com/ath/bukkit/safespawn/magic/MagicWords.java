@@ -47,23 +47,27 @@ public class MagicWords {
 
 
 	public static enum MagicCast {
-		Invalid( "invalid", "invalid" ), //
-		Charge( "charge", "charge" ), //
-		Lock( "lock", "colloportus" ), //
-		Unlock( "unlock", "alohomora" ), //
-		// Levitate( "wingardium-leviosa" ), //
-		Grant( "grant", "grant" ), //
-		Revoke( "revoke", "revoke" ), //
-		Access( "access", "access" ), //
-		Debug( "debug", "debug" ), //
+		Invalid( "invalid", "invalid", 0 ), //
+		Charge( "charge", "charge", 100 ), //
+		Lock( "lock", "colloportus", 100 ), //
+		Unlock( "unlock", "alohomora", 0 ), //
+		Levitate( "wingardium-leviosa", "levitate", 1000 ), //
+		Protection( "impervius", "protection", 1000 ), //
+		Grant( "grant", "grant", 0 ), //
+		Revoke( "revoke", "revoke", 0 ), //
+		Access( "access", "access", 0 ), //
+		Time( "time", "time", 0 ), //
+		Debug( "debug", "debug", 0 ), //
 		;
 
 		private String eWord;
 		private String mWord;
+		private int xpCost;
 
-		MagicCast( String eWord, String mWord ) {
+		MagicCast( String eWord, String mWord, int xpCost ) {
 			this.eWord = eWord;
 			this.mWord = mWord;
+			this.xpCost = xpCost;
 		}
 
 		public String getEnglishWord() {
@@ -72,6 +76,10 @@ public class MagicWords {
 
 		public String getMagicWord() {
 			return mWord;
+		}
+		
+		public int getCost() {
+			return xpCost;
 		}
 
 		public static MagicCast fromWord( String word ) {

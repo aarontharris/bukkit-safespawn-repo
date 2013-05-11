@@ -606,4 +606,22 @@ public class Functions {
 		return false;
 	}
 
+	public static int SEC_SUNDOWN = 13050;
+	public static int SEC_SUNRISE = 22950;
+
+	public static boolean isSunUp( World w ) {
+		try {
+			long time = w.getTime();
+			if ( time >= 24000 )
+				time = time % 24000;
+
+			boolean night = ( time > SEC_SUNDOWN && time < SEC_SUNRISE );
+			if ( !night ) {
+				return true;
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return false;
+	}
 }

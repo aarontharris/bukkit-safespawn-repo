@@ -37,6 +37,7 @@ import com.ath.bukkit.safespawn.event.BlockEventHandler;
 import com.ath.bukkit.safespawn.event.EntityEventHandler;
 import com.ath.bukkit.safespawn.event.PlayerEventHandler;
 import com.ath.bukkit.safespawn.event.ZoneEventHandler;
+import com.ath.bukkit.safespawn.pvpctrl.PVPEventHandler;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 
@@ -161,6 +162,7 @@ public class SafeSpawn extends JavaPlugin {
 
 			@EventHandler
 			public void entityDamagedByEntity( EntityDamageByEntityEvent event ) {
+				PVPEventHandler.onEntityDamagedByEntity( SafeSpawn.this, event );
 				PlayerEventHandler.onEntityDamagedByEntity( SafeSpawn.this, event );
 			}
 

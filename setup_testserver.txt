@@ -1,0 +1,9 @@
+
+# First you will need the CraftBukkit source code:
+git clone git@github.com:Bukkit/CraftBukkit.git
+
+# Once you have that checked out, you'll need to unpack the testserver.tgz in the CraftBukkit/ root folder
+tar xvfz ./testserver.tgz <CraftBukkitHome>/
+
+# Now import CraftBukkit into eclipse and use <CraftBukkitHome>/run.sh to start it
+

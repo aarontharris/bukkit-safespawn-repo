@@ -73,6 +73,7 @@ public class PlayerData implements Persisted {
 
 	private transient JSONObject flagsJSON;
 
+	private transient boolean modified = false;
 	private transient int chatCount = 0;
 	private transient long firstChatTime = 0;
 	private transient long lastChatTime = 0;
@@ -92,6 +93,7 @@ public class PlayerData implements Persisted {
 	public static void save( PlayerData data ) {
 		try {
 			SafeSpawn.instance().getPlayerStore().savePlayerData( data );
+			data.setModified( false );
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
@@ -234,6 +236,14 @@ public class PlayerData implements Persisted {
 
 	public void setFirstChatTime( long firstChatTime ) {
 		this.firstChatTime = firstChatTime;
+	}
+
+	public boolean isModified() {
+		return modified;
+	}
+
+	private void setModified( boolean modified ) {
+		this.modified = modified;
 	}
 
 }

@@ -1,4 +1,4 @@
-package com.ath.bukkit.safespawn.pvpctrl;
+package com.ath.bukkit.safespawn.ctrl.pvp;
 
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
@@ -9,7 +9,7 @@ import com.ath.bukkit.safespawn.F;
 import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
 
-public class PVPEventHandler {
+public class PVPController {
 
 	// FIXME: handle config.yml property pvp-mode: day|night|on|off
 	// FIXME: allow for whitelisting(always) and blacklisting(never) players from pvp

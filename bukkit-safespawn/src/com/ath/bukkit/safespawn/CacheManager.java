@@ -18,9 +18,16 @@ import com.ath.bukkit.safespawn.data.ChunkBlocksLoader;
 import com.ath.bukkit.safespawn.data.Task;
 import com.google.common.collect.Sets;
 
-public class GarbageCollection {
+public class CacheManager {
+	private static boolean initialized = false;
 
 	public static void init( final TaskManager taskmgr ) {
+		if ( !initialized ) {
+			cleanUpUnusedBlocks( taskmgr );
+		}
+	}
+
+	private static void cleanUpUnusedBlocks( final TaskManager taskmgr ) {
 		taskmgr.addSlowRepeatingTask( new Task() { // clean up unused blocks slowly
 			@Override
 			public void run() {

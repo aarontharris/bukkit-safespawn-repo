@@ -47,27 +47,42 @@ public class MagicWords {
 
 
 	public static enum MagicCast {
-		Invalid( "invalid", "invalid", 0 ), //
-		Charge( "charge", "charge", 100 ), //
-		Lock( "lock", "colloportus", 100 ), //
-		Unlock( "unlock", "alohomora", 0 ), //
-		Levitate( "wingardium-leviosa", "levitate", 1000 ), //
-		Protection( "impervius", "protection", 1000 ), //
-		Grant( "grant", "grant", 0 ), //
-		Revoke( "revoke", "revoke", 0 ), //
-		Access( "access", "access", 0 ), //
-		Time( "time", "time", 0 ), //
-		Debug( "debug", "debug", 0 ), //
+		Invalid( "invalid", "invalid", 0, 0 ), //
+		Charge( "charge", "charge", 1, 1 ), //
+		Lock( "lock", "colloportus", 1, 1 ), //
+		Unlock( "unlock", "alohomora", 0, 0 ), //
+		Levitate( "wingardium-leviosa", "levitate", 35, 35 ), //
+		Protection( "impervius", "protection", 35, 35 ), //
+		Grant( "grant", "grant", 0, 0 ), //
+		Revoke( "revoke", "revoke", 0, 0 ), //
+		Access( "access", "access", 0, 0 ), //
+		Time( "time", "time", 0, 0 ), //
+		Debug( "debug", "debug", 0, 0 ), //
 		;
 
 		private String eWord;
 		private String mWord;
-		private int xpCost;
+		private int xpLvlCost;
+		private int minLevel;
 
-		MagicCast( String eWord, String mWord, int xpCost ) {
+		MagicCast( String eWord, String mWord, int minLevel, int xpLvlCost ) {
 			this.eWord = eWord;
 			this.mWord = mWord;
-			this.xpCost = xpCost;
+			this.minLevel = minLevel;
+			this.xpLvlCost = xpLvlCost;
+		}
+
+		public static MagicCast fromWord( String word ) {
+			for ( MagicCast mc : MagicCast.values() ) {
+				if ( mc.eWord.equalsIgnoreCase( word ) || mc.mWord.equalsIgnoreCase( word ) ) {
+					return mc;
+				}
+			}
+			return Invalid;
+		}
+
+		public int getMinLevel() {
+			return minLevel;
 		}
 
 		public String getEnglishWord() {
@@ -78,17 +93,8 @@ public class MagicWords {
 			return mWord;
 		}
 
-		public int getCost() {
-			return xpCost;
-		}
-
-		public static MagicCast fromWord( String word ) {
-			for ( MagicCast mc : MagicCast.values() ) {
-				if ( mc.eWord.equalsIgnoreCase( word ) || mc.mWord.equalsIgnoreCase( word ) ) {
-					return mc;
-				}
-			}
-			return Invalid;
+		public int getLvlCost() {
+			return xpLvlCost;
 		}
 	}
 

@@ -93,6 +93,36 @@ public class F {
 		}
 	}
 
+	@SuppressWarnings( "incomplete-switch" )
+	public static boolean canCarryPlague( EntityType type ) {
+		switch ( type ) {
+		case PLAYER:
+			return true;
+		case ZOMBIE:
+			return true;
+		case SKELETON:
+			return true;
+		case SPIDER:
+			return true;
+		case CAVE_SPIDER:
+			return true;
+		case SLIME:
+			return true;
+		}
+		return false;
+	}
+
+	@SuppressWarnings( "incomplete-switch" )
+	public static boolean canCarryVampirism( EntityType type ) {
+		switch ( type ) {
+		case PLAYER:
+			return true;
+		case PIG_ZOMBIE:
+			return true;
+		}
+		return false;
+	}
+
 	public static boolean isBaddie( EntityType type ) {
 		switch ( type ) {
 		case BLAZE:

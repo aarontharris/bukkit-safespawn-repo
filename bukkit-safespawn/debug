@@ -25,4 +25,5 @@ rm config.yml plugin.yml
 #ssh `getMCServerUsername`@`getMCServerIP` "~/backup_safespawn_plugin.sh $jarname";
 
 # push jar to minecraft server
-push_bukkit $jarname 
+#push_bukkit $jarname 
+cp $jarname ~/dev/github/CraftBukkit/plugins/$jarname

@@ -9,7 +9,6 @@ import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import com.ath.bukkit.safespawn.Const;
@@ -35,61 +34,63 @@ public class CastCmd implements CommandExecutor {
 		try {
 			Player player = plugin.getPlayerManager().getActivePlayerByName( sender.getName() );
 			if ( player != null ) {
-				Log.line( "CastCmd: %s, %s, %s", player.getName(), player.getCustomName(), player.getDisplayName() );
+				Log.line( "CastCmd: %s, %s, %s", player.getName(), cmd.getName(), F.joinSpace( args ) );
 				if ( player.hasPermission( Const.PERM_magic_cast ) ) {
 					if ( args.length > 0 ) {
-						MagicCast castWord = null;
+						MagicCast castWord = MagicCast.Invalid;
 						try {
 							castWord = MagicCast.fromWord( args[0] );
 						} catch ( Exception e ) {
 							Log.error( e );
 						}
 
-						Log.line( "EXP: " + player.getTotalExperience() );
-						if ( player.getTotalExperience() >= castWord.getCost() ) {
+						if ( player.getLevel() >= castWord.getMinLevel() ) {
 							boolean success = false;
-							if ( castWord != null ) {
-								switch ( castWord ) {
-								case Charge:
-									success = doCharge( player, cmd, label, args );
-									break;
-								case Lock:
-									success = doLock( player, cmd, label, args );
-									break;
-								case Unlock:
-									success = doUnlock( player, cmd, label, args );
-									break;
-								case Grant:
-									success = doGrant( player, cmd, label, args );
-									break;
-								case Revoke:
-									success = doRevoke( player, cmd, label, args );
-									break;
-								case Access:
-									success = doAccess( player, cmd, label, args );
-									break;
-								case Time:
-									success = doTime( player, cmd, label, args );
-									break;
-								case Debug:
-									if ( player.hasPermission( Const.PERM_admin ) ) {
-										success = doDebug( player, cmd, label, args );
-									}
-									break;
-								// case Levitate: return doCharge( player, cmd, label, args );
-								default:
-									break;
+							switch ( castWord ) {
+							case Charge:
+								success = doCharge( player, cmd, label, args );
+								break;
+							case Lock:
+								success = doLock( player, cmd, label, args );
+								break;
+							case Unlock:
+								success = doUnlock( player, cmd, label, args );
+								break;
+							case Grant:
+								success = doGrant( player, cmd, label, args );
+								break;
+							case Revoke:
+								success = doRevoke( player, cmd, label, args );
+								break;
+							case Access:
+								success = doAccess( player, cmd, label, args );
+								break;
+							case Protection:
+								success = doProtection( player, cmd, label, args );
+								break;
+							case Levitate:
+								success = doLevitate( player, cmd, label, args );
+								break;
+							case Time:
+								success = doTime( player, cmd, label, args );
+								break;
+							case Debug:
+								if ( player.hasPermission( Const.PERM_admin ) ) {
+									success = doDebug( player, cmd, label, args );
 								}
+								break;
+							default:
+								break;
+							}
 
-								if ( success ) {
-									if ( castWord.getCost() > 0 ) {
-										player.setTotalExperience( player.getTotalExperience() - castWord.getCost() );
-									}
-									return true;
+							if ( success ) {
+								if ( castWord.getLvlCost() > 0 ) {
+									player.setLevel( player.getLevel() - castWord.getLvlCost() );
 								}
+								return true;
 							}
 						} else {
-							player.sendMessage( "You do not have enough magic (xp)." );
+							player.sendMessage( "You're not high enough level to cast that." );
 							return false;
 						}
 					}
@@ -145,28 +146,7 @@ public class CastCmd implements CommandExecutor {
 
 	private static void doTest( World w, Player p ) {
 		try {
-
-			// only consider Player vs Player
-			if ( EntityType.PLAYER.equals( p.getType() ) && EntityType.PLAYER.equals( p.getType() ) ) {
-
-				// fail if sun is up
-				if ( F.isSunUp( w ) ) {
-					// send a random fail message
-					if ( p instanceof Player ) {
-						( (Player) p ).sendMessage( F.randomMessage(
-								"You can't do that yet.",
-								"Wait until it gets darker.",
-								"Have patience...",
-								"The sun is up.",
-								"Maybe if it were night time."
-								) );
-					}
-				}
-				// success
-				else {
-					p.sendMessage( "Success" );
-				}
-			}
+			// p.setLevel( 10 );
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
@@ -212,18 +192,20 @@ public class CastCmd implements CommandExecutor {
 				return false;
 			}
 
-			BlockData bd = BlockData.get( block );
 
 			// initial lock, self access only
 			if ( F.isMagicAllowed( block.getLocation(), block.getType() ) ) {
+				BlockData bd = BlockData.attain( block );
 				if ( Blocks.canWrite( bd, player ) ) {
 					Blocks.grantWriteAccess( block, player );
 					Blocks.setMagical( block, true );
 					player.sendMessage( MagicCast.Lock.getMagicWord() + " -- lock successful" );
 					return true;
 				} else {
-					player.sendMessage( "You cannot lock a sign that is placed on a block with gravity" );
+					player.sendMessage( "You don't have permission." );
 				}
+			} else {
+				player.sendMessage( "You cannot lock a sign that is placed on a block with gravity" );
 			}
 		} catch ( Exception e ) {
 			Log.error( e );
@@ -241,10 +223,9 @@ public class CastCmd implements CommandExecutor {
 				return false;
 			}
 
-			BlockData bd = BlockData.get( block );
-
 			// initial lock, self access only
 			if ( F.isMagicAllowed( block.getLocation(), block.getType() ) ) {
+				BlockData bd = BlockData.attain( block );
 				if ( Blocks.canWrite( bd, player ) ) {
 					Blocks.clearReadWriteAccess( block );
 					player.sendMessage( MagicCast.Unlock.getMagicWord() + " -- unlock successful" );
@@ -417,6 +398,22 @@ public class CastCmd implements CommandExecutor {
 				player.sendMessage( "You've tried to access a non-magical " + block.getType() );
 			}
 
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return false;
+	}
+
+	protected boolean doLevitate( Player player, Command cmd, String label, String[] args ) {
+		try {
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return false;
+	}
+
+	protected boolean doProtection( Player player, Command cmd, String label, String[] args ) {
+		try {
 		} catch ( Exception e ) {
 			Log.error( e );
 		}

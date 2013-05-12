@@ -26,6 +26,7 @@ import com.ath.bukkit.safespawn.cmd.CastCmd;
 import com.ath.bukkit.safespawn.cmd.LinesReaderCmd;
 import com.ath.bukkit.safespawn.cmd.NickCmd;
 import com.ath.bukkit.safespawn.cmd.SpawnCmd;
+import com.ath.bukkit.safespawn.ctrl.pvp.PVPController;
 import com.ath.bukkit.safespawn.data.BlockData;
 import com.ath.bukkit.safespawn.data.BlockStore;
 import com.ath.bukkit.safespawn.data.Persisted;
@@ -37,7 +38,6 @@ import com.ath.bukkit.safespawn.event.BlockEventHandler;
 import com.ath.bukkit.safespawn.event.EntityEventHandler;
 import com.ath.bukkit.safespawn.event.PlayerEventHandler;
 import com.ath.bukkit.safespawn.event.ZoneEventHandler;
-import com.ath.bukkit.safespawn.pvpctrl.PVPEventHandler;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 
@@ -117,7 +117,7 @@ public class SafeSpawn extends JavaPlugin {
 				}
 			} );
 
-			GarbageCollection.init( getTaskman() );
+			CacheManager.init( getTaskman() );
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
@@ -162,20 +162,20 @@ public class SafeSpawn extends JavaPlugin {
 
 			@EventHandler
 			public void entityDamagedByEntity( EntityDamageByEntityEvent event ) {
-				PVPEventHandler.onEntityDamagedByEntity( SafeSpawn.this, event );
+				PVPController.onEntityDamagedByEntity( SafeSpawn.this, event );
 				PlayerEventHandler.onEntityDamagedByEntity( SafeSpawn.this, event );
 			}
 
 			@EventHandler
 			public void playerJoin( PlayerJoinEvent event ) {
 				PlayerEventHandler.onPlayerJoin( SafeSpawn.this, event );
-				GarbageCollection.onPlayerJoinEvent( SafeSpawn.this, event );
+				CacheManager.onPlayerJoinEvent( SafeSpawn.this, event );
 			}
 
 			@EventHandler
 			public void playerLeave( PlayerQuitEvent event ) {
 				PlayerEventHandler.onPlayerLeave( SafeSpawn.this, event );
-				GarbageCollection.onPlayerQuitEvent( SafeSpawn.this, event );
+				CacheManager.onPlayerQuitEvent( SafeSpawn.this, event );
 			}
 
 			@EventHandler
@@ -185,17 +185,17 @@ public class SafeSpawn extends JavaPlugin {
 
 			@EventHandler
 			public void playerMoveEvent( PlayerMoveEvent event ) {
-				GarbageCollection.onPlayerMoveEvent( SafeSpawn.this, event );
+				CacheManager.onPlayerMoveEvent( SafeSpawn.this, event );
 			}
 
 			@EventHandler
 			public void playerTeleportEvent( PlayerTeleportEvent event ) {
-				GarbageCollection.onPlayerMoveEvent( SafeSpawn.this, event );
+				CacheManager.onPlayerMoveEvent( SafeSpawn.this, event );
 			}
 
 			@EventHandler
 			public void playerPortalEvent( PlayerPortalEvent event ) {
-				GarbageCollection.onPlayerMoveEvent( SafeSpawn.this, event );
+				CacheManager.onPlayerMoveEvent( SafeSpawn.this, event );
 			}
 
 			@EventHandler

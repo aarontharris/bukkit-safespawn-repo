@@ -32,14 +32,15 @@ rules:
   - 2. Dont ask to change the server settings.
   - 3. Obey the rules.
 casthelp:
-  - The following commands are supported while point at a wall sign.
-  - /cast charge to magically the sign.
-  - /cast lock will cause the sign to lock a chest beneath it.
-  - /cast unlock will cause the sign to unlock a chest beneath it.
+  - /cast charge to magically enhance a wall sign.
+  - /cast lock will cause a wall sign to lock a chest beneath it.
+  - /cast unlock will cause a wall sign to unlock a chest beneath it.
   - /cast grant Joe to allow Joe to open a locked chest.
   - /cast revoke Joe to disallow Joe from opening a locked chest.
   - /cast access to display current access rights to the chest.
   - /cast time and a magical voice will tell you the time of day.
+  - /cast levitate allows a player to fly
+  - /cast protection makes a player invincible
 zones:
   zone0:
     description: Iron Spawn 

@@ -378,8 +378,6 @@ public class CastCmd implements CommandExecutor {
 				return false;
 			}
 
-			Log.line( "BD: " + bd.getHash() );
-
 			if ( Blocks.isMagical( bd ) ) {
 				Log.line( "is magical" );
 				if ( Blocks.isOwner( bd, player ) ) {

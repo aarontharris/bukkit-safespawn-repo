@@ -34,9 +34,16 @@ public class Log {
 
 	public static void error( Exception e ) {
 		try {
-			self.logger.log( Level.SEVERE, e.getMessage() );
+			self.logger.log( Level.SEVERE, e.getClass().getName() + ": " + e.getMessage() );
 			for ( StackTraceElement el : e.getStackTrace() ) {
-				self.logger.log( Level.SEVERE, el.getFileName() + ":" + el.getLineNumber() );
+				self.logger.log( Level.SEVERE, "  at " + el.getClassName() + "." + el.getMethodName() + "(" + el.getFileName() + ":" + el.getLineNumber() + ")" );
+			}
+			if ( e.getCause() != null ) {
+				Throwable c = e.getCause();
+				self.logger.log( Level.SEVERE, "Caused by: " + c.getClass().getName() + ": " + e.getMessage() );
+				for ( StackTraceElement el : c.getStackTrace() ) {
+					self.logger.log( Level.SEVERE, "  at " + el.getClassName() + "." + el.getMethodName() + "(" + el.getFileName() + ":" + el.getLineNumber() + ")" );
+				}
 			}
 		} catch ( Exception ex ) {
 			e.printStackTrace();

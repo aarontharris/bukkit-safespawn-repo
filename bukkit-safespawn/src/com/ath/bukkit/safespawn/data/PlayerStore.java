@@ -134,4 +134,11 @@ public class PlayerStore {
 		}
 	}
 
+	public boolean isPlayerLevitateEnabled( PlayerData pd ) {
+		return pd.getBoolean( "levitate", false );
+	}
+	
+	public void setPlayerLevitateEnabled( PlayerData pd, boolean enabled ) {
+		pd.putBoolean( "levitate", false );
+	}
 }

@@ -26,6 +26,7 @@ import com.ath.bukkit.safespawn.cmd.CastCmd;
 import com.ath.bukkit.safespawn.cmd.LinesReaderCmd;
 import com.ath.bukkit.safespawn.cmd.NickCmd;
 import com.ath.bukkit.safespawn.cmd.SpawnCmd;
+import com.ath.bukkit.safespawn.ctrl.levitate.PlayerLevStateCtrl;
 import com.ath.bukkit.safespawn.ctrl.pvp.PVPController;
 import com.ath.bukkit.safespawn.data.BlockData;
 import com.ath.bukkit.safespawn.data.BlockStore;
@@ -167,15 +168,17 @@ public class SafeSpawn extends JavaPlugin {
 			}
 
 			@EventHandler
-			public void playerJoin( PlayerJoinEvent event ) {
-				PlayerEventHandler.onPlayerJoin( SafeSpawn.this, event );
+			public void playerJoinEvent( PlayerJoinEvent event ) {
+				PlayerEventHandler.onPlayerJoinEvent( SafeSpawn.this, event ); // first
+				PlayerLevStateCtrl.onPlayerJoinEvent( SafeSpawn.this, event );
 				CacheManager.onPlayerJoinEvent( SafeSpawn.this, event );
 			}
 
 			@EventHandler
-			public void playerLeave( PlayerQuitEvent event ) {
-				PlayerEventHandler.onPlayerLeave( SafeSpawn.this, event );
+			public void playerQuitEvent( PlayerQuitEvent event ) {
+				PlayerLevStateCtrl.onPlayerQuitEvent( SafeSpawn.this, event );
 				CacheManager.onPlayerQuitEvent( SafeSpawn.this, event );
+				PlayerEventHandler.onPlayerQuitEvent( SafeSpawn.this, event ); // last
 			}
 
 			@EventHandler

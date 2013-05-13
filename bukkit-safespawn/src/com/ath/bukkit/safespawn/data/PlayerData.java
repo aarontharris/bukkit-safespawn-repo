@@ -16,7 +16,7 @@ import com.ath.bukkit.safespawn.SafeSpawn;
 
 @Entity
 @Table( name = "PlayerData" )
-public class PlayerData implements Persisted {
+public class PlayerData extends MetaData implements Persisted {
 	public static final String NAME = "name";
 	public static final String NICKNAME = "nickname";
 
@@ -68,12 +68,9 @@ public class PlayerData implements Persisted {
 	@Column( name = "timesLoggedIn" )
 	private int timesLoggedIn = 0;
 
-	@Column( name = "flags" )
-	private String flags;
+	@Column( name = "flags", updatable = true )
+	private String meta;
 
-	private transient JSONObject flagsJSON;
-
-	private transient boolean modified = false;
 	private transient int chatCount = 0;
 	private transient long firstChatTime = 0;
 	private transient long lastChatTime = 0;
@@ -101,27 +98,6 @@ public class PlayerData implements Persisted {
 
 	public static PlayerData get( Player player ) {
 		return SafeSpawn.instance().getPlayerStore().getPlayerData( player );
-	}
-
-	@SuppressWarnings( "unchecked" )
-	public void putString( String key, String value ) {
-		try {
-			getFlagsJSON().put( key, value );
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-	}
-
-	public String getString( String key, String defaultValue ) {
-		try {
-			String out = (String) getFlagsJSON().get( key );
-			if ( out != null ) {
-				return out;
-			}
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-		return defaultValue;
 	}
 
 	@Override
@@ -170,30 +146,24 @@ public class PlayerData implements Persisted {
 	}
 
 	/** @deprecated - used by ORM */
-	public String getFlags() {
-		this.flags = getFlagsJSON().toString();
-		return this.flags;
+	public String getMeta() {
+		this.meta = getMetaJSON().toString();
+		return this.meta;
 	}
 
 	/** @deprecated - used by ORM */
-	public void setFlags( String flags ) {
+	public void setMeta( String meta ) {
 		try {
-			if ( flags == null || flags.isEmpty() ) {
-				flags = "{}";
+			if ( meta == null || meta.isEmpty() ) {
+				meta = "{}";
 			}
+
 			JSONParser parser = new JSONParser();
-			this.flags = flags;
-			this.flagsJSON = (JSONObject) parser.parse( flags );
+			this.meta = meta;
+			setMetaJSON( (JSONObject) parser.parse( meta ) );
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
-	}
-
-	private JSONObject getFlagsJSON() {
-		if ( flagsJSON == null ) {
-			flagsJSON = new JSONObject();
-		}
-		return flagsJSON;
 	}
 
 	public String getNickname() {
@@ -238,12 +208,9 @@ public class PlayerData implements Persisted {
 		this.firstChatTime = firstChatTime;
 	}
 
-	public boolean isModified() {
-		return modified;
-	}
-
-	private void setModified( boolean modified ) {
-		this.modified = modified;
+	@Override
+	public void setLastModified( long millis ) {
+		// NO-OP
 	}
 
 }

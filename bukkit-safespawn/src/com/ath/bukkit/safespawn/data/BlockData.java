@@ -1,7 +1,5 @@
 package com.ath.bukkit.safespawn.data;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -12,20 +10,18 @@ import javax.persistence.Table;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import com.ath.bukkit.safespawn.F;
 import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 
 @Entity
 @Table( name = "BlockData" )
-public class BlockData implements Persisted {
+public class BlockData extends MetaData implements Persisted {
 	public static final String HASH = "hash";
 	public static final String BLOCK_W = "block_w";
 	public static final String CHUNK_X = "chunk_x";
@@ -144,10 +140,6 @@ public class BlockData implements Persisted {
 	@Column( name = "lastModified", updatable = true )
 	private long lastModified;
 
-	private transient JSONObject metaJSON;
-
-	private transient boolean modified;
-
 	private transient String owner;
 	private transient Set<String> rAccess;
 	private transient Set<String> wAccess;
@@ -163,103 +155,6 @@ public class BlockData implements Persisted {
 	@Override
 	public String[] getSchema() {
 		return SCHEMA;
-	}
-
-	public void putStringCollection( String key, Collection<String> strings ) {
-		try {
-			JSONArray ary = new JSONArray();
-			ary.addAll( strings );
-			getMetaJSON().put( key, ary );
-			setModified( true );
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-	}
-
-	/** never null */
-	public Set<String> getStringSet( String key ) {
-		Set<String> out = Sets.newHashSet( getStringArray( key ) );
-		return out;
-	}
-
-	/** never null */
-	public List<String> getStringArray( String key ) {
-		Log.line( "getStringArray( %s )", key );
-		List<String> out = Lists.newArrayList();
-		try {
-			JSONArray ary = (JSONArray) getMetaJSON().get( key );
-			if ( ary != null ) {
-				for ( Object o : ary.toArray() ) {
-					out.add( o.toString() );
-				}
-			}
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-		return out;
-	}
-
-	public void removeKey( String key ) {
-		try {
-			getMetaJSON().remove( key );
-			setModified( true );
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-	}
-
-	@SuppressWarnings( "unchecked" )
-	public void putString( String key, String value ) {
-		try {
-			getMetaJSON().put( key, value );
-			setModified( true );
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-	}
-
-	public String getString( String key, String defaultValue ) {
-		try {
-			String out = (String) getMetaJSON().get( key );
-			if ( out != null ) {
-				return out;
-			}
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-		return defaultValue;
-	}
-
-	public void putBoolean( String key, boolean value ) {
-		putString( key, String.valueOf( value ) );
-	}
-
-	public boolean getBoolean( String key, boolean defaultValue ) {
-		try {
-			String strVal = getString( key, null );
-			if ( strVal != null ) {
-				return Boolean.valueOf( strVal );
-			}
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-		return defaultValue;
-	}
-
-	public void putInt( String key, int value ) {
-		putString( key, String.valueOf( value ) );
-	}
-
-	public int getInt( String key, int defaultValue ) {
-		try {
-			String strVal = getString( key, null );
-			if ( strVal != null ) {
-				return Integer.valueOf( strVal );
-			}
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-		return defaultValue;
 	}
 
 	public Set<String> getReadAccess() {
@@ -311,17 +206,10 @@ public class BlockData implements Persisted {
 
 			JSONParser parser = new JSONParser();
 			this.meta = meta;
-			this.metaJSON = (JSONObject) parser.parse( meta );
+			setMetaJSON( (JSONObject) parser.parse( meta ) );
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
-	}
-
-	private JSONObject getMetaJSON() {
-		if ( metaJSON == null ) {
-			metaJSON = new JSONObject();
-		}
-		return metaJSON;
 	}
 
 	public int getId() {
@@ -346,15 +234,6 @@ public class BlockData implements Persisted {
 
 	public void setLastModified( long lastModified ) {
 		this.lastModified = lastModified;
-	}
-
-	boolean isModified() {
-		return modified;
-	}
-
-	void setModified( boolean modified ) {
-		this.modified = modified;
-		setLastModified( System.currentTimeMillis() );
 	}
 
 	public int getChunkX() {

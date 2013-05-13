@@ -36,7 +36,7 @@ import com.google.common.collect.Sets;
 
 public class PlayerEventHandler {
 
-	public static void onPlayerJoin( SafeSpawn plugin, PlayerJoinEvent event ) {
+	public static void onPlayerJoinEvent( SafeSpawn plugin, PlayerJoinEvent event ) {
 		try {
 			Player player = event.getPlayer();
 			plugin.getPlayerManager().cachePlayer( player );
@@ -88,7 +88,7 @@ public class PlayerEventHandler {
 		}
 	}
 
-	public static void onPlayerLeave( SafeSpawn plugin, PlayerQuitEvent event ) {
+	public static void onPlayerQuitEvent( SafeSpawn plugin, PlayerQuitEvent event ) {
 		try {
 			Log.line( "onPlayerQuit: %s", event.getPlayer().getName() );
 			Player player = event.getPlayer();

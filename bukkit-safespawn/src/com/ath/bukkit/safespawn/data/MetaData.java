@@ -30,7 +30,7 @@ public abstract class MetaData {
 		this.metaJSON = json;
 	}
 
-	boolean isModified() {
+	public boolean isModified() {
 		return modified;
 	}
 

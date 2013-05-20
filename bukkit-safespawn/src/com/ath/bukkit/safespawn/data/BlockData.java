@@ -92,6 +92,15 @@ public class BlockData extends MetaData implements Persisted {
 		return out;
 	}
 
+	public static void save( BlockData data ) {
+		try {
+			SafeSpawn.instance().getBlockStore().saveBlockData( data );
+			data.setModified( false );
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+	}
+
 	/** not null - but will create if doesnt exist */
 	public static BlockData attain( Block block ) {
 		return SafeSpawn.instance().getBlockStore().attainBlockData( block );

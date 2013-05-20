@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.ath.bukkit.safespawn.data.BlockStore;
 import com.ath.bukkit.safespawn.data.ChunkBlocksLoader;
+import com.ath.bukkit.safespawn.data.PlayerData;
 import com.ath.bukkit.safespawn.data.Task;
 import com.google.common.collect.Sets;
 
@@ -24,6 +25,7 @@ public class CacheManager {
 	public static void init( final TaskManager taskmgr ) {
 		if ( !initialized ) {
 			cleanUpUnusedBlocks( taskmgr );
+			savePlayers( taskmgr );
 		}
 	}
 
@@ -61,6 +63,32 @@ public class CacheManager {
 			}
 		} );
 
+	}
+
+	private static void savePlayers( final TaskManager taskmgr ) {
+		taskmgr.addSlowRepeatingTask( new Task() {
+			@Override
+			public void run() {
+				// loop thru all players in cache
+				// for each modified
+				// - save
+				// for each not online
+				// - remove from cache
+
+				for ( PlayerData pd : SafeSpawn.instance().getPlayerStore().getPlayersInCache() ) {
+					if ( pd.isModified() ) {
+						Log.line( "Saving: %s", pd.getName() );
+						PlayerData.save( pd );
+					}
+
+					Player player = SafeSpawn.instance().getServer().getPlayer( pd.getName() );
+					if ( player == null || !player.isOnline() ) {
+						Log.line( "Removing: %s", pd.getName() );
+						SafeSpawn.instance().getPlayerStore().removeFromCache( pd.getName() );
+					}
+				}
+			}
+		} );
 	}
 
 	/**

@@ -172,6 +172,7 @@ public class PlayerData extends MetaData implements Persisted {
 
 	public void setNickname( String nickname ) {
 		this.nickname = nickname;
+		setModified( true );
 	}
 
 	public int getChatCount() {

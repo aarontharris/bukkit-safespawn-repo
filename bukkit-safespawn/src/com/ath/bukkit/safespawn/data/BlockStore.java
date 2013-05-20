@@ -163,8 +163,7 @@ public class BlockStore {
 				BlockData data = getBlockData( hash );
 				if ( data != null && data.isModified() ) {
 					Log.line( "syncAll - " + hash + " id= " + data.getId() );
-					saveBlockData( data );
-					data.setModified( false );
+					BlockData.save( data );
 				}
 			}
 		} catch ( Exception e ) {
@@ -271,7 +270,7 @@ public class BlockStore {
 	}
 
 	@SuppressWarnings( "deprecation" )
-	private void saveBlockData( BlockData blockData ) {
+	void saveBlockData( BlockData blockData ) {
 		try {
 			if ( blockData != null ) {
 				if ( blockData.getId() <= 0 ) {

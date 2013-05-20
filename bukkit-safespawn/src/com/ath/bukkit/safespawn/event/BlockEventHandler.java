@@ -1,16 +1,21 @@
 package com.ath.bukkit.safespawn.event;
 
+import java.util.List;
+import java.util.Set;
+
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 
 import com.ath.bukkit.safespawn.F;
 import com.ath.bukkit.safespawn.Log;
 import com.ath.bukkit.safespawn.SafeSpawn;
 import com.ath.bukkit.safespawn.Zone;
 import com.ath.bukkit.safespawn.Zone.ZoneExclude;
+import com.google.common.collect.Sets;
 
 public class BlockEventHandler {
 
@@ -94,6 +99,27 @@ public class BlockEventHandler {
 					}
 				}
 			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+	}
+
+	public static void onEntityExplodeEvent( SafeSpawn plugin, EntityExplodeEvent event ) {
+		try {
+			if ( event.isCancelled() ) {
+				return;
+			}
+			
+			Set<Block> dontExplode = Sets.newHashSet();
+			List<Block> blocks = event.blockList();
+			for ( Block block : blocks ) {
+//				F.isOwnedBlock( block.getLocation(), block.getType() );
+				// Instead
+				// 1. find a sign
+				// 2. is it magical
+				// 3. exclude the blocks that fall under the signs protection
+			}
+			blocks.removeAll( dontExplode );
 		} catch ( Exception e ) {
 			Log.error( e );
 		}

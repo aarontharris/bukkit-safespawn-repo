@@ -6,9 +6,13 @@
 # - PVP enabled after sun down.
 #
 # Coming soon:
-# safespawn.night_terror // PVP enabled after sun down.
 # safespawn.vampirism // if you are infected, sunlight hurts your skin for 3 minecraft days, contact with others can spread infection. 
 # safespawn.plague // if you are infected, you slowly drain life for 3 minecraft days, contact with others can spread infection.
+# Tied teleporters // two signs with a matching symbol that teleport to each other no matter where they are.
+# Dowsing rod for diamonds or gold or redstone etc
+#
+# Fix:
+# Make magic signs and their chests explode proof
 # 
 # Ideas:
 # - ability to heal plague or vampirism?

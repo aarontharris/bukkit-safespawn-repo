@@ -8,6 +8,8 @@ import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockEvent;
+import org.bukkit.event.block.BlockExpEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -214,6 +216,16 @@ public class SafeSpawn extends JavaPlugin {
 			@EventHandler
 			public void blockBreakEvent( BlockBreakEvent event ) {
 				BlockEventHandler.onBlockBreakEvent( SafeSpawn.this, event );
+			}
+			
+			@EventHandler
+			public void blockExpEvent( BlockExpEvent event ) {
+				Log.line("BlockExpEvent: %s, %s", event.getClass(), event.getEventName() );
+			}
+			
+			@EventHandler
+			public void blockEvent( BlockEvent event ) {
+				Log.line("BlockEvent: %s, %s", event.getClass(), event.getEventName() );
 			}
 
 			// @EventHandler

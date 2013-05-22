@@ -8,8 +8,6 @@ import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockEvent;
-import org.bukkit.event.block.BlockExpEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -36,7 +34,6 @@ import com.ath.bukkit.safespawn.data.Persisted;
 import com.ath.bukkit.safespawn.data.PlayerData;
 import com.ath.bukkit.safespawn.data.PlayerStore;
 import com.ath.bukkit.safespawn.data.SimpleKeyVal;
-import com.ath.bukkit.safespawn.data.Task;
 import com.ath.bukkit.safespawn.event.BlockEventHandler;
 import com.ath.bukkit.safespawn.event.EntityEventHandler;
 import com.ath.bukkit.safespawn.event.PlayerEventHandler;
@@ -108,17 +105,7 @@ public class SafeSpawn extends JavaPlugin {
 			initializeCommands();
 			playerManager.initialize();
 
-			// getBlockStore().primeTheCache();
-
 			taskman = new TaskManager();
-
-			// tasks
-			getTaskman().addSlowRepeatingTask( new Task() {
-				@Override
-				public void run() {
-					getBlockStore().syncAll();
-				}
-			} );
 
 			CacheManager.init( getTaskman() );
 		} catch ( Exception e ) {
@@ -217,15 +204,10 @@ public class SafeSpawn extends JavaPlugin {
 			public void blockBreakEvent( BlockBreakEvent event ) {
 				BlockEventHandler.onBlockBreakEvent( SafeSpawn.this, event );
 			}
-			
+
 			@EventHandler
-			public void blockExpEvent( BlockExpEvent event ) {
-				Log.line("BlockExpEvent: %s, %s", event.getClass(), event.getEventName() );
-			}
-			
-			@EventHandler
-			public void blockEvent( BlockEvent event ) {
-				Log.line("BlockEvent: %s, %s", event.getClass(), event.getEventName() );
+			public void onEntityExplodeEvent( EntityExplodeEvent event ) {
+				BlockEventHandler.onEntityExplodeEvent( SafeSpawn.this, event );
 			}
 
 			// @EventHandler

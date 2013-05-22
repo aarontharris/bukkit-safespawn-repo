@@ -28,7 +28,7 @@ public class TaskManager {
 	}
 
 	public void reset() {
-		scheduler = Executors.newScheduledThreadPool( 2 );
+		scheduler = Executors.newScheduledThreadPool( 5 );
 
 		scheduler.scheduleWithFixedDelay( new Runnable() {
 			@Override

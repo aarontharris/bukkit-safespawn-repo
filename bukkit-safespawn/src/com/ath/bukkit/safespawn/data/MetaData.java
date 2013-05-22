@@ -3,6 +3,7 @@ package com.ath.bukkit.safespawn.data;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -13,7 +14,7 @@ import com.google.common.collect.Sets;
 
 public abstract class MetaData {
 
-	private transient boolean modified;
+	private transient AtomicBoolean modified = new AtomicBoolean( false );
 
 	private transient JSONObject metaJSON;
 
@@ -31,11 +32,11 @@ public abstract class MetaData {
 	}
 
 	public boolean isModified() {
-		return modified;
+		return modified.get();
 	}
 
 	void setModified( boolean modified ) {
-		this.modified = modified;
+		this.modified.set( modified );
 		setLastModified( System.currentTimeMillis() );
 	}
 

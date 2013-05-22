@@ -86,7 +86,11 @@ public class Blocks {
 	public static void setOwner( Block b, Player p ) {
 		try {
 			BlockData bd = BlockData.attain( b );
-			bd.setOwner( p.getName() );
+			if ( p == null ) {
+				bd.setOwner( null );
+			} else {
+				bd.setOwner( p.getName() );
+			}
 		} catch ( Exception e ) {
 			Log.error( e );
 		}

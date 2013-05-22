@@ -4,6 +4,7 @@ import java.nio.CharBuffer;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -28,6 +29,12 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 
 public class F {
+
+	private static final HashSet<Byte> AIR_SIGN_FILTER = Sets.newHashSet(
+			(byte) Material.AIR.getId(),
+			(byte) Material.WATER.getId(),
+			(byte) Material.WALL_SIGN.getId()
+			);
 
 	public static Joiner spaceJoiner = Joiner.on( " " );
 
@@ -378,6 +385,7 @@ public class F {
 		return buffer;
 	}
 
+	/** @deprecated doesn't quite do what you always expect see getTargetWallSign */
 	public static Block getTargetBlock( Player player, int maxDist, Material mat ) {
 		try {
 			List<Block> blocks = player.getLastTwoTargetBlocks( null, 5 );
@@ -509,14 +517,20 @@ public class F {
 		return null;
 	}
 
-	/** @return the controlling block (sign) or null */
+	/** @return the block (sign) or null if not magical and owned */
 	public static Block isOwnedWallSign( Location l, Material m ) {
 		try {
+			Log.line( " - isOwnedWallSign" );
 			if ( Material.WALL_SIGN.equals( m ) ) {
+				Log.line( " - isOwnedWallSign - isSign" );
 				BlockData bd = BlockData.get( l, m );
+				Log.line( " - isOwnedWallSign - isSign, bd=%s", bd );
 				if ( bd != null ) {
+					Log.line( " - isOwnedWallSign - isSign, bd=%s, not null", bd );
 					if ( Blocks.isMagical( bd ) ) {
+						Log.line( " - isOwnedWallSign - isSign, bd=%s, not null, is magic", bd );
 						if ( Blocks.hasOwner( bd ) ) {
+							Log.line( " - isOwnedWallSign - isSign, bd=%s, not null, has owner", bd );
 							return l.getBlock();
 						}
 					}
@@ -556,6 +570,22 @@ public class F {
 			Log.error( e );
 		}
 		return null;
+	}
+
+	public static void getAdjacentBlocks( Location l, Material m, Collection<Block> out ) {
+		try {
+			Log.line( " - geAdjacentBlocks" );
+			int idx = 0;
+			while ( AdjBlockIterator.hasNext( idx ) ) {
+				Log.line( " - geAdjacentBlocks %s", idx );
+				Block adj = AdjBlockIterator.next( l, idx );
+				Log.line( " - geAdjacentBlocks %s = %s", idx, F.toString( adj ) );
+				out.add( adj );
+				idx++ ;
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
 	}
 
 	/**
@@ -653,5 +683,36 @@ public class F {
 			Log.error( e );
 		}
 		return false;
+	}
+
+	/**
+	 * Because line of sight or targetBlock, or lastTwoTarget etc, will
+	 * collide with the transparent space of another wallsign beside/below/above it.
+	 * This ensures you get the block you have highlighted
+	 * 
+	 * @param player
+	 * @return
+	 */
+	public static Block getTargetWallSign( Player player ) {
+		List<Block> blocks = player.getLineOfSight( AIR_SIGN_FILTER, 5 );
+		if ( blocks == null || blocks.isEmpty() ) {
+			return null;
+		}
+
+		Block block = null;
+
+		for ( int i = 0; i < blocks.size(); i++ ) {
+			Block b = blocks.get( i );
+			Log.line( "Block%s: %s", i, F.toString( b ) );
+			if ( Material.WALL_SIGN.equals( b.getType() ) ) {
+				block = b;
+			} else if ( !AIR_SIGN_FILTER.contains( (byte) b.getTypeId() ) ) {
+				break;
+			}
+		}
+
+		Log.line( "Found Block: %s", F.toString( block ) );
+
+		return block;
 	}
 }

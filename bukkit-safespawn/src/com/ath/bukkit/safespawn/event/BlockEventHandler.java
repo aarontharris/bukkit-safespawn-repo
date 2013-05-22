@@ -106,19 +106,30 @@ public class BlockEventHandler {
 
 	public static void onEntityExplodeEvent( SafeSpawn plugin, EntityExplodeEvent event ) {
 		try {
+			Log.line( "onEntityExplodeEvent" );
 			if ( event.isCancelled() ) {
+				Log.line( "onEntityExplodeEvent - cancelled" );
 				return;
 			}
-			
+
 			Set<Block> dontExplode = Sets.newHashSet();
 			List<Block> blocks = event.blockList();
 			for ( Block block : blocks ) {
-//				F.isOwnedBlock( block.getLocation(), block.getType() );
+				Log.line( "onEntityExplodeEvent - block: %s", F.toString( block ) );
+				// F.isOwnedBlock( block.getLocation(), block.getType() );
+
 				// Instead
 				// 1. find a sign
 				// 2. is it magical
 				// 3. exclude the blocks that fall under the signs protection
+
+				if ( null != F.isOwnedWallSign( block.getLocation(), block.getType() ) ) {
+					Log.line( "onEntityExplodeEvent - block: %s - is OwnedWallSign", F.toString( block ) );
+					dontExplode.add( block );
+					F.getAdjacentBlocks( block.getLocation(), block.getType(), dontExplode );
+				}
 			}
+			Log.line( "onEntityExplodeEvent - excluding: %s", dontExplode );
 			blocks.removeAll( dontExplode );
 		} catch ( Exception e ) {
 			Log.error( e );

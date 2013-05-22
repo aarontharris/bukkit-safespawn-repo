@@ -28,6 +28,9 @@ public class ChunkBlocksLoader implements Task {
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
+
+		// do in series, not parallel
+		// ChunkBlocksGC gc = new ChunkBlocksGC( chunk ); gc.run();
 	}
 
 }

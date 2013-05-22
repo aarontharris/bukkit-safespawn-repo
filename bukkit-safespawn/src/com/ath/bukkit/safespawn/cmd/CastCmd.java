@@ -155,7 +155,7 @@ public class CastCmd implements CommandExecutor {
 	// /cast charge
 	protected boolean doCharge( Player player, Command cmd, String label, String[] args ) {
 		try {
-			Block block = F.getTargetBlock( player, 5, Material.WALL_SIGN );
+			Block block = F.getTargetWallSign( player );
 
 			// distance or no chest fail
 			if ( block == null ) {
@@ -168,6 +168,7 @@ public class CastCmd implements CommandExecutor {
 				if ( F.isOwnedWallSign( block.getLocation(), block.getType() ) == null ) { // if not owned
 					Log.line( "%s.doCharge - magic allowed", player.getName() );
 					Blocks.setMagical( block, true );
+					Blocks.setOwner( block, player );
 					Log.line( "%s successfully cast %s", player.getName(), F.joinSpace( args ) );
 					player.sendMessage( MagicCast.Charge.getMagicWord() + " -- charge successful" );
 					return true;
@@ -184,7 +185,7 @@ public class CastCmd implements CommandExecutor {
 	// /cast lock
 	protected boolean doLock( Player player, Command cmd, String label, String[] args ) {
 		try {
-			Block block = F.getTargetBlock( player, 5, Material.WALL_SIGN );
+			Block block = F.getTargetWallSign( player );
 
 			// distance or no chest fail
 			if ( block == null ) {
@@ -199,6 +200,7 @@ public class CastCmd implements CommandExecutor {
 				if ( Blocks.canWrite( bd, player ) ) {
 					Blocks.grantWriteAccess( block, player );
 					Blocks.setMagical( block, true );
+					Blocks.setOwner( block, player );
 					player.sendMessage( MagicCast.Lock.getMagicWord() + " -- lock successful" );
 					return true;
 				} else {
@@ -216,18 +218,18 @@ public class CastCmd implements CommandExecutor {
 	// /cast unlock
 	protected boolean doUnlock( Player player, Command cmd, String label, String[] args ) {
 		try {
-			Block block = F.getTargetBlock( player, 5, Material.WALL_SIGN );
+			Block block = F.getTargetWallSign( player );
 			// distance or no chest fail
 			if ( block == null ) {
 				player.sendMessage( "You're too far from a Wall Sign" );
 				return false;
 			}
 
-			// initial lock, self access only
 			if ( F.isMagicAllowed( block.getLocation(), block.getType() ) ) {
 				BlockData bd = BlockData.attain( block );
 				if ( Blocks.canWrite( bd, player ) ) {
 					Blocks.clearReadWriteAccess( block );
+					Blocks.setOwner( block, null );
 					player.sendMessage( MagicCast.Unlock.getMagicWord() + " -- unlock successful" );
 					return true;
 				} else {
@@ -355,15 +357,9 @@ public class CastCmd implements CommandExecutor {
 		try {
 			Log.line( player.getName() + ".doAccess" );
 
-			List<Block> blocks = player.getLastTwoTargetBlocks( null, 5 );
-			if ( blocks == null || blocks.isEmpty() ) {
-				player.sendMessage( "What is it you're trying to access?" );
-				return false;
-			}
+			Block block = F.getTargetWallSign( player );
 
-			Block block = blocks.get( 1 );
-
-			if ( !Material.WALL_SIGN.equals( block.getType() ) ) {
+			if ( block == null || !Material.WALL_SIGN.equals( block.getType() ) ) {
 				player.sendMessage( "What is it you're trying to access?" );
 				return false;
 			}
@@ -383,6 +379,7 @@ public class CastCmd implements CommandExecutor {
 				if ( Blocks.isOwner( bd, player ) ) {
 					Set<String> access = Blocks.getWriteAccess( bd );
 					Log.line( "has write" );
+					player.sendMessage( "Owner: " + ( bd.getOwner() == null ? "none" : bd.getOwner() ) );
 					if ( access.isEmpty() ) {
 						player.sendMessage( "Write: none" );
 					} else {

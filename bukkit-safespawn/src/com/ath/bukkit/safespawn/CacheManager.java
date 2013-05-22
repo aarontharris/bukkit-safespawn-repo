@@ -26,7 +26,17 @@ public class CacheManager {
 		if ( !initialized ) {
 			cleanUpUnusedBlocks( taskmgr );
 			savePlayers( taskmgr );
+			syncBlocks( taskmgr );
 		}
+	}
+
+	private static void syncBlocks( final TaskManager taskmgr ) {
+		taskmgr.addSlowRepeatingTask( new Task() {
+			@Override
+			public void run() {
+				SafeSpawn.instance().getBlockStore().syncAll();
+			}
+		} );
 	}
 
 	private static void cleanUpUnusedBlocks( final TaskManager taskmgr ) {
@@ -64,6 +74,15 @@ public class CacheManager {
 		} );
 
 	}
+
+	// private static void deleteMissedMagicBlocks( final TaskManager taskmgr ) {
+	// taskmgr.addSlowRepeatingTask( new Task() {
+	// @Override
+	// public void run() {
+	// SafeSpawn.instance().getBlockStore().getBlockData( blockHash )
+	// }
+	// });
+	// }
 
 	private static void savePlayers( final TaskManager taskmgr ) {
 		taskmgr.addSlowRepeatingTask( new Task() {
@@ -161,6 +180,7 @@ public class CacheManager {
 		try {
 			Log.line( "Player entered: %s %sx%s", chunk.getWorld().getName(), chunk.getX(), chunk.getZ() );
 			plugin.getTaskman().addNonRepeatingTask( new ChunkBlocksLoader( chunk ) );
+			// plugin.getTaskman().addNonRepeatingTask( new ChunkBlocksGC( chunk ) ); // done serially from ChunkBlocksLoader instead
 		} catch ( Exception e ) {
 			Log.error( e );
 		}

@@ -2,7 +2,6 @@ package com.ath.bukkit.safespawn.data;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -17,13 +16,15 @@ import com.ath.bukkit.safespawn.SafeSpawn;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.SqlUpdate;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class BlockStore {
 
 	private EbeanServer database;
-	private Map<String, BlockData> dataCache = new HashMap<String, BlockData>(); //
-	private Map<String, Set<BlockData>> chunkToBlockHashes = new HashMap<String, Set<BlockData>>();
+	
+	private Map<String, BlockData> dataCache = Maps.newConcurrentMap();
+	private Map<String, Set<BlockData>> chunkToBlockHashes = Maps.newConcurrentMap();
 
 	// TODO: make sure its the same chunk for each read and not just a copy with the same data which would break the cache
 	// TODO: maybe convert back to hash instead of chunk
@@ -177,11 +178,20 @@ public class BlockStore {
 			if ( block != null ) {
 				String hash = BlockData.toHash( block );
 				BlockData data = getBlockData( hash );
-				if ( data != null ) {
-					removeFromCache( data );
-					if ( data.getId() > 0 ) { // if persisted
-						deleteBlockData( data );
-					}
+				remove( data );
+			}
+		} catch ( Exception e ) {
+			logError( e );
+		}
+	}
+
+	/** when the block is destroyed */
+	public void remove( BlockData data ) {
+		try {
+			if ( data != null ) {
+				removeFromCache( data );
+				if ( data.getId() > 0 ) { // if persisted
+					deleteBlockData( data );
 				}
 			}
 		} catch ( Exception e ) {
@@ -217,6 +227,26 @@ public class BlockStore {
 			Log.error( e );
 		}
 		return null;
+	}
+
+	public Set<BlockData> dbFind( int x, int y, int z, World w ) {
+		try {
+			String queryString = String.format( "find BlockData where %s=:%s and %s=:%s and %s=:%s and %s=:%s",
+					BlockData.BLOCK_W, BlockData.BLOCK_W,
+					BlockData.BLOCK_X, BlockData.BLOCK_X,
+					BlockData.BLOCK_Y, BlockData.BLOCK_Y,
+					BlockData.BLOCK_Z, BlockData.BLOCK_Z
+					);
+			Query<BlockData> query = database.createQuery( BlockData.class, queryString );
+			query.setParameter( BlockData.BLOCK_W, w.getName() );
+			query.setParameter( BlockData.BLOCK_X, x );
+			query.setParameter( BlockData.BLOCK_Y, y );
+			query.setParameter( BlockData.BLOCK_Z, z );
+			return query.findSet();
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return Collections.emptySet();
 	}
 
 	/** careful - kinda heavy */

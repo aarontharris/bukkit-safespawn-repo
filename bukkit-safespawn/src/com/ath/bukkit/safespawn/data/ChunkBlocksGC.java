@@ -29,11 +29,13 @@ public class ChunkBlocksGC implements Task {
 			if ( ( now - lastRun ) >= MIN_RUN_PERIOD_MILLIS ) {
 				Set<BlockData> blocks = store.getBlockDatasByChunk( BlockStore.toHash( chunk ) );
 				for ( BlockData bd : blocks ) {
+					Log.line( "GC: checking %s", bd.getHash() );
 					if ( bd != null ) {
 						// store.remove( chunk.getBlock( ) );
 						Set<BlockData> match = store.dbFind( bd.getBlockX(), bd.getBlockY(), bd.getBlockZ(), chunk.getWorld() );
 						for ( BlockData m : match ) {
-							if ( m != null && m.getHash().equals( bd.getHash() ) ) {
+							Log.line( "%s vs %s", m.getHash(), bd.getHash() );
+							if ( m != null && !m.getHash().equals( bd.getHash() ) ) {
 								Log.line( "Found a defunct BlockData %s", bd );
 								store.remove( bd );
 								break;

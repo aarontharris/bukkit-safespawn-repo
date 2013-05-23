@@ -2,6 +2,7 @@ package com.ath.bukkit.safespawn;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Chunk;
@@ -17,6 +18,7 @@ import com.ath.bukkit.safespawn.data.BlockStore;
 import com.ath.bukkit.safespawn.data.ChunkBlocksLoader;
 import com.ath.bukkit.safespawn.data.PlayerData;
 import com.ath.bukkit.safespawn.data.Task;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class CacheManager {
@@ -121,7 +123,8 @@ public class CacheManager {
 			// find all active chunks
 			Set<String> activeChunks = Sets.newHashSet();
 			for ( World w : SafeSpawn.instance().getServer().getWorlds() ) {
-				for ( Player p : SafeSpawn.instance().getServer().getWorld( w.getUID() ).getPlayers() ) {
+				List<Player> players = Lists.newArrayList( SafeSpawn.instance().getServer().getWorld( w.getUID() ).getPlayers() );
+				for ( Player p : players ) {
 					Chunk pChunk = p.getLocation().getChunk();
 					int cx = pChunk.getX();
 					int cz = pChunk.getZ();

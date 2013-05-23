@@ -23,6 +23,19 @@
 # - - if you put 2 or more sticks, 2 or more stone blocks and 2 or more bones into a container
 # - - you get a surprise!
 #
+# - Teleporters should not support absolute teleport coordinates
+# - Teleporters can only teleport between paired teleporters (same markings and same owner)
+# - Teleporters obey access rules
+#
+# - Iron Doors should obey access rules 
+#
+# Access rules:
+# - Ownership is not the same as having access
+# - - Only the owner may destroy owned blocks
+# - - Only the owner may grant access to owned blocks
+# - - If you do not log in for 3 months, the first name in the access list that has logged in in less than 3 months becomes the owner
+# - - If you are the only player with access, the block becomes unowned.
+# - - By default the owner has access, but if the owner /revokes access, the block becomes public
 
 
 ### General commands

@@ -30,7 +30,12 @@ import com.google.common.collect.Sets;
 
 public class F {
 
-	private static final HashSet<Byte> AIR_SIGN_FILTER = Sets.newHashSet(
+	private static final HashSet<Byte> AIR_WATER_FILTER = Sets.newHashSet(
+			(byte) Material.AIR.getId(),
+			(byte) Material.WATER.getId()
+			);
+
+	private static final HashSet<Byte> AIR_WATER_SIGN_FILTER = Sets.newHashSet(
 			(byte) Material.AIR.getId(),
 			(byte) Material.WATER.getId(),
 			(byte) Material.WALL_SIGN.getId()
@@ -44,6 +49,14 @@ public class F {
 
 	public static String joinSpace( Collection<String> strings ) {
 		return spaceJoiner.join( strings );
+	}
+
+	/** empty or null */
+	public static boolean isEmpty( String string ) {
+		if ( string == null || string.isEmpty() ) {
+			return true;
+		}
+		return false;
 	}
 
 	public static boolean insideZone( Zone z, Location l ) {
@@ -385,26 +398,6 @@ public class F {
 		return buffer;
 	}
 
-	/** @deprecated doesn't quite do what you always expect see getTargetWallSign */
-	public static Block getTargetBlock( Player player, int maxDist, Material mat ) {
-		try {
-			List<Block> blocks = player.getLastTwoTargetBlocks( null, 5 );
-
-			Block block = null;
-			for ( Block b : blocks ) {
-				if ( b.getType().equals( mat ) ) {
-					block = b;
-					break;
-				}
-			}
-
-			return block;
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-		return null;
-	}
-
 	public static void debugBlock( Block block ) {
 		if ( block == null ) {
 			Log.line( "blocks is null" );
@@ -520,17 +513,11 @@ public class F {
 	/** @return the block (sign) or null if not magical and owned */
 	public static Block isOwnedWallSign( Location l, Material m ) {
 		try {
-			Log.line( " - isOwnedWallSign" );
 			if ( Material.WALL_SIGN.equals( m ) ) {
-				Log.line( " - isOwnedWallSign - isSign" );
 				BlockData bd = BlockData.get( l, m );
-				Log.line( " - isOwnedWallSign - isSign, bd=%s", bd );
 				if ( bd != null ) {
-					Log.line( " - isOwnedWallSign - isSign, bd=%s, not null", bd );
 					if ( Blocks.isMagical( bd ) ) {
-						Log.line( " - isOwnedWallSign - isSign, bd=%s, not null, is magic", bd );
 						if ( Blocks.hasOwner( bd ) ) {
-							Log.line( " - isOwnedWallSign - isSign, bd=%s, not null, has owner", bd );
 							return l.getBlock();
 						}
 					}
@@ -618,13 +605,14 @@ public class F {
 		return null;
 	}
 
+	/** true if the block is just a regular block or if it is an owned block and the player has access */
 	public static boolean canUserAccessBlock( Location l, Material m, Player p ) {
 		try {
 			BlockData bd = BlockData.get( l, m );
 			if ( bd == null ) {
 				return true;
 			}
-			if ( Blocks.canRead( bd, p ) ) {
+			if ( Blocks.canAccess( bd, p ) ) {
 				return true;
 			}
 		} catch ( Exception e ) {
@@ -694,7 +682,7 @@ public class F {
 	 * @return
 	 */
 	public static Block getTargetWallSign( Player player ) {
-		List<Block> blocks = player.getLineOfSight( AIR_SIGN_FILTER, 5 );
+		List<Block> blocks = player.getLineOfSight( AIR_WATER_SIGN_FILTER, 5 );
 		if ( blocks == null || blocks.isEmpty() ) {
 			return null;
 		}
@@ -703,16 +691,63 @@ public class F {
 
 		for ( int i = 0; i < blocks.size(); i++ ) {
 			Block b = blocks.get( i );
-			Log.line( "Block%s: %s", i, F.toString( b ) );
 			if ( Material.WALL_SIGN.equals( b.getType() ) ) {
 				block = b;
-			} else if ( !AIR_SIGN_FILTER.contains( (byte) b.getTypeId() ) ) {
+			} else if ( !AIR_WATER_SIGN_FILTER.contains( (byte) b.getTypeId() ) ) {
 				break;
 			}
 		}
 
-		Log.line( "Found Block: %s", F.toString( block ) );
+		return block;
+	}
+
+	/**
+	 * Because line of sight or targetBlock, or lastTwoTarget etc, will
+	 * collide with the transparent space of another wallsign beside/below/above it.
+	 * This ensures you get the block you have highlighted
+	 * 
+	 * @param player
+	 * @return
+	 */
+	public static Block getTargetBlockClose( Player player, int maxDist, Material mat ) {
+		HashSet<Byte> filter = new HashSet<Byte>( AIR_WATER_FILTER );
+		filter.add( (byte) mat.getId() );
+		List<Block> blocks = player.getLineOfSight( filter, 5 );
+		if ( blocks == null || blocks.isEmpty() ) {
+			return null;
+		}
+
+		Block block = null;
+
+		for ( int i = 0; i < blocks.size(); i++ ) {
+			Block b = blocks.get( i );
+			if ( mat.equals( b.getType() ) ) {
+				block = b;
+			} else if ( !AIR_WATER_FILTER.contains( (byte) b.getTypeId() ) ) {
+				break;
+			}
+		}
 
 		return block;
+	}
+
+	/** Don't use this unless you're far away, like +10 units, otherwise it has some funk, see notes on getTargetWallSign */
+	public static Block getTargetBlockFarAway( Player player, int maxDist, Material mat ) {
+		try {
+			List<Block> blocks = player.getLastTwoTargetBlocks( null, 5 );
+
+			Block block = null;
+			for ( Block b : blocks ) {
+				if ( b.getType().equals( mat ) ) {
+					block = b;
+					break;
+				}
+			}
+
+			return block;
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return null;
 	}
 }

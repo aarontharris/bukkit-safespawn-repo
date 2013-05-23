@@ -103,8 +103,30 @@ public class BlockEventHandler {
 			Log.error( e );
 		}
 	}
-
+	
+	/** cancels the explosion if near protected blocks */
 	public static void onEntityExplodeEvent( SafeSpawn plugin, EntityExplodeEvent event ) {
+		try {
+			Log.line( "onEntityExplodeEvent" );
+			if ( event.isCancelled() ) {
+				Log.line( "onEntityExplodeEvent - cancelled" );
+				return;
+			}
+
+			List<Block> blocks = event.blockList();
+			for ( Block block : blocks ) {
+				if ( null != F.isOwnedWallSign( block.getLocation(), block.getType() ) ) {
+					event.setCancelled( true );
+					break;
+				}
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+	}
+
+	/** allows the explosion but protects the select few owned blocks */
+	public static void old_onEntityExplodeEvent( SafeSpawn plugin, EntityExplodeEvent event ) {
 		try {
 			Log.line( "onEntityExplodeEvent" );
 			if ( event.isCancelled() ) {

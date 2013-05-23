@@ -29,12 +29,14 @@ public class BlockData extends MetaData implements Persisted {
 	public static final String BLOCK_W = "block_w";
 	public static final String CHUNK_X = "chunk_x";
 	public static final String CHUNK_Z = "chunk_z";
+	public static final String REF = "ref";
 
 	public static final String[] SCHEMA = {
 			"create table BlockData" +
 					"(" +
 					"hash TEXT," +
 					"meta BLOB," +
+					"ref TEXT," +
 					"lastModified bigint," +
 					"chunk_x INTEGER," +
 					"chunk_z INTEGER," +
@@ -49,6 +51,8 @@ public class BlockData extends MetaData implements Persisted {
 			"CREATE INDEX BlockData_chkx_INDEX ON BlockData (chunk_x);",
 			"CREATE INDEX BlockData_chkz_INDEX ON BlockData (chunk_z);"
 	};
+
+	// alter table BlockData add column ref text;
 
 	/*
 	 * create table temp as select hash, meta, lastModified, id from BlockData;
@@ -91,7 +95,7 @@ public class BlockData extends MetaData implements Persisted {
 		out.setBlockZ( block.getZ() );
 		out.setBlockW( block.getLocation().getWorld().getName() );
 		out.setBlockM( block.getTypeId() );
-		out.setLastModified( System.currentTimeMillis() );
+		out.setModified( true );
 		return out;
 	}
 
@@ -149,6 +153,9 @@ public class BlockData extends MetaData implements Persisted {
 	@Column( name = "meta", updatable = true )
 	private String meta;
 
+	@Column( name = "ref", updatable = true )
+	private String ref;
+
 	@Column( name = "lastModified", updatable = true )
 	private long lastModified;
 
@@ -169,31 +176,31 @@ public class BlockData extends MetaData implements Persisted {
 		return SCHEMA;
 	}
 
-	public Set<String> getReadAccess() {
-		if ( rAccess == null ) {
-			rAccess = getStringSet( READ_ACCESS );
-		}
-		return rAccess;
-	}
+	// public Set<String> getReadAccess() {
+	// if ( rAccess == null ) {
+	// rAccess = getStringSet( READ_ACCESS );
+	// }
+	// return rAccess;
+	// }
+	//
+	// public void setReadAccess( Set<String> access ) {
+	// if ( access == null ) {
+	// rAccess = null;
+	// removeKey( READ_ACCESS );
+	// } else {
+	// rAccess = Sets.newHashSet( access );
+	// putStringCollection( READ_ACCESS, rAccess );
+	// }
+	// }
 
-	public void setReadAccess( Set<String> access ) {
-		if ( access == null ) {
-			rAccess = null;
-			removeKey( READ_ACCESS );
-		} else {
-			rAccess = Sets.newHashSet( access );
-			putStringCollection( READ_ACCESS, rAccess );
-		}
-	}
-
-	public Set<String> getWriteAccess() {
+	public Set<String> getAccess() {
 		if ( wAccess == null ) {
 			wAccess = getStringSet( WRITE_ACCESS );
 		}
 		return wAccess;
 	}
 
-	public void setWriteAccess( Set<String> access ) {
+	public void setAccess( Set<String> access ) {
 		if ( access == null ) {
 			wAccess = null;
 			removeKey( WRITE_ACCESS );
@@ -244,6 +251,8 @@ public class BlockData extends MetaData implements Persisted {
 		return lastModified;
 	}
 
+	/** @deprecated use setModified */
+	@Override
 	public void setLastModified( long lastModified ) {
 		this.lastModified = lastModified;
 	}
@@ -321,4 +330,19 @@ public class BlockData extends MetaData implements Persisted {
 		putString( OWNER, owner );
 		this.setModified( true );
 	}
+
+	public String getRef() {
+		return ref;
+	}
+
+	/** @deprecated don't use this, its only for ORM */
+	public void setRef( String ref ) {
+		this.ref = ref;
+	}
+	
+	public void updateRef( String ref ) {
+		this.ref = ref;
+		this.setModified( true );
+	}
+
 }

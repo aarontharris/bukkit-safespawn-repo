@@ -29,32 +29,11 @@ public class Blocks {
 		}
 	}
 
-	public static void grantReadWriteAccess( Block b, Set<String> playerNames ) {
-		try {
-			setReadAccess( b, playerNames );
-			setWriteAccess( b, playerNames );
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-	}
-
 	/** overwrite */
-	public static void setReadAccess( Block b, Set<String> playerNames ) {
+	public static void setAccess( Block b, Set<String> playerNames ) {
 		try {
 			BlockData bd = BlockData.attain( b );
-			// bd.putStringCollection( READ_ACCESS, playerNames );
-			bd.setReadAccess( playerNames );
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-	}
-
-	/** overwrite */
-	public static void setWriteAccess( Block b, Set<String> playerNames ) {
-		try {
-			BlockData bd = BlockData.attain( b );
-			// bd.putStringCollection( WRITE_ACCESS, playerNames );
-			bd.setWriteAccess( playerNames );
+			bd.setAccess( playerNames );
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
@@ -62,21 +41,10 @@ public class Blocks {
 
 
 	/** never null */
-	public static Set<String> getReadAccess( BlockData bd ) {
+	public static Set<String> getAccess( BlockData bd ) {
 		try {
 			if ( bd != null )
-				return bd.getReadAccess();
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-		return Collections.emptySet();
-	}
-
-	/** never null */
-	public static Set<String> getWriteAccess( BlockData bd ) {
-		try {
-			if ( bd != null )
-				return bd.getWriteAccess();
+				return bd.getAccess();
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
@@ -122,73 +90,64 @@ public class Blocks {
 		return false;
 	}
 
-	/** do not use in a loop */
-	public static boolean canRead( BlockData bd, Player player ) {
+	public static boolean canModify( BlockData bd, Player player ) {
 		try {
-			if ( canWrite( bd, player ) ) {
-				return true;
+			if ( hasOwner( bd ) ) {
+				if ( isOwner( bd, player ) ) {
+					return true;
+				}
 			}
-			if ( getReadAccess( bd ).contains( player.getName() ) ) {
-				return true;
-			}
+			return true;
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
 		return false;
 	}
 
-	/** do not use in a loop */
-	public static boolean canWrite( BlockData bd, Player player ) {
+	/** does this user have the ability to use this block - includes owner, not the same as canModify */
+	public static boolean canAccess( BlockData bd, Player player ) {
 		try {
-			if ( isOwner( bd, player ) ) {
-				return true;
+			if ( hasOwner( bd ) ) {
+				if ( isOwner( bd, player ) ) {
+					return true;
+				}
+				Set<String> access = getAccess( bd );
+				if ( access.isEmpty() || access.contains( player.getName() ) ) {
+					return true;
+				}
+				return false;
 			}
-			if ( getWriteAccess( bd ).contains( player.getName() ) ) {
-				return true;
-			}
+			return true;
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
 		return false;
 	}
 
-	public static void grantReadAccess( Block b, Player player ) {
-		try {
-			BlockData bd = BlockData.attain( b );
-			Set<String> access = getReadAccess( bd );
-			if ( !access.contains( player.getName() ) ) {
-				access.add( player.getName() );
-				setReadAccess( b, access );
-			}
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
+	public static void grantAccess( Block b, Player player ) {
+		grantAccess( b, player.getName() );
 	}
 
-	public static void grantWriteAccess( Block b, Player player ) {
-		grantWriteAccess( b, player.getName() );
-	}
-
-	public static void grantWriteAccess( Block b, String playerName ) {
+	public static void grantAccess( Block b, String playerName ) {
 		try {
 			BlockData bd = BlockData.attain( b );
-			Set<String> access = getWriteAccess( bd );
+			Set<String> access = getAccess( bd );
 			if ( !access.contains( playerName ) ) {
 				access.add( playerName );
-				setWriteAccess( b, access );
+				setAccess( b, access );
 			}
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
 	}
 
-	public static void clearReadWriteAccess( Block b ) {
+	public static void clearAccess( Block b ) {
 		try {
 			BlockData bd = BlockData.attain( b );
-			bd.setReadAccess( null );
-			bd.setWriteAccess( null );
+			bd.setAccess( null );
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
 	}
+
 }

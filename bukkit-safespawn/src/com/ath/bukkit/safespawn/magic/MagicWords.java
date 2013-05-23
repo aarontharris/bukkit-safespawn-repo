@@ -57,7 +57,8 @@ public class MagicWords {
 		Revoke( "revoke", "revoke", 0, 0 ), //
 		Access( "access", "access", 0, 0 ), //
 		Time( "time", "time", 0, 0 ), //
-		Debug( "debug", "debug", 0, 0 ), //
+		Debug( "debug", "debug", 0, 0 ),//
+		Discharge( "discharge", "discharge", 0, 0 ), //
 		;
 
 		private String eWord;

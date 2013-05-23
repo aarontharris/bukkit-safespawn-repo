@@ -22,15 +22,9 @@ import com.google.common.collect.Sets;
 public class BlockStore {
 
 	private EbeanServer database;
-	
+
 	private Map<String, BlockData> dataCache = Maps.newConcurrentMap();
 	private Map<String, Set<BlockData>> chunkToBlockHashes = Maps.newConcurrentMap();
-
-	// TODO: make sure its the same chunk for each read and not just a copy with the same data which would break the cache
-	// TODO: maybe convert back to hash instead of chunk
-
-	// private Queue<BlockData> outgoing = new ConcurrentLinkedQueue<BlockData>();
-	// private Queue<BlockData> incoming = new ConcurrentLinkedQueue<BlockData>();
 
 	public BlockStore( EbeanServer database ) {
 		this.database = database;
@@ -162,9 +156,20 @@ public class BlockStore {
 			Set<String> keys = new HashSet<String>( dataCache.keySet() ); // copy to reduce concurrent mod
 			for ( String hash : keys ) {
 				BlockData data = getBlockData( hash );
-				if ( data != null && data.isModified() ) {
-					Log.line( "syncAll - " + hash + " id= " + data.getId() );
-					BlockData.save( data );
+				if ( data != null ) {
+					try {
+						World w = SafeSpawn.instance().getServer().getWorld( data.getBlockW() );
+						Block block = w.getBlockAt( data.getBlockX(), data.getBlockY(), data.getBlockZ() );
+						if ( !BlockData.toHash( block ).equals( data.getHash() ) ) {
+							Log.line( "syncAll - remove " + hash + " id= " + data.getId() );
+							remove( data );
+						} else if ( data.isModified() ) {
+							Log.line( "syncAll - saving " + hash + " id= " + data.getId() );
+							BlockData.save( data );
+						}
+					} catch ( Exception e ) {
+						Log.error( e );
+					}
 				}
 			}
 		} catch ( Exception e ) {
@@ -211,6 +216,16 @@ public class BlockStore {
 			return data;
 		} catch ( Exception e ) {
 			logError( e );
+		}
+		return null;
+	}
+
+	public Set<BlockData> dbFindByRef( String ref ) {
+		try {
+			Set<BlockData> data = database.find( BlockData.class ).where().ieq( BlockData.REF, ref ).findSet();
+			return data;
+		} catch ( Exception e ) {
+			Log.error( e );
 		}
 		return null;
 	}
@@ -319,6 +334,15 @@ public class BlockStore {
 			}
 		} catch ( Exception e ) {
 			logError( e );
+		}
+	}
+
+	/** straight up save to db, no fuss */
+	public void dbSave( BlockData bd ) {
+		try {
+			database.save( bd );
+		} catch ( Exception e ) {
+			Log.error( e );
 		}
 	}
 

@@ -575,14 +575,25 @@ public class F {
 		}
 	}
 
+	/** Checks to see if a locked sign is in front and above the door */
+	public static Block isOwnedDoorBlock( Location l, Material m ) {
+		try {
+			if ( l != null && m != null ) {
+				Block block = l.getBlock();
+
+				int x = l.getBlockX();
+				int y = l.getBlockY();
+				int z = l.getBlockZ();
+			}
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
+		return null;
+	}
+
 	/**
 	 * magic signs can lock a relative position<br>
 	 * the magic sign itself, the block the sign is attached to, and the block below are protected<br>
-	 * <br>
-	 * lock
-	 * 0
-	 * -1
-	 * 0
 	 * 
 	 * @return the block (sign) controlling this owned block or null
 	 */
@@ -615,21 +626,6 @@ public class F {
 			if ( Blocks.canAccess( bd, p ) ) {
 				return true;
 			}
-		} catch ( Exception e ) {
-			Log.error( e );
-		}
-		return false;
-	}
-
-	/**
-	 * @deprecated not implemented yet
-	 * @param l
-	 * @param m
-	 * @return
-	 */
-	public static boolean isUserOwnerOfBlock( Location l, Material m ) {
-		try {
-			// FIXME: isUserOwnerOfBlock
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
@@ -732,7 +728,7 @@ public class F {
 	}
 
 	/** Don't use this unless you're far away, like +10 units, otherwise it has some funk, see notes on getTargetWallSign */
-	public static Block getTargetBlockFarAway( Player player, int maxDist, Material mat ) {
+	public static Block getTargetBlock( Player player, int maxDist, Material mat ) {
 		try {
 			List<Block> blocks = player.getLastTwoTargetBlocks( null, 5 );
 

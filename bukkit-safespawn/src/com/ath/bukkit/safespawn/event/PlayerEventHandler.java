@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.block.Sign;
@@ -31,7 +30,6 @@ import com.ath.bukkit.safespawn.data.BlockData;
 import com.ath.bukkit.safespawn.data.Blocks;
 import com.ath.bukkit.safespawn.data.PlayerData;
 import com.ath.bukkit.safespawn.magic.MagicWords.MagicCommand;
-import com.ath.bukkit.safespawn.magic.MagicWords.MagicWord;
 import com.ath.bukkit.safespawn.magic.sign.MagicSign;
 import com.ath.bukkit.safespawn.magic.sign.SignReader;
 import com.google.common.collect.Sets;
@@ -152,28 +150,8 @@ public class PlayerEventHandler {
 					}
 				}
 
-				// // SIGN
-				// if ( Material.WALL_SIGN.equals( block.getType() ) ) {
-				// if ( event.getPlayer().hasPermission( Const.PERM_magic_sign ) ) {
-				// BlockState state = block.getState();
-				// if ( state instanceof Sign ) {
-				// try {
-				// boolean magical = Blocks.isMagical( BlockData.get( block ) );
-				// Log.line( event.getPlayer() + " activate sign, magical= " + magical );
-				// if ( magical ) {
-				// MagicSign sign = SignReader.readSign( (Sign) state );
-				// if ( sign.activateSign( (Sign) state, event ) ) {
-				// // TODO: send a message?
-				// }
-				// }
-				// } catch ( Exception e ) {
-				// Log.error( e );
-				// }
-				//
-				// }
-				// }
-				// }
-
+				// Door
+//				if ( F.isOwnedBlock( block.getLocation(), block.getType() ) ) { }
 			}
 		} catch ( Exception e ) {
 			Log.error( e );

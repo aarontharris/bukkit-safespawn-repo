@@ -1,0 +1,12 @@
+#!/bin/bash
+
+ssh `getMCServerUsername`@`getMCServerIP` "rm -rf /root/Public/*"
+
+cd web
+tar cvfz webdir.tgz *
+scp ./webdir.tgz `getMCServerUsername`@`getMCServerIP`:/root/Public/webdir.tgz
+rm webdir.tgz
+cd ..
+
+ssh `getMCServerUsername`@`getMCServerIP` "/root/deploy_web"
+

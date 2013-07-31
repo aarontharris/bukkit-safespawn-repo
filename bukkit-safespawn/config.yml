@@ -32,15 +32,11 @@ rules:
   - 2. Dont ask to change the server settings.
   - 3. Obey the rules.
 casthelp:
-  - /cast charge to magically enhance a wall sign.
-  - /cast lock will cause a wall sign to lock a chest beneath it.
-  - /cast unlock will cause a wall sign to unlock a chest beneath it.
-  - /cast grant Joe to allow Joe to open a locked chest.
-  - /cast revoke Joe to disallow Joe from opening a locked chest.
-  - /cast access to display current access rights to the chest.
-  - /cast time and a magical voice will tell you the time of day.
-  - /cast levitate allows a player to fly
-  - /cast protection makes a player invincible
+  - Make a teleporter!
+  - Lock your stuff in a chest!
+  - Claim land and protect it!
+  - For more info visit:
+  - http://176.31.140.130:8080/Public/zulu.html
 zones:
   zone0:
     description: Iron Spawn 
@@ -66,3 +62,15 @@ zones:
     x: 14
     y: 66
     z: 1306 
+  zone2:
+    description: Iron Pyramid
+    exclude:
+      - BLOCK_BREAK
+      - BLOCK_PLACE
+      - PLAYER_DMG_FROM_ENTITY
+      - BADDIE_SPAWN
+    radius: 35  
+    world: world
+    x: 114 
+    y: 63
+    z: 2255 

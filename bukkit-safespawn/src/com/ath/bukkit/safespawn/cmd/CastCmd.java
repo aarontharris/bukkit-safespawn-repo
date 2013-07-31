@@ -151,10 +151,23 @@ public class CastCmd implements CommandExecutor {
 				Log.line( "CREATE DEFUNCT" );
 				doCreateDefunct( player );
 			}
+			else if ( "info".equals( subcmd ) ) {
+				Log.line( "INFO" );
+				doGetBlockInfo( player, cmd, label, args );
+			}
 		} catch ( Exception e ) {
 			Log.error( e );
 		}
 		return true;
+	}
+
+	private void doGetBlockInfo( Player player, Command cmd, String label, String[] args ) {
+		try {
+			Block block = player.getTargetBlock( null, 10 );
+			player.sendMessage( F.toString( block ) );
+		} catch ( Exception e ) {
+			Log.error( e );
+		}
 	}
 
 	private static void doCreateDefunct( Player p ) {

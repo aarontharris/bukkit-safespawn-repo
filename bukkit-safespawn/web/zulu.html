@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+	<head>
+		<title>Zulu Guide</title>
+		<link rel="stylesheet" type="text/css" href="zulu.css">
+	</head>
+	<body id="body">
+		<div id="div_header">
+			<div id="island_outer">
+				<div id="island_inner">
+					<a href="#create_tele">Create a Teleporter</a>
+					<br>
+					<a href="#lock_tele">Lock a Teleporter</a>
+					<br>
+					<a href="#lock_access">Locking Access</a>
+				</div>
+			</div>
+		</div>
+		
+		<div id="div_master">
+			<div id="island_outer">
+				<div id="island_inner">
+				
+				
+					<!-- Create Teleporter -->
+					<div class="menu_topic">
+						<a id="create_tele" />
+						<h3>Quick: How to create a teleporter</h3>
+						<p>
+							Teleporters are created by magically enhancing ( <code>/cast charge</code> or <code>/cast lock</code> ) two wall signs with the command <code>teles</code> on the first line and any name you like on the second line.
+							Two teleporters with the same name will be linked.  The name is unique to each player so don't worry if your teleporter name is the same as someone else's.<br>
+							<ol>
+								Requirements:
+								<li>The teleporter sign must be raised at least one unit off the ground or you will be partially teleported into the ground.</li>
+								<li>All wall signs must be paired with another of the same name, or else how will it know where to send you?</li>
+								<li>Both teleporter signs must be magicaly enhanced.</li>
+								<li>Both teleporter signs must be placed on a block that does not observe gravity -- no sand or gravel, etc.</li>
+								<li>Requires xp level 1 (will be consumed)</li>
+							</ol>
+							<a href='quick_tele1.png'><img src='quick_tele1.jpg' height="110" width="170"/></a>
+							<ol>
+								Steps (refer to images above):
+								<li> Place two blocks vertically. </li>
+								<li> Place a sign on the top block. </li>
+								<li> Sign Text Line 1: "teles" </li>
+								<li> Sign Text Line 2: Enter a teleporter name </li>
+								<li> Sign Text Line 3: (optional) </li>
+								<li> Sign Text Line 4: (optional) </li>
+								<li> Point the cursor at the sign (make sure nothing else is in the way) </li>
+								<li> Now enhance the block by typing: <code>/cast charge</code> </li>
+								<li> Repeat these steps for the second teleporter, be sure to use the same name. </li>
+								<li> Once both teleporters are properly created, you may teleport between them by clicking the sign</li>
+							</ol>
+						</p>
+					</div>
+					<!-- / Create Teleporter -->
+					
+					<!-- Lock a Teleporter -->
+					<div class="menu_topic">
+						<a id="lock_tele" />
+						<h3>Quick: How to lock a teleporter</h3>
+						<p>
+							Locking a teleporter allows you to control who may use the teleporter.  You may lock a teleporter so that only you and those you grant access to may use it.
+							These instructions assume you already have a working teleporter set up and you are the owner.  If you are not the owner, you will not be able to lock the teleporter.
+							<ol>
+								Requirements:
+								<li>A working teleporter system.</li>
+								<li>You are the owner.</li>
+								<li>Requires xp level 1 (will be consumed).</li>
+							</ol>
+							<a href='quick_tele_lock1.jpg'><img src='quick_tele_lock1.jpg' height="110" width="170"/></a>
+							<a href='quick_tele_lock2.jpg'><img src='quick_tele_lock2.jpg' height="110" width="170"/></a>
+							<ol>
+								Steps to lock only allowing yourself access (refer to images above):
+								<li> Point the cursor at the sign (make sure nothing else is in the way) </li>
+								<li> Now enhance the sign by typing: <code>/cast lock</code> (see image 1 above)</li>
+								<li> Repeat these steps for the second teleporter, be sure to use the same name. </li>
+								<li> Both teleporters are now locked so that only you may use them by default, for more see locking access. </li>
+								<li> Test your lock by pointing at the sign and typing: <code>/cast access</code> (see image 2 above)</li>
+							</ol>
+						</p>
+					</div>
+					<!-- / Lock a Teleporter -->
+					
+					<!-- Locking Access -->
+					<div class="menu_topic">
+						<a id="lock_access" />
+						<h3>Quick: Locking Access - How to grant or revoke access to a lock</h3>
+						<p>
+							Once you have successfully locked a teleporter or a chest, etc, you may now grant or revoke access for others.
+							You may only alter access if you are the owner.  If you are not the owner, you will not be able to alter the lock.
+							<ol>
+								Requirements:
+								<li>A working lock, test your lock by pointing at the sign and typing: <code>/cast access</code> (see image 1 below)</li>
+								<li>You are the owner.</li>
+								<li>No xp required to alter access.</li>
+							</ol>
+							<a href='quick_tele_lock2.jpg'><img src='quick_tele_lock2.jpg' height="110" width="170"/></a>
+							<a href='quick_tele_grant1.jpg'><img src='quick_tele_grant1.jpg' height="110" width="170"/></a>
+							<a href='quick_tele_revoke1.jpg'><img src='quick_tele_revoke1.jpg' height="110" width="170"/></a>
+							<ol>
+								Steps to grant or revoke access for others (refer to images above):
+								<li> Point the cursor at the sign (make sure nothing else is in the way) </li>
+								<li> Now grant access by typing: <code>/cast grant playername</code> (see image 2 above)</li>
+								<li> <code>/cast access</code> again to confirm your change.
+								<li> Repeat these steps for the second teleporter, as both teleporters must have the same access. </li>
+								<li> You have not granted access to "playername"</li>
+								<li> You may also revoke access the same way with <code>/cast revoke playername</code> (see image 3 above)</li>
+							</ol>
+						</p>
+					</div>
+					<!-- / Locking Access -->
+					
+				</div>
+			</div>
+		</div>
+		
+	</body>
+</html>

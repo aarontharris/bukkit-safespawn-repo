@@ -1,0 +1,75 @@
+
+#body {
+    background: none repeat scroll 0 0 #000000;
+    margin: 0;
+}
+#island_outer {
+    background: none repeat scroll 0 0 #AAAAAA;
+    margin-bottom: 0;
+    margin-left: auto;
+    margin-right: auto;
+    min-height: 100px;
+    opacity: 0.75;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    width: 770px;
+}
+#island_inner {
+    background: none repeat scroll 0 0 #090909;
+    margin-bottom: 0;
+    margin-left: auto;
+    margin-right: auto;
+    min-height: 100px;
+    opacity: 0.9;
+    padding: 5px;
+    width: 750px;
+}
+#div_master {
+    background: url("zulubackrepeat5.jpg") repeat scroll 0 0 transparent;
+    margin: 0 auto;
+    padding-bottom: 65px;
+    width: 900px;
+}
+#div_header {
+    background: url("zulubacktop_compressed.jpg") repeat scroll 0 0 transparent;
+    height: 576px;
+    margin: 0 auto;
+    padding-top: 324px;
+    width: 900px;
+}
+#div_header a {
+    color: green;
+    font-family: Lucida Grande;
+    font-weight: bold;
+    text-decoration: none;
+}
+.menu_topic {
+}
+.menu_topic p {
+    color: lightgray;
+    padding-left: 10px;
+}
+.menu_topic h3 {
+    color: red;
+    font-family: Lucida Grande;
+    font-weight: bold;
+}
+.menu_topic code {
+    color: white;
+}
+.menu_topic ol {
+    color: lightgray;
+    counter-reset: item;
+    padding-right: 20px;
+}
+.menu_topic li {
+    color: lightgray;
+    display: block;
+    font-size: 14px;
+}
+.menu_topic li:before {
+    color: white;
+    content: counter(item, decimal) ". ";
+    counter-increment: item;
+    font-family: Lucida Grande;
+}

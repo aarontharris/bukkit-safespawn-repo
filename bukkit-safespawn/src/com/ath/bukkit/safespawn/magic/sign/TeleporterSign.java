@@ -54,7 +54,7 @@ public class TeleporterSign extends MagicSign {
 
 			String bindingWord = sign.getLine( 1 ); // 1 == line #2
 			if ( F.isEmpty( bindingWord ) ) {
-				Log.line("bindingWord is empty");
+				Log.line( "bindingWord is empty" );
 				player.sendMessage( "This sign has not been paired" );
 				player.sendMessage( "A teleporter sign must be paired with another sign." );
 				return false;
@@ -63,7 +63,7 @@ public class TeleporterSign extends MagicSign {
 			BlockData bd = BlockData.get( sign.getLocation(), sign.getType() );
 
 			if ( F.isEmpty( bd.getRef() ) ) {
-				Log.line("bd.ref is empty");
+				Log.line( "bd.ref is empty" );
 				player.sendMessage( "This sign has not been paired" );
 				player.sendMessage( "A teleporter sign must be paired with another sign." );
 				return false;
@@ -103,7 +103,7 @@ public class TeleporterSign extends MagicSign {
 				BlockFace facing = F.getFacing( partnerBlock );
 				location = new Location( w, partner.getBlockX(), partner.getBlockY(), partner.getBlockZ() );
 				F.adjustXZ( location, 1, facing );
-				location.setY( location.getBlockY() - 1 );
+				location.setY( location.getBlockY() - 0.75 ); // because the teleporter sign shld be 1 block above the ground
 				location.setX( location.getBlockX() + 0.5 );
 				location.setZ( location.getBlockZ() + 0.5 );
 			}
